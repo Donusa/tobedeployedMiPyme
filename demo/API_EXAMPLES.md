@@ -13,14 +13,6 @@ curl --location 'http://localhost:8080/api/companies/register' \
     "businessName": "Mi Pyme SA",
     "tradeName": "Mi Pyme Store",
     "ssoCode": "MPSA02",
-    "cuit": "30-12345678-9",
-    "country": "Argentina",
-    "province": "Buenos Aires",
-    "city": "La Plata",
-    "industry": "Retail",
-    "companyEmail": "contact@mipyme.com",
-    "phone": "+5491112345678",
-    "fiscalAddress": "Calle Falsa 123",
     "termsAccepted": true,
     "adminName": "Admin User",
     "adminEmail": "admin@mipyme.com",
@@ -28,7 +20,7 @@ curl --location 'http://localhost:8080/api/companies/register' \
 }'
 ```
 
-**Note:** The `ssoCode` ("MPSA02") must be unique and is used for login.
+**Note:** The `ssoCode` ("MPSA02") must be unique and is used for login. Fields like CUIT, country, province, city, phone, companyEmail, and fiscalAddress can be configured later via the `PUT /api/companies/me` endpoint.
 
 ## 2. Register a New User (in an existing company)
 
