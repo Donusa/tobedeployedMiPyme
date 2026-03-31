@@ -16,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
@@ -59,7 +60,7 @@ class SubscriptionChangeServiceTest {
 
 
         lenient().when(exchangeRateService.getLatestRate())
-                .thenReturn(new MpExchangeRateService.ExchangeRateInfo(EXCHANGE_RATE, Instant.now(), "dolarapi"));
+                .thenReturn(new MpExchangeRateService.ExchangeRateInfo(EXCHANGE_RATE, LocalDateTime.now()));
 
 
         lenient().when(auditRepository.save(any(SubscriptionChangeAudit.class)))
@@ -68,7 +69,7 @@ class SubscriptionChangeServiceTest {
 
     private Company createCompany(String tier, String cycle, Company.PlanStatus status, int daysUntilRenewal) {
         Company company = new Company("comp1", "Test Co", TENANT, Instant.now(), "ABC123",
-                null, null, null, null, null, null, null, null, null, true);
+                null, null, null, null, null, null, null, null, true);
         company.setPlanTier(tier);
         company.setBillingCycle(cycle);
         company.setPlanStatus(status);

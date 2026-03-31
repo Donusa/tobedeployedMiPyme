@@ -42,7 +42,7 @@ class SubscriptionLifecycleSchedulerTest {
     private Company makeCompany(String tenantSchema, String tier, Company.PlanStatus status) {
         Company company = new Company("id-" + tenantSchema, "Test", tenantSchema,
                 Instant.now(), tenantSchema.substring(0, Math.min(6, tenantSchema.length())).toUpperCase(),
-                null, null, null, null, null, null, "test@test.com", null, null, true);
+                null, null, null, null, null, null, "test@test.com", null, true);
         company.setPlanTier(tier);
         company.setPlanStatus(status);
         return company;

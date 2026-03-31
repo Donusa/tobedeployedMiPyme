@@ -46,7 +46,7 @@ class EntitlementServiceTest {
 
     private Company createCompany(String tier, Company.PlanStatus status) {
         Company company = new Company("comp1", "Test Co", TENANT, Instant.now(), "TST123",
-                null, null, null, null, null, null, null, null, null, true);
+                null, null, null, null, null, null, null, null, true);
         company.setPlanTier(tier);
         company.setPlanStatus(status);
         return company;
