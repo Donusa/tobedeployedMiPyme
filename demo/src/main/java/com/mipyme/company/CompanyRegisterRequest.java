@@ -7,7 +7,6 @@ public record CompanyRegisterRequest(
 		String country,
 		String province,
 		String city,
-		String industry,
 		String companyEmail,
 		String phone,
 		String fiscalAddress,

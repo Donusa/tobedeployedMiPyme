@@ -1,7 +1,7 @@
 <div class="login-container">
 
 
-  <div class="login-section" [class.is-plan-step]="isRegisterMode && registerStep === 5" [@expandToFull]="isRegistrationSuccess ? 'expanded' : (isLoginSuccess ? 'sidebar' : ((isRegisterMode && registerStep === 5) ? 'wide' : 'normal'))">
+  <div class="login-section" [class.is-plan-step]="isRegisterMode && registerStep === 3" [@expandToFull]="isRegistrationSuccess ? 'expanded' : (isLoginSuccess ? 'sidebar' : ((isRegisterMode && registerStep === 3) ? 'wide' : 'normal'))">
 
     <div class="success-content" *ngIf="isRegistrationSuccess" [@contentFade]>
       <div class="success-icon-wrapper">
@@ -162,15 +162,11 @@
 
 
             <div class="form-group" *ngIf="isRegisterMode && registerStep === 1" [@slideFade]>
-              <label for="reg-cuit">
-                CUIT <span class="optional-badge">(Opcional)</span>
-                <span class="tooltip-icon" data-tooltip="Clave Única de Identificación Tributaria (sin guiones).">?</span>
-              </label>
+              <label for="reg-adminName">Nombre del Administrador</label>
               <div class="input-wrapper">
-                <input type="text" id="reg-cuit" [class.shake]="shakeState.registerCuit" [(ngModel)]="registerData.cuit" name="cuit" placeholder="Ej. 30-12345678-9" class="input-field" autocomplete="off">
+                <input type="text" id="reg-adminName" [class.shake]="shakeState.registerAdminName" [(ngModel)]="registerData.adminName" name="adminName" class="input-field" required autocomplete="name" [disabled]="isLoading" placeholder="Nombre y Apellido">
               </div>
             </div>
-
 
             <div class="form-group" *ngIf="isTwoFactorMode" [@fadeInOut]>
               <label for="twoFactorCode" style="text-align: center; display: block;">
@@ -196,67 +192,6 @@
 
 
           <div *ngIf="isRegisterMode && registerStep === 2" [@fadeInOut]>
-            <div class="form-group">
-              <label for="reg-adminName">Nombre del Administrador</label>
-              <div class="input-wrapper">
-                <input type="text" id="reg-adminName" [class.shake]="shakeState.registerAdminName" [(ngModel)]="registerData.adminName" name="adminName" class="input-field" required autocomplete="name" [disabled]="isLoading" placeholder="Nombre y Apellido">
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="reg-location">Ubicación (País, Provincia, Ciudad)</label>
-              <div class="input-wrapper" style="position: relative;">
-                <input type="text" id="reg-location" (input)="onLocationInput()" [class.shake]="shakeState.registerLocation" [(ngModel)]="registerData.location" name="location" class="input-field" required autocomplete="off" [disabled]="isLoading" placeholder="Escriba para buscar...">
-
-
-                <ul *ngIf="showLocationDropdown" class="location-dropdown">
-                  <li *ngIf="isSearchingLocation" class="searching-item">
-                    <div class="spinner-dark"></div>
-                    <span>Buscando...</span>
-                  </li>
-                  <ng-container *ngIf="!isSearchingLocation">
-                    <li *ngFor="let result of locationResults" (click)="selectLocation(result)">
-                      {{ result.display_name }}
-                    </li>
-                  </ng-container>
-                </ul>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="reg-industry">Rubro / Industria <span class="optional-badge">(Opcional)</span></label>
-              <div class="input-wrapper">
-                <input type="text" id="reg-industry" [class.shake]="shakeState.registerIndustry" [(ngModel)]="registerData.industry" name="industry" class="input-field" autocomplete="off" [disabled]="isLoading">
-              </div>
-            </div>
-          </div>
-
-
-          <div *ngIf="isRegisterMode && registerStep === 3" [@fadeInOut]>
-            <div class="form-group">
-              <label for="reg-companyEmail">Email Corporativo <span class="optional-badge">(Opcional)</span></label>
-              <div class="input-wrapper">
-                <input type="email" id="reg-companyEmail" [class.shake]="shakeState.registerCompanyEmail" [(ngModel)]="registerData.companyEmail" name="companyEmail" class="input-field" autocomplete="email" [disabled]="isLoading" placeholder="contacto@empresa.com">
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="reg-phone">Teléfono de Contacto</label>
-              <div class="input-wrapper">
-                <input type="tel" id="reg-phone" [class.shake]="shakeState.registerPhone" [(ngModel)]="registerData.phone" name="phone" class="input-field" required autocomplete="tel" [disabled]="isLoading" placeholder="+54 11 1234-5678">
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="reg-fiscalAddress">Dirección Fiscal <span class="optional-badge">(Opcional)</span></label>
-              <div class="input-wrapper">
-                <input type="text" id="reg-fiscalAddress" [class.shake]="shakeState.registerFiscalAddress" [(ngModel)]="registerData.fiscalAddress" name="fiscalAddress" class="input-field" autocomplete="off" [disabled]="isLoading">
-              </div>
-            </div>
-          </div>
-
-
-          <div *ngIf="isRegisterMode && registerStep === 4" [@fadeInOut]>
             <div class="form-group">
               <label for="reg-adminEmail">Email de Administrador</label>
               <div class="input-wrapper">
@@ -291,7 +226,7 @@
           </div>
 
 
-          <div *ngIf="isRegisterMode && registerStep === 5" [@fadeInOut]>
+          <div *ngIf="isRegisterMode && registerStep === 3" [@fadeInOut]>
             <p class="plan-step-subtitle">Elegí el plan que mejor se adapte a tu negocio</p>
 
 
@@ -441,9 +376,9 @@
                 <span *ngIf="isLoading">Procesando...</span>
               </ng-container>
               <ng-container *ngIf="isRegisterMode">
-                <span *ngIf="!isLoading">{{ registerStep === 5 ? (selectedPlan === 'pro' ? 'Comenzar prueba gratis' : 'Registrarse y pagar') : 'Siguiente' }}</span>
+                <span *ngIf="!isLoading">{{ registerStep === 3 ? (selectedPlan === 'pro' ? 'Comenzar prueba gratis' : 'Registrarse y pagar') : 'Siguiente' }}</span>
                 <span *ngIf="isLoading">Procesando...</span>
-                <svg *ngIf="!isLoading && registerStep < 5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 0.5rem;">
+                <svg *ngIf="!isLoading && registerStep < 3" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 0.5rem;">
                   <polyline points="9 18 15 12 9 6"></polyline>
                 </svg>
               </ng-container>
@@ -486,7 +421,7 @@
   </div>
 
 
-  <div class="visual-section" [@heroFadeOut]="isLoginSuccess ? 'hidden' : ((isRegisterMode && registerStep === 5) ? 'collapsed' : 'visible')">
+  <div class="visual-section" [@heroFadeOut]="isLoginSuccess ? 'hidden' : ((isRegisterMode && registerStep === 3) ? 'collapsed' : 'visible')">
     <div class="visual-background">
       <div class="shape-blob blob-1"></div>
       <div class="shape-blob blob-2"></div>

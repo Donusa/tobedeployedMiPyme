@@ -35,7 +35,6 @@ export class CompanyDataComponent implements OnInit {
           country: data.country,
           province: data.province,
           city: data.city,
-          industry: data.industry,
           companyEmail: data.companyEmail,
           phone: data.phone,
           fiscalAddress: data.fiscalAddress

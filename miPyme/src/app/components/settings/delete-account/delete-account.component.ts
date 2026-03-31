@@ -95,7 +95,6 @@ export class DeleteAccountComponent {
             pais:            (company as any).country       ?? null,
             provincia:       (company as any).province      ?? null,
             ciudad:          (company as any).city          ?? null,
-            rubro:           (company as any).industry      ?? null,
             emailEmpresa:    (company as any).companyEmail  ?? null,
             telefono:        (company as any).phone         ?? null,
             domicilioFiscal: (company as any).fiscalAddress ?? null,

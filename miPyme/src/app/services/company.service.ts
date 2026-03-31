@@ -12,7 +12,6 @@ export interface Company {
   country?: string;
   province?: string;
   city?: string;
-  industry?: string;
   companyEmail?: string;
   phone?: string;
   fiscalAddress?: string;
@@ -30,7 +29,6 @@ export interface CompanyUpdateRequest {
   country?: string;
   province?: string;
   city?: string;
-  industry?: string;
   companyEmail?: string;
   phone?: string;
   fiscalAddress?: string;
