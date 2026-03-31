@@ -1,0 +1,50 @@
+<div class="movimientos-container">
+  <div class="movimientos-table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Hora</th>
+          <th>Tipo</th>
+          <th>Medio</th>
+          <th>Monto</th>
+          <th>Descripción</th>
+          <th>Usuario</th>
+          <th>Estado</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let mov of movimientos" [class.anulado]="mov.estado === 'ANULADO'">
+          <td>{{ mov.fechaHoraCreacion | date:'HH:mm' }}</td>
+          <td>
+            <span class="tipo-badge" [ngClass]="'tipo-' + getSigno(mov.tipo)">
+              {{ getTipoLabel(mov.tipo) }}
+            </span>
+          </td>
+          <td>{{ mov.medioPago }}</td>
+          <td class="monto-cell" [ngClass]="getSigno(mov.tipo) === '+' ? 'positive' : (getSigno(mov.tipo) === '-' ? 'negative' : '')">
+            {{ getSigno(mov.tipo) }}{{ mov.monto | currency:'ARS':'symbol':'1.2-2' }}
+          </td>
+          <td class="desc-cell">
+            <span>{{ mov.descripcion }}</span>
+            <small *ngIf="mov.categoriaEgreso" class="categoria-tag">{{ mov.categoriaEgreso }}</small>
+          </td>
+          <td>{{ mov.usuarioCreador }}</td>
+          <td>
+            <span class="estado-badge" [ngClass]="mov.estado === 'ACTIVO' ? 'activo' : 'anulado-badge'">
+              {{ mov.estado }}
+            </span>
+          </td>
+          <td>
+            <button *ngIf="canAnular(mov)" class="btn-icon" title="Anular movimiento" (click)="anular(mov)">
+              <i class="bx bx-block"></i>
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="movimientos.length === 0">
+          <td colspan="8" class="no-data">No hay movimientos registrados.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

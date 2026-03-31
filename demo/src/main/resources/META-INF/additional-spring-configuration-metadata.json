@@ -1,0 +1,31 @@
+{
+  "properties": [
+    {"name": "jwt.secret", "type": "java.lang.String", "description": "Secret key used for signing JWT tokens."},
+    {"name": "jwt.expiration-seconds", "type": "java.lang.Long", "description": "Access token expiration in seconds."},
+    {"name": "jwt.refresh-expiration-seconds", "type": "java.lang.Long", "description": "Refresh token expiration in seconds."},
+    {"name": "mipyme.cors.allowed-origins", "type": "java.lang.String", "description": "Comma-separated list of allowed CORS origins."},
+    {"name": "mipyme.tenant.default-schema", "type": "java.lang.String", "description": "Default schema/tenant name used when no tenant context is set."},
+    {"name": "tiendanube.app-id", "type": "java.lang.String", "description": "TiendaNube application ID."},
+    {"name": "tiendanube.client-secret", "type": "java.lang.String", "description": "TiendaNube client secret."},
+    {"name": "mercadolibre.app-id", "type": "java.lang.String", "description": "MercadoLibre application ID."},
+    {"name": "mercadolibre.client-secret", "type": "java.lang.String", "description": "MercadoLibre client secret."},
+    {"name": "mercadolibre.redirect-uri", "type": "java.lang.String", "description": "MercadoLibre OAuth redirect URI."},
+    {"name": "whatsapp.verify-token", "type": "java.lang.String", "description": "Webhook verify token for WhatsApp/Meta."},
+    {"name": "whatsapp.meta-app-id", "type": "java.lang.String", "description": "Meta application ID for WhatsApp."},
+    {"name": "whatsapp.meta-app-secret", "type": "java.lang.String", "description": "Meta application secret for WhatsApp."},
+    {"name": "whatsapp.meta-config-id", "type": "java.lang.String", "description": "Meta embedded signup config ID."},
+    {"name": "whatsapp.graph-version", "type": "java.lang.String", "description": "Meta Graph API version (e.g. v25.0)."},
+    {"name": "whatsapp.connect-session-ttl-min", "type": "java.lang.Integer", "description": "TTL in minutes for the WhatsApp connect session."},
+    {"name": "whatsapp.skip-signature-validation", "type": "java.lang.Boolean", "description": "Set to true in dev environments to bypass HMAC-SHA256 webhook signature validation."},
+    {"name": "mercadopago.access-token", "type": "java.lang.String", "description": "MercadoPago API access token."},
+    {"name": "mercadopago.webhook.secret", "type": "java.lang.String", "description": "MercadoPago webhook HMAC secret."},
+    {"name": "mercadopago.back-url", "type": "java.lang.String", "description": "Return URL after checkout completion."},
+    {"name": "mercadopago.price-usd.base", "type": "java.math.BigDecimal", "description": "Monthly USD price for the Base plan."},
+    {"name": "mercadopago.price-usd.pro", "type": "java.math.BigDecimal", "description": "Monthly USD price for the Pro plan."},
+    {"name": "mercadopago.price-usd.enterprise", "type": "java.math.BigDecimal", "description": "Monthly USD price for the Enterprise plan."},
+    {"name": "mercadopago.price-usd.base-annual", "type": "java.math.BigDecimal", "description": "Annual USD price for the Base plan."},
+    {"name": "mercadopago.price-usd.pro-annual", "type": "java.math.BigDecimal", "description": "Annual USD price for the Pro plan."},
+    {"name": "mercadopago.price-usd.enterprise-annual", "type": "java.math.BigDecimal", "description": "Annual USD price for the Enterprise plan."},
+    {"name": "mercadopago.exchange-rate.threshold", "type": "java.math.BigDecimal", "description": "ARS threshold delta that triggers an automatic plan price update."}
+  ]
+}

@@ -1,0 +1,31 @@
+<div class="messaging-container">
+  <div class="messaging-card">
+
+
+    <div class="tabs-carousel">
+      <button class="carousel-arrow carousel-arrow-left" (click)="scrollTabs('left')" aria-label="Canal anterior">
+        <i class='bx bx-chevron-left'></i>
+      </button>
+      <div class="tabs-header" #tabsContainer (scroll)="onTabsScroll()">
+        <a class="tab-item" routerLink="/mensajeria/whatsapp" routerLinkActive="active">
+          <i class='bx bxl-whatsapp'></i> <span>WhatsApp</span>
+        </a>
+        <a class="tab-item" routerLink="/mensajeria/mercadolibre" routerLinkActive="active">
+          <i class='bx bx-shopping-bag'></i> <span>MercadoLibre</span>
+        </a>
+        <a class="tab-item" routerLink="/mensajeria/instagram" routerLinkActive="active">
+          <i class='bx bxl-instagram'></i> <span>Instagram</span>
+        </a>
+      </div>
+      <button class="carousel-arrow carousel-arrow-right" (click)="scrollTabs('right')" aria-label="Canal siguiente">
+        <i class='bx bx-chevron-right'></i>
+      </button>
+    </div>
+
+
+    <div class="messaging-content">
+      <router-outlet></router-outlet>
+    </div>
+
+  </div>
+</div>

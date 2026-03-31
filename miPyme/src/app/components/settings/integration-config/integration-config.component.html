@@ -1,0 +1,86 @@
+<div class="config-container" [ngClass]="'type-' + type">
+
+
+    <div class="brand-banner">
+        <div class="brand-icon-wrap">
+            <i class='bx' [ngClass]="getIcon()"></i>
+        </div>
+        <div class="brand-info">
+            <h1>{{ getTitle() }}</h1>
+            <p>Configuración de integración</p>
+        </div>
+        <div class="brand-badge" [ngClass]="isConnected ? 'badge-connected' : 'badge-disconnected'" *ngIf="!isLoading">
+            <i class='bx' [ngClass]="isConnected ? 'bx-check-circle' : 'bx-x-circle'"></i>
+            {{ isConnected ? 'Conectado' : 'Sin conexión' }}
+        </div>
+    </div>
+
+
+    <div *ngIf="isLoading" class="loading-state">
+        <div class="spinner"></div>
+        <p>Verificando estado de la integración...</p>
+    </div>
+
+
+    <div *ngIf="errorMessage" class="alert-bar error">
+        <i class='bx bx-error-circle'></i> {{ errorMessage }}
+    </div>
+    <div *ngIf="successMessage" class="alert-bar success">
+        <i class='bx bx-check-circle'></i> {{ successMessage }}
+    </div>
+
+    <div class="content" *ngIf="!isLoading">
+
+
+        <div *ngIf="isConnected">
+            <div class="info-card">
+                <div class="info-card-header">
+                    <i class='bx bx-user-circle'></i>
+                    <span>Cuenta vinculada</span>
+                </div>
+                <div class="info-rows">
+                    <div class="info-row">
+                        <span class="info-label"><i class='bx bx-id-card'></i> ID de usuario</span>
+                        <span class="info-value">{{ userData?.user_id || '—' }}</span>
+                    </div>
+                    <div class="info-row" *ngIf="userData?.expires_at">
+                        <span class="info-label"><i class='bx bx-time'></i> Expiración del token</span>
+                        <span class="info-value">{{ userData?.expires_at }}</span>
+                    </div>
+                    <div class="info-row" *ngIf="userData?.access_token">
+                        <span class="info-label"><i class='bx bx-key'></i> Token de acceso</span>
+                        <span class="info-value token-preview">{{ userData?.access_token | slice:0:12 }}••••••••</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions-row">
+                <button class="btn-danger" (click)="unlink()">
+                    <i class='bx bx-unlink'></i> Desvincular cuenta
+                </button>
+            </div>
+        </div>
+
+
+        <div *ngIf="!isConnected">
+            <div class="connect-card">
+                <div class="connect-icon">
+                    <i class='bx bx-plug'></i>
+                </div>
+                <h3>Ninguna cuenta vinculada</h3>
+                <p>Conectá tu cuenta de <strong>{{ getTitle() }}</strong> para sincronizar tu catálogo de productos automáticamente y gestionar todo desde un solo lugar.</p>
+
+                <ul class="feature-list">
+                    <li><i class='bx bx-check'></i> Sincronización automática de stock</li>
+                    <li><i class='bx bx-check'></i> Actualización de precios en tiempo real</li>
+                    <li><i class='bx bx-check'></i> Gestión centralizada de productos</li>
+                </ul>
+
+                <button class="btn-connect" (click)="goToWizard()">
+                    <i class='bx bx-link-external'></i> Vincular cuenta de {{ getTitle() }}
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>

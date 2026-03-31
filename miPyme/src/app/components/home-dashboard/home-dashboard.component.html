@@ -1,0 +1,103 @@
+<div class="dashboard-container">
+  <div class="welcome-header" style="justify-content: flex-end; margin-bottom: 16px;">
+    <div class="last-updated" *ngIf="!isLoading">
+      <i class='bx bx-refresh'></i> Actualizado hace un momento
+    </div>
+  </div>
+
+
+  <div class="north-star-grid" *ngIf="!isLoading">
+    <div *ngFor="let metric of northStarMetrics" class="metric-card {{ metric.type }} glass-effect"
+      [class.clickable]="!!metric.route && (!metric.requiredPlan || planService.hasAccess(metric.requiredPlan))"
+      [class.locked-card]="metric.requiredPlan && !planService.hasAccess(metric.requiredPlan)"
+      (click)="(!metric.requiredPlan || planService.hasAccess(metric.requiredPlan)) && metric.route ? navigateTo(metric.route) : null"
+      style="position: relative;">
+      <div class="card-icon">
+        <i class='bx {{ metric.icon }}'></i>
+      </div>
+      <div class="card-content"
+        [style.filter]="metric.requiredPlan && !planService.hasAccess(metric.requiredPlan) ? 'blur(4px)' : 'none'">
+        <span class="card-title">{{ metric.title }}</span>
+        <div class="card-value-row">
+          <span class="card-value">{{ metric.value }}</span>
+          <span *ngIf="metric.trend !== undefined" class="trend-tag" [class.positive]="metric.trend >= 0"
+            [class.negative]="metric.trend < 0">
+            <i class='bx' [ngClass]="metric.trend >= 0 ? 'bx-trending-up' : 'bx-trending-down'"></i>
+            {{ (metric.trend >= 0 ? '+' : '') + (metric.trend | number:'1.0-1') }}%
+          </span>
+        </div>
+        <span class="card-sub">{{ metric.subValue }}</span>
+      </div>
+      <div class="interaction-hint"
+        *ngIf="metric.route && (!metric.requiredPlan || planService.hasAccess(metric.requiredPlan))">
+        <i class='bx bx-chevron-right'></i>
+      </div>
+
+      <div class="card-lock-overlay" *ngIf="metric.requiredPlan && !planService.hasAccess(metric.requiredPlan)">
+        <i class='bx bx-lock-alt'></i>
+        <span>{{ metric.requiredPlan === 'enterprise' ? 'Enterprise' : 'Pro' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-dashboard-content" *ngIf="!isLoading">
+
+    <div class="dashboard-section chart-section glass-effect" style="position: relative;">
+      <div class="section-header">
+        <h3><i class='bx bx-line-chart'></i> Tendencia de Ventas y Margen</h3>
+        <span class="time-range">Últimos 7 días</span>
+      </div>
+      <div class="chart-body" [style.filter]="planService.hasAccess('enterprise') ? 'none' : 'blur(6px)'"
+        [style.pointer-events]="planService.hasAccess('enterprise') ? 'auto' : 'none'">
+        <app-trend-chart [data]="trendData"></app-trend-chart>
+      </div>
+
+      <div class="metrics-lock-overlay" *ngIf="!planService.hasAccess('enterprise')">
+        <div class="lock-card-mini">
+          <i class='bx bx-lock-alt'></i>
+          <span>Requiere plan Enterprise</span>
+          <button class="upgrade-btn-mini" (click)="navigateTo('/configuracion/facturacion/plan')">Mejorar plan</button>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="dashboard-section actions-section glass-effect">
+      <div class="section-header">
+        <h3><i class='bx bx-list-check'></i> Acciones para Hoy</h3>
+        <span class="priority-badge">Priorizado por Impacto $</span>
+      </div>
+      <div class="actions-list">
+        <div *ngFor="let action of todayActions" class="action-item {{ action.severity }}"
+          (click)="navigateTo(action.route)">
+          <div class="action-icon">
+            <i class='bx' [ngClass]="{
+              'bx-package': action.type === 'stock',
+              'bx-receipt': action.type === 'order',
+              'bx-wallet': action.type === 'payment',
+              'bx-plug': action.type === 'integration'
+            }"></i>
+          </div>
+          <div class="action-details">
+            <div class="action-title-row">
+              <span class="action-title">{{ action.title }}</span>
+              <span class="action-impact" [title]="'Impacto económico estimado'">
+                {{ action.impactFormatted }}
+              </span>
+            </div>
+            <p class="action-desc">{{ action.description }}</p>
+          </div>
+          <div class="action-go">
+            <i class='bx bx-right-arrow-alt'></i>
+          </div>
+        </div>
+        <div class="empty-actions" *ngIf="todayActions.length === 0">
+          <i class='bx bx-check-circle'></i>
+          <p>¡Todo bajo control por ahora!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <app-spinner *ngIf="isLoading" [label]="'Cargando tu tablero de control...'"></app-spinner>
+</div>

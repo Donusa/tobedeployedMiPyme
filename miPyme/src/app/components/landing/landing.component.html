@@ -1,0 +1,422 @@
+
+<nav class="navbar" [class.scrolled]="isScrolled">
+  <div class="nav-inner">
+    <a class="nav-brand" (click)="scrollTo('hero')" role="button">
+      <div class="brand-icon">M</div>
+      <span class="brand-name">MiPyme</span>
+    </a>
+    <div class="nav-links">
+      <a class="nav-link" (click)="scrollTo('como-funciona')" role="button">¿Cómo funciona?</a>
+      <a class="nav-link" (click)="scrollTo('features')" role="button">Funcionalidades</a>
+      <a class="nav-link" (click)="scrollTo('integrations')" role="button">Integraciones</a>
+      <a class="nav-link" (click)="scrollTo('pricing')" role="button">Planes</a>
+    </div>
+    <button class="btn-nav-login" (click)="goToLogin()">
+      Iniciar sesión
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+    </button>
+    <button class="mobile-toggle" (click)="isMenuOpen = !isMenuOpen" [class.open]="isMenuOpen">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="mobile-menu" [class.open]="isMenuOpen">
+    <a class="mobile-link" (click)="scrollTo('como-funciona')" role="button">¿Cómo funciona?</a>
+    <a class="mobile-link" (click)="scrollTo('features')" role="button">Funcionalidades</a>
+    <a class="mobile-link" (click)="scrollTo('integrations')" role="button">Integraciones</a>
+    <a class="mobile-link" (click)="scrollTo('pricing')" role="button">Planes</a>
+    <button class="btn-mobile-login" (click)="goToLogin()">Iniciar sesión</button>
+  </div>
+</nav>
+
+<section class="hero" id="hero">
+  <div class="hero-bg-shape shape-1"></div>
+  <div class="hero-bg-shape shape-2"></div>
+  <div class="hero-bg-shape shape-3"></div>
+
+  <div class="hero-inner">
+
+    <div class="hero-content">
+      <div class="hero-eyebrow">
+        <span class="eyebrow-dot"></span>
+        Plataforma todo-en-uno para PyMEs argentinas
+      </div>
+
+      <h1 class="hero-title">
+        Tu negocio,<br>
+        <span class="hero-title-accent">bajo control total</span>
+      </h1>
+
+      <p class="hero-subtitle">
+        Ventas, stock, facturación ARCA/AFIP, WhatsApp y e-commerce
+        en una sola plataforma. Simple, potente, diseñada para crecer.
+      </p>
+
+      <div class="hero-cta-row">
+        <button class="btn-primary" (click)="goToLogin()">
+          Empezar — 28 días Pro gratis
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </button>
+        <button class="btn-ghost" (click)="scrollTo('como-funciona')">
+          Ver cómo funciona
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 13l5 5 5-5M7 6l5 5 5-5"/>
+          </svg>
+        </button>
+      </div>
+      <div class="hero-trial-note">
+        <span class="tn-check">✓</span> Sin tarjeta de crédito
+        <span class="tn-sep">·</span>
+        <span class="tn-check">✓</span> 28 días de prueba Plan Pro
+        <span class="tn-sep">·</span>
+        <span class="tn-check">✓</span> Acceso inmediato
+      </div>
+
+      <div class="hero-trust">
+        <div class="avatars">
+          <div class="av" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">A</div>
+          <div class="av" style="background:linear-gradient(135deg,#10b981,#059669)">M</div>
+          <div class="av" style="background:linear-gradient(135deg,#2B59FF,#1d3a8a)">L</div>
+          <div class="av" style="background:linear-gradient(135deg,#f59e0b,#d97706)">S</div>
+        </div>
+        <p class="trust-label">Más de <strong>+50 negocios en Argentina</strong> ya confían en MiPyme</p>
+      </div>
+    </div>
+
+
+    <div class="hero-visual">
+      <div class="mockup">
+        <div class="mockup-topbar">
+          <span class="d r"></span><span class="d y"></span><span class="d g"></span>
+          <span class="mock-url">app.mipyme.com/home</span>
+        </div>
+        <div class="mockup-content">
+          <div class="kpi-row">
+            <div class="kpi blue">
+              <div class="kpi-icon"></div>
+              <div class="kpi-data">
+                <span class="kpi-val">$847.320</span>
+                <span class="kpi-lbl">Ventas hoy</span>
+              </div>
+              <span class="kpi-chip up">+12%</span>
+            </div>
+            <div class="kpi green">
+              <div class="kpi-icon"></div>
+              <div class="kpi-data">
+                <span class="kpi-val">1.243</span>
+                <span class="kpi-lbl">Items stock</span>
+              </div>
+              <span class="kpi-chip up">+3%</span>
+            </div>
+            <div class="kpi purple">
+              <div class="kpi-icon"></div>
+              <div class="kpi-data">
+                <span class="kpi-val">38</span>
+                <span class="kpi-lbl">Facturas</span>
+              </div>
+              <span class="kpi-chip neutral">Hoy</span>
+            </div>
+          </div>
+          <div class="mock-chart">
+            <div class="chart-title">Tendencia de ventas  últimos 7 días</div>
+            <div class="bars">
+              <div class="bar-col" *ngFor="let h of [45,62,38,80,55,91,73]">
+                <div class="bar" [style.height.%]="h"></div>
+              </div>
+            </div>
+            <div class="bar-labels">
+              <span *ngFor="let d of ['L','M','X','J','V','S','D']">{{d}}</span>
+            </div>
+          </div>
+          <div class="activity">
+            <div class="act-row">
+              <span class="act-dot green"></span>
+              <span class="act-txt">Venta registrada  Producto A  3</span>
+              <span class="act-time">hace 2 min</span>
+            </div>
+            <div class="act-row">
+              <span class="act-dot blue"></span>
+              <span class="act-txt">Factura B 00001-00000842 emitida</span>
+              <span class="act-time">hace 5 min</span>
+            </div>
+            <div class="act-row">
+              <span class="act-dot orange"></span>
+              <span class="act-txt">Mensaje WhatsApp recibido</span>
+              <span class="act-time">hace 8 min</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="chip chip-afip"><span></span> AFIP Conectado</div>
+      <div class="chip chip-ml"><span></span> ML Sincronizado</div>
+      <div class="chip chip-wpp"><span></span> WhatsApp Activo</div>
+    </div>
+  </div>
+
+  <div class="scroll-hint" (click)="scrollTo('stats')">
+    <div class="scroll-chevron"></div>
+  </div>
+</section>
+
+<section class="stats-ribbon" id="stats">
+  <div class="container">
+    <div class="stats-row">
+      <div class="stat-item reveal" *ngFor="let s of stats">
+        <span class="stat-num">{{ s.value }}</span>
+        <span class="stat-lbl">{{ s.label }}</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="how-section" id="como-funciona">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow-chip">¿Cómo funciona?</span>
+      <h2 class="section-title">Tres pasos para empezar</h2>
+      <p class="section-sub">Sin instalaciones, sin configuraciones complejas. Empezás a vender en minutos.</p>
+    </div>
+    <div class="steps-row">
+      <div class="step-card reveal" *ngFor="let s of steps">
+        <div class="step-number">{{ s.number }}</div>
+        <div class="step-icon" [ngClass]="'step-icon-' + s.color">
+          <i class="bx {{ s.icon }}"></i>
+        </div>
+        <h3 class="step-title">{{ s.title }}</h3>
+        <p class="step-desc">{{ s.desc }}</p>
+      </div>
+    </div>
+    <div class="steps-cta">
+      <button class="btn-primary" (click)="goToLogin()">
+        Crear cuenta gratis
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </button>
+      <p class="steps-cta-note">Sin tarjeta de crédito · 28 días de prueba Pro gratis</p>
+    </div>
+  </div>
+</section>
+
+<section class="features-section" id="features">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow-chip">Funcionalidades</span>
+      <h2 class="section-title">Todo lo que tu empresa necesita</h2>
+      <p class="section-sub">Una plataforma pensada desde cero para la realidad de las PyMEs argentinas.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feat-card reveal" *ngFor="let f of features" [ngClass]="'accent-' + f.color">
+        <div class="feat-icon"><i class="bx {{ f.icon }}"></i></div>
+        <h3 class="feat-title">{{ f.title }}</h3>
+        <p class="feat-desc">{{ f.desc }}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="highlight">
+  <div class="container highlight-grid">
+    <div class="hl-content reveal">
+      <span class="eyebrow-chip">Facturación electrónica</span>
+      <h2 class="hl-title">ARCA / AFIP<br>sin complicaciones</h2>
+      <p class="hl-body">
+        Integramos directo con los Web Services de AFIP (WSFE/WSAA) para que emitas comprobantes
+        electrónicos Tipo A, B y C en segundos, con certificado digital propio.
+      </p>
+      <ul class="hl-list">
+        <li><span class="check"></span>Wizard de configuración ARCA paso a paso</li>
+        <li><span class="check"></span>Generación de CSR y certificados P12</li>
+        <li><span class="check"></span>Entornos de Homologación y Producción</li>
+        <li><span class="check"></span>Registro de auditoría completo</li>
+      </ul>
+      <button class="btn-primary" (click)="goToLogin()">Probarlo ahora</button>
+    </div>
+    <div class="hl-visual reveal">
+      <div class="invoice-card">
+        <div class="ic-header">
+          <div class="ic-logo"><span></span><strong>ARCA / AFIP</strong></div>
+          <span class="ic-status"> Conectado</span>
+        </div>
+        <div class="ic-divider"></div>
+        <div class="ic-rows">
+          <div class="ic-row"><span class="ic-lbl">Tipo</span><span class="ic-val">Factura B</span></div>
+          <div class="ic-row"><span class="ic-lbl">Número</span><span class="ic-val mono">00001-00000843</span></div>
+          <div class="ic-row"><span class="ic-lbl">Importe</span><span class="ic-val amount-green">$12.500,00</span></div>
+          <div class="ic-row"><span class="ic-lbl">CAE</span><span class="ic-val mono small">74021563984510</span></div>
+        </div>
+        <div class="ic-btn">
+          <span class="emit-dot"></span>
+          Emitiendo comprobante...
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="integrations-section" id="integrations">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow-chip">Integraciones</span>
+      <h2 class="section-title">Conectado con tu ecosistema</h2>
+      <p class="section-sub">Sincronizá tus canales de venta y comunicación sin esfuerzo.</p>
+    </div>
+    <div class="int-grid">
+      <div class="int-card reveal">
+        <div class="int-logo ml">ML</div>
+        <span class="int-name">Mercado Libre</span>
+        <span class="int-desc">Sincronización de stock y pedidos automática</span>
+        <span class="int-tag">Disponible</span>
+      </div>
+      <div class="int-card reveal">
+        <div class="int-logo tn">TN</div>
+        <span class="int-name">Tienda Nube</span>
+        <span class="int-desc">Gestión centralizada de tu tienda online</span>
+        <span class="int-tag">Disponible</span>
+      </div>
+      <div class="int-card reveal">
+        <div class="int-logo wpp">WP</div>
+        <span class="int-name">WhatsApp Business</span>
+        <span class="int-desc">Atención al cliente vía WhatsApp Cloud API</span>
+        <span class="int-tag">Disponible</span>
+      </div>
+      <div class="int-card reveal">
+        <div class="int-logo afip-l">AF</div>
+        <span class="int-name">ARCA / AFIP</span>
+        <span class="int-desc">Facturación electrónica oficial</span>
+        <span class="int-tag">Disponible</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="testimonials-section">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow-chip">Testimonios</span>
+      <h2 class="section-title">Lo que dicen nuestros clientes</h2>
+    </div>
+    <div class="testi-slider">
+      <div class="testi-card" *ngFor="let t of testimonials; let i = index" [class.active]="i === activeTestimonial">
+        <div class="testi-quote">"</div>
+        <p class="testi-text">{{ t.quote }}</p>
+        <div class="testi-author">
+          <div class="testi-av">{{ t.author.charAt(0) }}</div>
+          <div>
+            <div class="testi-name">{{ t.author }}</div>
+            <div class="testi-role">{{ t.role }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-dots">
+      <button *ngFor="let t of testimonials; let i = index"
+        class="tdot" [class.active]="i === activeTestimonial"
+        (click)="setTestimonial(i)">
+      </button>
+    </div>
+  </div>
+</section>
+
+<section class="pricing-section" id="pricing">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow-chip">Planes</span>
+      <h2 class="section-title">Precios transparentes</h2>
+      <p class="section-sub">Crecé con nosotros. Sin costos ocultos, sin sorpresas.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="plan-card reveal" *ngFor="let p of plans" [class.featured]="p.featured">
+        <div class="popular-tag" *ngIf="p.featured">Más elegido</div>
+        <div class="plan-name">{{ p.name }}</div>
+        <div class="plan-price">{{ p.price }}<span class="per">{{ p.period }}</span></div>
+        <div class="plan-trial-badge" *ngIf="p.trialBadge">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          {{ p.trialBadge }}
+        </div>
+        <p class="plan-desc">{{ p.desc }}</p>
+        <ul class="plan-feats">
+          <li *ngFor="let f of p.features">
+            <span class="feat-tick"></span> {{ f }}
+          </li>
+          <li *ngFor="let f of p.disabled" class="feat-disabled-item">
+            <span class="feat-cross"></span> {{ f }}
+          </li>
+        </ul>
+        <button [class.btn-primary]="p.featured" [class.btn-outline]="!p.featured" (click)="goToLogin()">
+          {{ p.featured ? 'Empezar gratis 28 días' : (p.id === 'enterprise' ? 'Empezar ahora' : 'Comenzar') }}
+        </button>
+      </div>
+    </div>
+    <p class="pricing-note">Los precios se muestran en USD. El cobro se realiza en ARS al tipo de cambio vigente vía Mercado Pago.</p>
+  </div>
+</section>
+
+<section class="faq-section" id="faq">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow-chip">Preguntas frecuentes</span>
+      <h2 class="section-title">Todo lo que querés saber</h2>
+      <p class="section-sub">Resolvemos las dudas más comunes del empresario PyME argentino.</p>
+    </div>
+    <div class="faq-list reveal">
+      <div class="faq-item" *ngFor="let f of faqItems; let i = index" [class.open]="openFaqIndex === i">
+        <button class="faq-q" (click)="toggleFaq(i)">
+          <span>{{ f.q }}</span>
+          <span class="faq-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+          </span>
+        </button>
+        <div class="faq-a">
+          <p>{{ f.a }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="container cta-inner reveal">
+    <h2 class="cta-title">¿Listo para tomar el control de tu negocio?</h2>
+    <p class="cta-sub">28 días de prueba Plan Pro completamente gratis. Sin tarjeta de crédito. Configuración en minutos.</p>
+    <button class="btn-primary btn-lg btn-on-dark" (click)="goToLogin()">
+      Crear cuenta — 28 días Pro gratis
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+    </button>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <div class="footer-brand">
+      <div class="nav-brand">
+        <div class="brand-icon sm">M</div>
+        <span class="brand-name">MiPyme</span>
+      </div>
+      <p class="footer-tag">La plataforma que tu PyMe necesitaba.</p>
+    </div>
+    <div class="footer-links">
+      <div class="footer-col">
+        <h4>Producto</h4>
+        <a role="button" (click)="scrollTo('features')">Funcionalidades</a>
+        <a role="button" (click)="scrollTo('integrations')">Integraciones</a>
+        <a role="button" (click)="scrollTo('pricing')">Planes</a>
+      </div>
+      <div class="footer-col">
+        <h4>Cuenta</h4>
+        <a (click)="goToLogin()" role="button">Iniciar sesión</a>
+        <a (click)="goToLogin()" role="button">Registrarse</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span> 2026 MiPyme. Hecho en Argentina </span>
+  </div>
+</footer>

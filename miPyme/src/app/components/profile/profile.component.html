@@ -1,0 +1,66 @@
+<div class="corporate-container">
+
+  <div class="hero-section">
+    <div class="hero-content">
+      <h1 class="corp-title">Miembro de la Organización</h1>
+      <p class="corp-subtitle">Gestión de identidad y credenciales institucionales.</p>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <app-spinner *ngIf="isLoading"></app-spinner>
+
+    <div *ngIf="successMessage" class="alert alert-success">
+      <i class="fas fa-check-circle"></i> {{ successMessage }}
+    </div>
+    <div *ngIf="errorMessage" class="alert alert-danger">
+      <i class="fas fa-exclamation-triangle"></i> {{ errorMessage }}
+    </div>
+
+    <div *ngIf="!isLoading" class="profile-layout">
+
+      <aside class="identity-panel">
+        <div class="avatar-holder">
+          <div class="avatar-circle">
+            {{ user.name ? (user.name.charAt(0) | uppercase) : 'U' }}
+          </div>
+        </div>
+        <div class="identity-text">
+          <h2 class="identity-name">{{ user.name }}</h2>
+          <span class="identity-role">{{ user.role }}</span>
+        </div>
+      </aside>
+
+
+      <section class="details-panel">
+        <div class="detail-group">
+          <span class="detail-label">IDENTIFICADOR DE USUARIO (ID)</span>
+          <div class="detail-value-box">
+            <i class="fas fa-id-badge detail-icon"></i>
+            <span class="detail-text">{{ user.username }}</span>
+          </div>
+        </div>
+
+        <div class="detail-group">
+          <span class="detail-label">CORREO ELECTRÓNICO INSTITUCIONAL</span>
+          <div class="detail-value-box">
+            <i class="fas fa-envelope detail-icon"></i>
+            <span class="detail-text">{{ user.email }}</span>
+          </div>
+        </div>
+
+        <div class="detail-group" *ngIf="user.company">
+          <span class="detail-label">ENTIDAD / EMPRESA ASIGNADA</span>
+          <div class="detail-value-box">
+            <i class="fas fa-building detail-icon"></i>
+            <span class="detail-text">{{ user.company.businessName || user.company.name }}</span>
+          </div>
+        </div>
+
+        <div class="info-footer">
+          <i class="fas fa-shield-alt"></i> La información sensible es de solo lectura por seguridad de la cuenta.
+        </div>
+      </section>
+    </div>
+  </div>
+</div>

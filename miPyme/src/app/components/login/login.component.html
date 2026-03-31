@@ -1,0 +1,520 @@
+<div class="login-container">
+
+
+  <div class="login-section" [class.is-plan-step]="isRegisterMode && registerStep === 5" [@expandToFull]="isRegistrationSuccess ? 'expanded' : (isLoginSuccess ? 'sidebar' : ((isRegisterMode && registerStep === 5) ? 'wide' : 'normal'))">
+
+    <div class="success-content" *ngIf="isRegistrationSuccess" [@contentFade]>
+      <div class="success-icon-wrapper">
+        <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+          <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+          <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+        </svg>
+      </div>
+      <h2 class="welcome-title" style="text-align: center; margin-top: 2rem;">¡Bienvenido, {{ registerData.adminName }}!</h2>
+      <p class="welcome-subtitle" style="text-align: center; font-size: 1.25rem;">Tu espacio en <strong>{{ registerData.tradeName || registerData.businessName }}</strong> está listo.</p>
+      <div class="spinner-dark" style="margin-top: 2rem;"></div>
+      <p style="margin-top: 1rem; color: var(--color-text-muted); font-size: 0.875rem;">Iniciando sesión automáticamente...</p>
+    </div>
+
+
+    <ng-container *ngIf="!isRegistrationSuccess && !isLoginSuccess">
+
+    <div class="brand-logo">
+      <div class="logo-icon">M</div>
+      <span class="logo-text">MiPyme</span>
+    </div>
+
+
+    <div class="center-content-stack">
+
+      <div class="login-card-wrapper">
+        <div class="login-header">
+          <h1 class="welcome-title" *ngIf="!isForgotPasswordMode && !isRegisterMode && !isTwoFactorMode">Bienvenido</h1>
+          <h1 class="welcome-title" *ngIf="isForgotPasswordMode">Recuperar Contraseña</h1>
+          <h1 class="welcome-title" *ngIf="isRegisterMode">Registro</h1>
+          <h1 class="welcome-title" *ngIf="isTwoFactorMode">Verificación 2FA</h1>
+        </div>
+
+        <form (ngSubmit)="isForgotPasswordMode ? onRecoverPassword() : (isRegisterMode ? onNextStep() : (isTwoFactorMode ? onVerifyTwoFactor() : onLogin()))">
+
+
+          <div *ngIf="errorMessage" class="error-banner" [class.error-banner-hide]="!isErrorVisible">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span>{{ errorMessage }}</span>
+          </div>
+
+
+          <div *ngIf="isForgotPasswordMode">
+
+            <div *ngIf="forgotPasswordStep === 1" [@fadeInOut]>
+              <div class="form-group">
+                <label for="fp-ssoCode">
+                  Código de Organización
+                  <span class="tooltip-icon" data-tooltip="Identificador único de su empresa.">?</span>
+                </label>
+                <div class="input-wrapper">
+                  <input type="text" id="fp-ssoCode" [class.shake]="shakeState.ssoCode" [(ngModel)]="ssoCode" name="ssoCode" placeholder="Ej. EMP-1234" class="input-field" required autocomplete="off" [disabled]="isLoading">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="fp-email">
+                  Email
+                  <span class="tooltip-icon" data-tooltip="Su correo electrónico registrado.">?</span>
+                </label>
+                <div class="input-wrapper">
+                  <input type="email" id="fp-email" [class.shake]="shakeState.username" [(ngModel)]="username" name="username" placeholder="nombre@empresa.com" class="input-field" required autocomplete="email" [disabled]="isLoading">
+                </div>
+              </div>
+            </div>
+
+
+            <div *ngIf="forgotPasswordStep === 2" [@slideFade]>
+              <p class="info-text" style="text-align: center; margin-bottom: 1.5rem; color: var(--color-text-muted);">
+                Hemos enviado un código de 6 dígitos a <strong>{{ username }}</strong>
+              </p>
+              <div class="form-group">
+                <label for="fp-code">Código de Verificación</label>
+                <div class="input-wrapper">
+                  <input type="text" id="fp-code" [(ngModel)]="recoveryCode" name="recoveryCode" placeholder="123456" maxlength="6" class="input-field" required autocomplete="off" [disabled]="isLoading" style="letter-spacing: 0.25rem; text-align: center;">
+                </div>
+              </div>
+            </div>
+
+
+            <div *ngIf="forgotPasswordStep === 3" [@slideFade]>
+              <div class="form-group">
+                <label for="fp-newPassword">Nueva Contraseña</label>
+                <div class="input-wrapper">
+                  <input [type]="passwordVisibility.newPassword ? 'text' : 'password'" id="fp-newPassword" [(ngModel)]="newPassword" name="newPassword" class="input-field" required autocomplete="new-password" [disabled]="isLoading" placeholder="••••••••••••" style="padding-right: 2.5rem;">
+                  <i class="bx" [class.bx-show]="!passwordVisibility.newPassword" [class.bx-hide]="passwordVisibility.newPassword" (click)="togglePasswordVisibility('newPassword')" style="position: absolute; right: 10px; cursor: pointer; color: #6b7280; font-size: 1.25rem; z-index: 10;"></i>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="fp-confirmNewPassword">Confirmar Contraseña</label>
+                <div class="input-wrapper">
+                  <input [type]="passwordVisibility.confirmNewPassword ? 'text' : 'password'" id="fp-confirmNewPassword" [(ngModel)]="confirmNewPassword" name="confirmNewPassword" class="input-field" required autocomplete="new-password" [disabled]="isLoading" placeholder="••••••••••••" style="padding-right: 2.5rem;">
+                  <i class="bx" [class.bx-show]="!passwordVisibility.confirmNewPassword" [class.bx-hide]="passwordVisibility.confirmNewPassword" (click)="togglePasswordVisibility('confirmNewPassword')" style="position: absolute; right: 10px; cursor: pointer; color: #6b7280; font-size: 1.25rem; z-index: 10;"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+
+          <div *ngIf="!isForgotPasswordMode" [@fadeInOut]>
+            <div class="form-group" *ngIf="!isRegisterMode">
+              <label for="ssoCode">
+                Código de Organización
+                <span class="tooltip-icon" data-tooltip="Identificador único de su empresa (ej. MPSA01).">?</span>
+              </label>
+              <div class="input-wrapper">
+                <input type="text" id="ssoCode" [class.shake]="shakeState.ssoCode" [class.invalid]="submitted && !ssoCode" [(ngModel)]="ssoCode" name="ssoCode" placeholder="Ej. EMP-1234" class="input-field" required autocomplete="off" [disabled]="isLoading">
+              </div>
+            </div>
+            <div class="form-group" *ngIf="isRegisterMode && registerStep === 1" [@slideFade]>
+              <label for="reg-businessName">
+                Razón Social <span class="optional-badge">(Opcional)</span>
+                <span class="tooltip-icon" data-tooltip="Nombre legal de la empresa registrado ante las autoridades.">?</span>
+              </label>
+              <div class="input-wrapper">
+                <input type="text" id="reg-businessName" [class.shake]="shakeState.registerBusinessName" [(ngModel)]="registerData.businessName" name="businessName" placeholder="Ej. Mi Pyme S.A." class="input-field" autocomplete="off">
+              </div>
+            </div>
+          </div>
+
+
+          <div class="form-group" *ngIf="!isRegisterMode && !isTwoFactorMode && !isForgotPasswordMode" [@fadeInOut]>
+            <label for="email">
+              Email
+              <span class="tooltip-icon" data-tooltip="Su correo electrónico corporativo registrado.">?</span>
+            </label>
+            <div class="input-wrapper">
+              <input type="email" id="email" [class.shake]="shakeState.username" [class.invalid]="submitted && !username" [(ngModel)]="username" name="email" placeholder="nombre@empresa.com" class="input-field" required autocomplete="email" [disabled]="isLoading">
+            </div>
+          </div>
+          <div class="form-group" *ngIf="isRegisterMode && registerStep === 1" [@slideFade]>
+            <label for="reg-tradeName">
+              Nombre de Fantasía
+              <span class="tooltip-icon" data-tooltip="Nombre comercial con el que se conoce a su negocio.">?</span>
+            </label>
+            <div class="input-wrapper">
+              <input type="text" id="reg-tradeName" (blur)="generateSso()" [class.shake]="shakeState.registerTradeName" [(ngModel)]="registerData.tradeName" name="tradeName" placeholder="Ej. Mi Pyme" class="input-field" required autocomplete="off" [disabled]="isLoading">
+            </div>
+          </div>
+
+
+          <div *ngIf="!isForgotPasswordMode" [@fadeInOut]>
+
+            <div class="form-group" *ngIf="!isRegisterMode && !isTwoFactorMode">
+              <label for="password">
+                Contraseña
+                <span class="tooltip-icon" data-tooltip="Su clave de acceso personal.">?</span>
+              </label>
+              <div class="input-wrapper">
+                <input [type]="passwordVisibility.login ? 'text' : 'password'" id="password" [class.shake]="shakeState.password" [class.invalid]="submitted && !password" [(ngModel)]="password" name="password" placeholder="••••••••••••" class="input-field" required autocomplete="current-password" [disabled]="isLoading" style="padding-right: 2.5rem;">
+                <i class="bx" [class.bx-show]="!passwordVisibility.login" [class.bx-hide]="passwordVisibility.login" (click)="togglePasswordVisibility('login')" style="position: absolute; right: 10px; cursor: pointer; color: #6b7280; font-size: 1.25rem; z-index: 10;"></i>
+              </div>
+            </div>
+
+
+            <div class="form-group" *ngIf="isRegisterMode && registerStep === 1" [@slideFade]>
+              <label for="reg-cuit">
+                CUIT <span class="optional-badge">(Opcional)</span>
+                <span class="tooltip-icon" data-tooltip="Clave Única de Identificación Tributaria (sin guiones).">?</span>
+              </label>
+              <div class="input-wrapper">
+                <input type="text" id="reg-cuit" [class.shake]="shakeState.registerCuit" [(ngModel)]="registerData.cuit" name="cuit" placeholder="Ej. 30-12345678-9" class="input-field" autocomplete="off">
+              </div>
+            </div>
+
+
+            <div class="form-group" *ngIf="isTwoFactorMode" [@fadeInOut]>
+              <label for="twoFactorCode" style="text-align: center; display: block;">
+                Código de Verificación
+              </label>
+              <div class="input-wrapper">
+                <input type="text" id="twoFactorCode" [(ngModel)]="twoFactorCode" name="twoFactorCode" placeholder="123456" class="input-field" required autocomplete="one-time-code" [disabled]="isLoading" maxlength="6" style="letter-spacing: 0.5rem; text-align: center; font-size: 1.5rem; font-weight: 600;">
+              </div>
+              <p style="font-size: 0.8rem; color: #6b7280; margin-top: 0.5rem; text-align: center;">
+                Hemos enviado un código de 6 dígitos a su correo.
+              </p>
+            </div>
+          </div>
+
+
+          <div class="form-group" *ngIf="isRegisterMode && registerStep === 1" [@rotateInOut]>
+            <label for="reg-sso">Código de Organización (Generado)</label>
+            <div class="input-wrapper">
+              <input type="text" id="reg-sso" [ngModel]="registerData.ssoCode" name="ssoCodeGenerated" class="input-field" placeholder="Se generará automáticamente" readonly style="background-color: #f3f4f6; cursor: default;">
+            </div>
+            <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem;">Este código será su identificador único para iniciar sesión.</p>
+          </div>
+
+
+          <div *ngIf="isRegisterMode && registerStep === 2" [@fadeInOut]>
+            <div class="form-group">
+              <label for="reg-adminName">Nombre del Administrador</label>
+              <div class="input-wrapper">
+                <input type="text" id="reg-adminName" [class.shake]="shakeState.registerAdminName" [(ngModel)]="registerData.adminName" name="adminName" class="input-field" required autocomplete="name" [disabled]="isLoading" placeholder="Nombre y Apellido">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="reg-location">Ubicación (País, Provincia, Ciudad)</label>
+              <div class="input-wrapper" style="position: relative;">
+                <input type="text" id="reg-location" (input)="onLocationInput()" [class.shake]="shakeState.registerLocation" [(ngModel)]="registerData.location" name="location" class="input-field" required autocomplete="off" [disabled]="isLoading" placeholder="Escriba para buscar...">
+
+
+                <ul *ngIf="showLocationDropdown" class="location-dropdown">
+                  <li *ngIf="isSearchingLocation" class="searching-item">
+                    <div class="spinner-dark"></div>
+                    <span>Buscando...</span>
+                  </li>
+                  <ng-container *ngIf="!isSearchingLocation">
+                    <li *ngFor="let result of locationResults" (click)="selectLocation(result)">
+                      {{ result.display_name }}
+                    </li>
+                  </ng-container>
+                </ul>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="reg-industry">Rubro / Industria <span class="optional-badge">(Opcional)</span></label>
+              <div class="input-wrapper">
+                <input type="text" id="reg-industry" [class.shake]="shakeState.registerIndustry" [(ngModel)]="registerData.industry" name="industry" class="input-field" autocomplete="off" [disabled]="isLoading">
+              </div>
+            </div>
+          </div>
+
+
+          <div *ngIf="isRegisterMode && registerStep === 3" [@fadeInOut]>
+            <div class="form-group">
+              <label for="reg-companyEmail">Email Corporativo <span class="optional-badge">(Opcional)</span></label>
+              <div class="input-wrapper">
+                <input type="email" id="reg-companyEmail" [class.shake]="shakeState.registerCompanyEmail" [(ngModel)]="registerData.companyEmail" name="companyEmail" class="input-field" autocomplete="email" [disabled]="isLoading" placeholder="contacto@empresa.com">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="reg-phone">Teléfono de Contacto</label>
+              <div class="input-wrapper">
+                <input type="tel" id="reg-phone" [class.shake]="shakeState.registerPhone" [(ngModel)]="registerData.phone" name="phone" class="input-field" required autocomplete="tel" [disabled]="isLoading" placeholder="+54 11 1234-5678">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="reg-fiscalAddress">Dirección Fiscal <span class="optional-badge">(Opcional)</span></label>
+              <div class="input-wrapper">
+                <input type="text" id="reg-fiscalAddress" [class.shake]="shakeState.registerFiscalAddress" [(ngModel)]="registerData.fiscalAddress" name="fiscalAddress" class="input-field" autocomplete="off" [disabled]="isLoading">
+              </div>
+            </div>
+          </div>
+
+
+          <div *ngIf="isRegisterMode && registerStep === 4" [@fadeInOut]>
+            <div class="form-group">
+              <label for="reg-adminEmail">Email de Administrador</label>
+              <div class="input-wrapper">
+                <input type="email" id="reg-adminEmail" [class.shake]="shakeState.registerAdminEmail" [(ngModel)]="registerData.adminEmail" name="adminEmail" class="input-field" required autocomplete="email" [disabled]="isLoading" placeholder="admin@empresa.com">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="reg-adminPassword">Contraseña</label>
+              <div class="input-wrapper">
+                <input [type]="passwordVisibility.registerAdmin ? 'text' : 'password'" id="reg-adminPassword" [class.shake]="shakeState.registerAdminPassword" [(ngModel)]="registerData.adminPassword" name="adminPassword" class="input-field" required autocomplete="new-password" [disabled]="isLoading" placeholder="••••••••••••" style="padding-right: 2.5rem;">
+                <i class="bx" [class.bx-show]="!passwordVisibility.registerAdmin" [class.bx-hide]="passwordVisibility.registerAdmin" (click)="togglePasswordVisibility('registerAdmin')" style="position: absolute; right: 10px; cursor: pointer; color: #6b7280; font-size: 1.25rem; z-index: 10;"></i>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="reg-confirmPassword">Confirmar Contraseña</label>
+              <div class="input-wrapper">
+                <input [type]="passwordVisibility.registerConfirm ? 'text' : 'password'" id="reg-confirmPassword" (blur)="onConfirmPasswordBlur()" [class.shake]="shakeState.registerConfirmPassword" [(ngModel)]="confirmPassword" name="confirmPassword" class="input-field" required autocomplete="new-password" [disabled]="isLoading" placeholder="••••••••••••" style="padding-right: 2.5rem;">
+                <i class="bx" [class.bx-show]="!passwordVisibility.registerConfirm" [class.bx-hide]="passwordVisibility.registerConfirm" (click)="togglePasswordVisibility('registerConfirm')" style="position: absolute; right: 10px; cursor: pointer; color: #6b7280; font-size: 1.25rem; z-index: 10;"></i>
+              </div>
+            </div>
+
+            <div class="form-options" style="margin-top: 1rem;">
+              <label class="checkbox-label" style="align-items: flex-start;">
+                <input type="checkbox" name="termsAccepted" [(ngModel)]="registerData.termsAccepted" [disabled]="isLoading" style="margin-top: 0.25rem;">
+                <span style="font-size: 0.875rem; color: #4b5563;">
+                  Acepto los <a href="javascript:void(0)" style="color: var(--color-primary); text-decoration: none;">Términos y Condiciones</a> y la <a href="javascript:void(0)" style="color: var(--color-primary); text-decoration: none;">Política de Privacidad</a>
+                </span>
+              </label>
+            </div>
+          </div>
+
+
+          <div *ngIf="isRegisterMode && registerStep === 5" [@fadeInOut]>
+            <p class="plan-step-subtitle">Elegí el plan que mejor se adapte a tu negocio</p>
+
+
+            <div class="reg-cycle-toggle">
+              <button type="button" [class.active]="billingCycle === 'monthly'" (click)="billingCycle = 'monthly'">Mensual</button>
+              <button type="button" [class.active]="billingCycle === 'annual'" (click)="billingCycle = 'annual'">
+                Anual <span class="reg-discount-tag">-17%</span>
+              </button>
+            </div>
+
+
+            <div *ngIf="pricingError && !isLoadingPricing" class="pricing-error-block">
+              <i class="bx bx-error-circle"></i>
+              <span>No se pudieron cargar los precios.</span>
+              <button type="button" class="retry-btn" (click)="retryLoadPricing()">Reintentar</button>
+            </div>
+
+
+            <div *ngIf="isLoadingPricing" class="pricing-loading-block">
+              <div class="spinner-dark"></div>
+              <span>Cargando planes...</span>
+            </div>
+
+
+            <div class="reg-plan-cards reg-plan-cards-desktop" *ngIf="!isLoadingPricing && !pricingError">
+              <div *ngFor="let plan of planCards"
+                   class="reg-plan-card"
+                   [class.selected]="selectedPlan === plan.id"
+                   (click)="selectPlanCard(plan.id)">
+
+                <div class="reg-plan-badge" *ngIf="plan.badge">{{ plan.badge }}</div>
+
+                <div class="reg-plan-header">
+                  <h4>{{ plan.name }}</h4>
+                  <p class="reg-plan-desc">{{ plan.description }}</p>
+                  <div class="reg-plan-price" *ngIf="plan.id === 'pro'">
+                    <span class="reg-price-free">GRATIS</span>
+                    <span class="reg-price-period">por 28 días</span>
+                  </div>
+                  <div class="reg-plan-price" *ngIf="plan.id !== 'pro'">
+                    <span class="reg-price-amount">{{ formatPlanUsd(plan.id) }}</span>
+                    <span class="reg-price-period">{{ billingCycle === 'annual' ? '/ año' : '/ mes' }}</span>
+                  </div>
+                  <div class="reg-price-ars" *ngIf="plan.id !== 'pro' && formatPlanArs(plan.id)">
+                    {{ formatPlanArs(plan.id) }}
+                  </div>
+                </div>
+
+                <ul class="reg-plan-features">
+                  <li *ngFor="let feature of plan.features">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    {{ feature }}
+                  </li>
+                </ul>
+
+                <div class="reg-plan-select-indicator">
+                  <svg *ngIf="selectedPlan === plan.id" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+              </div>
+            </div>
+
+
+            <div class="reg-plan-carousel" *ngIf="!isLoadingPricing && !pricingError">
+              <button type="button" class="carousel-arrow carousel-arrow-left" (click)="carouselPrev()" [disabled]="activeCarouselIndex === 0">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              </button>
+
+              <div class="carousel-card-wrapper">
+                <div class="reg-plan-card selected">
+                  <div class="reg-plan-badge" *ngIf="planCards[activeCarouselIndex].badge">{{ planCards[activeCarouselIndex].badge }}</div>
+
+                  <div class="reg-plan-header">
+                    <h4>{{ planCards[activeCarouselIndex].name }}</h4>
+                    <p class="reg-plan-desc">{{ planCards[activeCarouselIndex].description }}</p>
+                    <div class="reg-plan-price" *ngIf="planCards[activeCarouselIndex].id === 'pro'">
+                      <span class="reg-price-free">GRATIS</span>
+                      <span class="reg-price-period">por 28 días</span>
+                    </div>
+                    <div class="reg-plan-price" *ngIf="planCards[activeCarouselIndex].id !== 'pro'">
+                      <span class="reg-price-amount">{{ formatPlanUsd(planCards[activeCarouselIndex].id) }}</span>
+                      <span class="reg-price-period">{{ billingCycle === 'annual' ? '/ año' : '/ mes' }}</span>
+                    </div>
+                    <div class="reg-price-ars" *ngIf="planCards[activeCarouselIndex].id !== 'pro' && formatPlanArs(planCards[activeCarouselIndex].id)">
+                      {{ formatPlanArs(planCards[activeCarouselIndex].id) }}
+                    </div>
+                  </div>
+
+                  <ul class="reg-plan-features">
+                    <ng-container *ngFor="let feature of planCards[activeCarouselIndex].features; let i = index">
+                      <li *ngIf="i < 4">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        {{ feature }}
+                      </li>
+                    </ng-container>
+                    <li *ngIf="planCards[activeCarouselIndex].features.length > 4" class="more-features-hint">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      Y mucho más...
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <button type="button" class="carousel-arrow carousel-arrow-right" (click)="carouselNext()" [disabled]="activeCarouselIndex === planCards.length - 1">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </button>
+            </div>
+
+
+            <div class="carousel-dots" *ngIf="!isLoadingPricing && !pricingError">
+              <span *ngFor="let plan of planCards; let i = index" class="carousel-dot" [class.active]="i === activeCarouselIndex" (click)="selectPlanCard(plan.id)"></span>
+            </div>
+
+            <p *ngIf="selectedPlan === 'pro'" class="plan-hint plan-hint-success">
+              Disfrutá de todas las funciones Pro durante 28 días sin cargo.
+            </p>
+            <p *ngIf="selectedPlan && selectedPlan !== 'pro'" class="plan-hint">
+              Serás redirigido a MercadoPago para completar el pago.
+            </p>
+          </div>
+
+          <div class="form-options" *ngIf="!isForgotPasswordMode && !isRegisterMode" [@fadeInOut]>
+            <label class="checkbox-label">
+              <input type="checkbox" name="rememberMe" [(ngModel)]="rememberMe" [disabled]="isLoading">
+              Recordarme
+            </label>
+            <a href="javascript:void(0)" class="forgot-password" (click)="toggleForgotPasswordMode()">¿Olvidaste tu contraseña?</a>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem; width: 100%;" [style.marginTop.rem]="isForgotPasswordMode || isRegisterMode ? 1.5 : 0">
+
+
+            <button type="button" *ngIf="isRegisterMode && registerStep > 1" (click)="onPreviousStep()" style="flex: 1; display: flex; justify-content: center; align-items: center; padding: 0.75rem; background: white; border: 1px solid #d1d5db; border-radius: 0.5rem; color: #374151; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+              Anterior
+            </button>
+
+            <button type="submit" class="btn-primary" [disabled]="isNextDisabled" style="flex: 1; margin-top: 0;">
+              <ng-container *ngIf="!isForgotPasswordMode && !isRegisterMode">
+                <span *ngIf="!isLoading">{{ isTwoFactorMode ? 'Verificar' : 'Iniciar Sesión' }}</span>
+                <span *ngIf="isLoading">Cargando...</span>
+              </ng-container>
+              <ng-container *ngIf="isForgotPasswordMode">
+                <span *ngIf="!isLoading">
+                  <ng-container *ngIf="forgotPasswordStep === 1">Enviar Código</ng-container>
+                  <ng-container *ngIf="forgotPasswordStep === 2">Verificar</ng-container>
+                  <ng-container *ngIf="forgotPasswordStep === 3">Cambiar Contraseña</ng-container>
+                </span>
+                <span *ngIf="isLoading">Procesando...</span>
+              </ng-container>
+              <ng-container *ngIf="isRegisterMode">
+                <span *ngIf="!isLoading">{{ registerStep === 5 ? (selectedPlan === 'pro' ? 'Comenzar prueba gratis' : 'Registrarse y pagar') : 'Siguiente' }}</span>
+                <span *ngIf="isLoading">Procesando...</span>
+                <svg *ngIf="!isLoading && registerStep < 5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 0.5rem;">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </ng-container>
+            </button>
+          </div>
+
+          <button type="button" class="btn-secondary" (click)="onRegister()" *ngIf="!isForgotPasswordMode && !isRegisterMode && !isTwoFactorMode" [@fadeInOut] style="margin-top: 1rem; width: 100%; display: flex; justify-content: center; align-items: center; gap: 0.5rem; padding: 0.75rem; background: transparent; border: 1px solid #d1d5db; border-radius: 0.5rem; color: #374151; font-weight: 500; cursor: pointer;">
+            Registrarse
+          </button>
+
+
+          <div style="min-height: 24px; position: relative; margin-top: 1.5rem;">
+
+
+            <div class="microcopy-benefit" *ngIf="!isForgotPasswordMode && !isRegisterMode && !isTwoFactorMode" [@fadeInOut]>
+              <svg class="microcopy-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <span>Acceso seguro a tu panel en segundos</span>
+            </div>
+
+
+            <button type="button" class="btn-back-to-login" (click)="onBackToLogin()" *ngIf="isForgotPasswordMode || isRegisterMode" [@fadeInOut]>
+              Volver al inicio de sesión
+            </button>
+
+
+            <button type="button" class="btn-back-to-login" (click)="cancelTwoFactor()" *ngIf="isTwoFactorMode" [@fadeInOut]>
+              Volver
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="footer-meta">
+        &copy; 2024 MiPyme System. V 1.0.0
+      </div>
+    </div>
+    </ng-container>
+  </div>
+
+
+  <div class="visual-section" [@heroFadeOut]="isLoginSuccess ? 'hidden' : ((isRegisterMode && registerStep === 5) ? 'collapsed' : 'visible')">
+    <div class="visual-background">
+      <div class="shape-blob blob-1"></div>
+      <div class="shape-blob blob-2"></div>
+    </div>
+
+    <div class="visual-content">
+      <div class="content-wrapper">
+
+        <div class="hero-image-placeholder">
+          <div class="card-inner-content">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="3" y1="9" x2="21" y2="9"></line>
+              <line x1="9" y1="21" x2="9" y2="9"></line>
+              <path d="M14 14h.01"></path>
+              <path d="M14 18h.01"></path>
+              <path d="M18 14h.01"></path>
+            </svg>
+            <h3>Dashboard Interactivo</h3>
+            <p>Gráficos en tiempo real</p>
+          </div>
+        </div>
+
+        <div class="marketing-copy" style="text-align: center;">
+          <h2 style="font-size: 2.25rem; font-weight: 800; color: #0B1220; margin: 0 0 1rem 0; letter-spacing: -0.03em; line-height: 1.1; display: block;">Control total de tu negocio</h2>
+          <p style="font-size: 1.125rem; color: #5B6472; line-height: 1.6; margin: 0; display: block;">Plataforma integral para la gestión de recursos empresariales, diseñada para escalar contigo.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

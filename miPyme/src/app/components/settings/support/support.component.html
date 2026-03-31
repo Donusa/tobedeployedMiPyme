@@ -1,0 +1,75 @@
+<div class="support-container">
+  <div class="header-section">
+    <h1>Soporte y Contacto</h1>
+    <p>¿Tienes alguna duda o inconveniente? Envíanos un mensaje y te responderemos a la brevedad.</p>
+  </div>
+
+  <div class="support-card">
+    <div *ngIf="successMessage" class="alert alert-success">
+      <i class='bx bx-check-circle'></i> {{ successMessage }}
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger">
+      <i class='bx bx-error-circle'></i> {{ errorMessage }}
+    </div>
+
+    <form [formGroup]="supportForm" (ngSubmit)="onSubmit()">
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="name">Nombre</label>
+          <input type="text" id="name" formControlName="name" class="form-control" placeholder="Tu nombre">
+          <div *ngIf="f['name'].touched && f['name'].errors" class="invalid-feedback">
+            El nombre es requerido
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email de contacto</label>
+          <input type="email" id="email" formControlName="email" class="form-control" placeholder="nombre@ejemplo.com">
+          <div *ngIf="f['email'].touched && f['email'].errors" class="invalid-feedback">
+            <span *ngIf="f['email'].errors?.['required']">El email es requerido</span>
+            <span *ngIf="f['email'].errors?.['email']">Email inválido</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="subject">Asunto</label>
+        <input type="text" id="subject" formControlName="subject" class="form-control" placeholder="Resumen breve del problema">
+        <div *ngIf="f['subject'].touched && f['subject'].errors" class="invalid-feedback">
+          El asunto es requerido
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="message">Mensaje</label>
+        <textarea id="message" formControlName="message" class="form-control" rows="6" placeholder="Describe tu consulta o problema con el mayor detalle posible..."></textarea>
+        <div *ngIf="f['message'].touched && f['message'].errors" class="invalid-feedback">
+          <span *ngIf="f['message'].errors?.['required']">El mensaje es requerido</span>
+          <span *ngIf="f['message'].errors?.['minlength']">El mensaje debe tener al menos 20 caracteres</span>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-submit" [disabled]="isLoading || supportForm.invalid">
+          <span *ngIf="!isLoading"><i class='bx bx-send'></i> Enviar Mensaje</span>
+          <span *ngIf="isLoading"><i class='bx bx-loader-alt bx-spin'></i> Enviando...</span>
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+  <div class="faq-section">
+    <h3>Preguntas Frecuentes</h3>
+    <div class="faq-item">
+      <h4>¿Cómo restablezco mi contraseña?</h4>
+      <p>Ve a Perfil > Seguridad > Contraseña para actualizarla, o usa la opción "¿Olvidaste tu contraseña?" en la pantalla de inicio de sesión.</p>
+    </div>
+    <div class="faq-item">
+      <h4>¿Cómo sincronizo con MercadoLibre?</h4>
+      <p>Dirígete a Configuración > Integraciones > MercadoLibre y sigue el asistente de vinculación.</p>
+    </div>
+  </div>
+</div>

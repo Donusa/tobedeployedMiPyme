@@ -1,0 +1,68 @@
+<div class="security-container">
+  <h3>Sesiones Activas</h3>
+  <p class="subtitle">Gestiona las sesiones activas en tus dispositivos.</p>
+
+  <div *ngIf="isLoading" class="loading-state">
+    <app-spinner></app-spinner>
+  </div>
+
+  <div *ngIf="!isLoading && sessions.length === 0" class="empty-state">
+    No hay sesiones activas (Esto es extraño si estás viendo esto).
+  </div>
+
+  <div *ngIf="!isLoading && sessions.length > 0" class="sessions-grid">
+    <div *ngFor="let session of sessions" class="session-card" [class.current-session]="session.isCurrent">
+      <div class="session-icon">
+        <i class="bx" [ngClass]="getDeviceIcon(session.device)"></i>
+      </div>
+      <div class="session-details">
+        <div class="session-device">
+          {{ session.device }}
+          <span *ngIf="session.isCurrent" class="badge-current">
+            <i class="bx bx-check-circle" style="font-size: 1rem; margin-right: 4px;"></i>
+            Actual
+          </span>
+        </div>
+
+        <div class="session-secondary-row">
+          <span class="location-text">
+            <i class='bx bx-map' style="margin-right: 2px;"></i>
+            {{ session.location || 'Ubicación desconocida' }}
+          </span>
+          <span class="dot">•</span>
+          <span class="ip">{{ session.ipAddress }}</span>
+          <span class="dot">•</span>
+          <span class="badge">{{ session.medium }}</span>
+          <span class="dot">•</span>
+          <span class="time">Activo: {{ session.lastActive | date:'short' }}</span>
+        </div>
+      </div>
+      <div class="session-actions">
+        <button class="btn-revoke" (click)="revokeSession(session)" [class.danger]="session.isCurrent">
+          {{ session.isCurrent ? 'Cerrar sesión actual' : 'Cerrar sesión' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showConfirmModal" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h4>Confirmar Cierre de Sesión</h4>
+      <button class="close-btn" (click)="closeModal()"><i class='bx bx-x'></i></button>
+    </div>
+    <div class="modal-body">
+      <p>¿Estás seguro de que deseas cerrar la sesión en <strong>{{ sessionToRevoke?.device }}</strong>?</p>
+      <p *ngIf="sessionToRevoke?.isCurrent" class="warning-text">
+        <i class='bx bx-error-circle'></i> Esta es tu sesión actual. Se cerrará tu sesión inmediatamente.
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeModal()">Cancelar</button>
+      <button class="btn-confirm" (click)="confirmRevoke()" [class.danger]="sessionToRevoke?.isCurrent">
+        {{ sessionToRevoke?.isCurrent ? 'Cerrar mi sesión' : 'Cerrar sesión' }}
+      </button>
+    </div>
+  </div>
+</div>

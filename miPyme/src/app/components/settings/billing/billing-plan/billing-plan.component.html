@@ -1,0 +1,186 @@
+<div class="billing-container slide-in-bottom">
+
+
+    <div class="page-header">
+        <h2><i class='bx bx-star'></i> Mi Plan y Suscripción</h2>
+        <p class="page-subtitle">Administrá tu plan, visualizá el estado de tu suscripción y realizá cambios cuando quieras.</p>
+    </div>
+
+
+    <div class="subscription-card glass-panel" *ngIf="subscriptionStatus">
+        <div class="sub-card-title"><i class='bx bx-credit-card-front'></i> Tu suscripción activa</div>
+        <div class="sub-details-grid">
+            <div class="sub-detail-item" *ngIf="subscriptionStatus.planTier">
+                <span class="sub-detail-label">Plan</span>
+                <span class="sub-detail-value sub-plan-name">{{ subscriptionStatus.planTier | titlecase }}</span>
+            </div>
+            <div class="sub-detail-item">
+                <span class="sub-detail-label">Estado</span>
+                <span class="status-badge" [ngClass]="subscriptionStatus.planStatus">
+                    {{ subscriptionStatus.planStatus | uppercase }}
+                </span>
+            </div>
+            <div class="sub-detail-item" *ngIf="subscriptionStatus.billingCycle">
+                <span class="sub-detail-label">Ciclo de facturación</span>
+                <span class="sub-detail-value">{{ subscriptionStatus.billingCycle === 'annual' ? 'Anual' : 'Mensual' }}</span>
+            </div>
+            <div class="sub-detail-item" *ngIf="subscriptionStatus.validUntil">
+                <span class="sub-detail-label">Vigente hasta</span>
+                <span class="sub-detail-value">{{ subscriptionStatus.validUntil | date:'dd/MM/yyyy' }}</span>
+            </div>
+            <div class="sub-detail-item" *ngIf="subscriptionStatus.amount">
+                <span class="sub-detail-label">Importe</span>
+                <span class="sub-detail-value">$ {{ subscriptionStatus.amount }} ARS</span>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="sub-loading" *ngIf="isStatusLoading">
+        <i class='bx bx-loader-alt bx-spin'></i> Cargando suscripción...
+    </div>
+
+
+    <div class="pending-change-bar glass-panel" *ngIf="subscriptionStatus?.cancelAtPeriodEnd">
+        <i class='bx bx-info-circle'></i>
+        <span>
+            Tu suscripción está programada para cancelarse al fin del período
+            <span *ngIf="subscriptionStatus?.validUntil">
+                ({{ subscriptionStatus!.validUntil | date:'dd/MM/yyyy' }})
+            </span>.
+        </span>
+        <button class="btn-reactivate" (click)="revertCancel()" [disabled]="isLoading">
+            <i class='bx bx-loader-alt bx-spin' *ngIf="isLoading"></i>
+            <ng-container *ngIf="!isLoading"><i class='bx bx-revision'></i> Reactivar suscripción</ng-container>
+            <ng-container *ngIf="isLoading">Procesando...</ng-container>
+        </button>
+    </div>
+
+
+    <div class="pending-change-bar glass-panel" *ngIf="subscriptionStatus?.pendingPlanKey">
+        <i class='bx bx-time-five'></i>
+        <span>
+            Cambio programado a <strong>{{ pendingPlanLabel }}</strong> para fin del ciclo actual
+            <span *ngIf="subscriptionStatus?.validUntil">
+                ({{ subscriptionStatus!.validUntil | date:'dd/MM/yyyy' }})
+            </span>.
+        </span>
+        <button class="btn-cancel-change" (click)="cancelScheduledChange()" [disabled]="isLoading">
+            Cancelar cambio
+        </button>
+    </div>
+
+    <div class="error-message" *ngIf="errorMessage">
+        <i class='bx bx-error-circle'></i> {{ errorMessage }}
+    </div>
+
+    <div class="success-message" *ngIf="successMessage">
+        <i class='bx bx-check-circle'></i> {{ successMessage }}
+    </div>
+
+
+    <div class="section-header">
+        <h3>Cambiar plan</h3>
+        <p class="section-subtitle">Elegí el plan que mejor se adapte a tu negocio.</p>
+    </div>
+
+
+    <div class="cycle-toggle">
+        <button [class.active]="billingCycle === 'monthly'" (click)="billingCycle = 'monthly'">Mensual</button>
+        <button [class.active]="billingCycle === 'annual'" (click)="billingCycle = 'annual'">
+            Anual <span class="discount-tag">2 meses gratis</span>
+        </button>
+    </div>
+
+    <div class="plan-cards-wrapper">
+        <div *ngFor="let plan of plans" class="plan-card glass-panel"
+            [class.current-plan]="!isStatusLoading && isCurrentPlan(plan.id)"
+            [class.pending-plan]="!isStatusLoading && isPendingChange(plan.id)">
+
+            <div class="plan-badge" *ngIf="!isStatusLoading && isCurrentPlan(plan.id)">Plan Actual</div>
+            <div class="plan-badge pending-badge" *ngIf="!isStatusLoading && isPendingChange(plan.id)">Cambio Programado</div>
+
+            <div class="plan-header">
+                <h3>{{ plan.name }}</h3>
+                <p class="plan-description">{{ plan.description }}</p>
+                <div class="price">
+                    <span class="amount">{{ formatUsd(plan.id) }}</span>
+                    <span class="period">{{ getPeriodLabel() }}</span>
+                </div>
+                <div class="price-ars" *ngIf="formatArs(plan.id)">
+                    {{ formatArs(plan.id) }}
+                </div>
+            </div>
+
+            <div class="plan-features">
+                <ul>
+                    <li *ngFor="let feature of plan.features">
+                        <i class='bx bx-check-circle'></i>
+                        {{ feature }}
+                    </li>
+                </ul>
+            </div>
+
+            <div class="plan-actions">
+                <button *ngIf="!isStatusLoading && isCurrentPlan(plan.id)" class="btn-current" disabled>
+                    <i class='bx bx-check'></i> Plan actual
+                </button>
+                <button *ngIf="!isStatusLoading && isPendingChange(plan.id) && !isCurrentPlan(plan.id)" class="btn-pending" disabled>
+                    <i class='bx bx-time-five'></i> Cambio programado
+                </button>
+                <button *ngIf="isStatusLoading || (!isCurrentPlan(plan.id) && !isPendingChange(plan.id))"
+                    class="btn-select"
+                    (click)="selectPlan(plan.id)"
+                    [disabled]="isLoading || isStatusLoading">
+                    <i class='bx bx-loader-alt bx-spin' *ngIf="isLoading"></i>
+                    <ng-container *ngIf="!isLoading">
+                        {{ isSubscriptionActive ? 'Programar cambio' : 'Seleccionar plan' }}
+                    </ng-container>
+                    <ng-container *ngIf="isLoading">Procesando...</ng-container>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="manage-sub-section" *ngIf="(isSubscriptionActive || isStatusLoading) && !subscriptionStatus?.cancelAtPeriodEnd">
+        <div class="section-header section-header--danger">
+            <h3>Gestión de la suscripción</h3>
+        </div>
+        <div class="manage-sub-card glass-panel" *ngIf="isStatusLoading && !isSubscriptionActive">
+            <div class="sub-loading"><i class='bx bx-loader-alt bx-spin'></i> Verificando estado...</div>
+        </div>
+        <div class="manage-sub-card glass-panel" *ngIf="!isStatusLoading && isSubscriptionActive">
+            <div class="manage-sub-row" *ngIf="!subscriptionStatus?.cancelAtPeriodEnd">
+                <div class="manage-sub-desc">
+                    <strong>Cancelar suscripción</strong>
+                    <p>Cancelás el cobro recurrente. Seguirás teniendo acceso hasta el fin del período ya abonado.</p>
+                </div>
+                <button class="btn-cancel" *ngIf="!showCancelConfirm" (click)="requestCancelSubscription()" [disabled]="isLoading">
+                    <i class='bx bx-x-circle'></i> Cancelar suscripción
+                </button>
+            </div>
+
+            <div class="cancel-confirm-panel" *ngIf="showCancelConfirm && !subscriptionStatus?.cancelAtPeriodEnd">
+                <div class="cancel-confirm-content">
+                    <i class='bx bx-error-circle'></i>
+                    <div>
+                        <strong>¿Cancelar suscripción?</strong>
+                        <p>Perderás el acceso al plan activo al vencimiento del período ya abonado. Esta acción no puede deshacerse.</p>
+                    </div>
+                </div>
+                <div class="cancel-confirm-actions">
+                    <button class="btn-confirm-cancel" (click)="cancelSubscription()" [disabled]="isLoading">
+                        <i class='bx bx-loader-alt bx-spin' *ngIf="isLoading"></i>
+                        <ng-container *ngIf="!isLoading">Sí, cancelar suscripción</ng-container>
+                        <ng-container *ngIf="isLoading">Procesando...</ng-container>
+                    </button>
+                    <button class="btn-dismiss" (click)="dismissCancelConfirm()" [disabled]="isLoading">
+                        Mantener suscripción
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

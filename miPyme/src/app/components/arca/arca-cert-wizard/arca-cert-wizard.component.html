@@ -1,0 +1,443 @@
+<div class="wizard-container">
+
+
+  <div class="loading-container" *ngIf="isCheckingConfig">
+    <div class="spinner-box">
+      <i class='bx bx-loader-alt bx-spin'></i>
+      <p>Verificando configuración de ARCA...</p>
+    </div>
+  </div>
+
+
+  <div class="dashboard-card" *ngIf="showDashboard && !isCheckingConfig">
+    <div class="dashboard-header">
+      <div class="dashboard-icon-container">
+        <i class='bx bx-check-shield'></i>
+      </div>
+      <h2>Configuración ARCA Activa</h2>
+    </div>
+
+    <div class="dashboard-content">
+      <ng-container *ngIf="isAutoTesting">
+        <div class="loading-container"
+          style="min-height: 200px; display: flex; align-items: center; justify-content: center;">
+          <div class="spinner-box">
+            <i class='bx bx-loader-alt bx-spin' style="font-size: 3rem; color: #4f46e5;"></i>
+            <p style="margin-top: 1rem; color: #4b5563;">Verificando conexión con AFIP...</p>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="!isAutoTesting && !showRenewalForm">
+        <div class="status-badge success">
+          <i class='bx bx-check'></i> Certificados Configurados Correctamente
+        </div>
+
+        <p class="dashboard-text">
+          Conexión exitosa, redirigiendo a facturación...
+        </p>
+      </ng-container>
+
+      <ng-container *ngIf="!isAutoTesting && showRenewalForm">
+        <div class="status-badge error renewal-expired-badge">
+          <i class='bx bx-error-circle'></i> Sesión Expirada
+        </div>
+
+        <p class="dashboard-text renewal-expired-text">
+          No se pudo establecer conexión con los servicios de AFIP. Por favor, renueva tu sesión subiendo tu certificado
+          P12.
+        </p>
+
+
+        <div class="renewal-form">
+          <h3 class="renewal-form-title">Renovar Sesión AFIP</h3>
+
+          <div class="renewal-form-grid">
+
+
+            <div class="renewal-field">
+              <label class="renewal-label">Archivo P12</label>
+
+              <div class="custom-file-upload">
+                <input type="file" id="p12-file-inline" (change)="onFileSelected($event)" accept=".p12"
+                  class="hidden-file-input">
+                <label for="p12-file-inline" class="file-upload-label renewal-file-label" [class.has-file]="selectedP12File">
+                  <div class="file-upload-icon renewal-file-icon">
+                    <i class='bx' [ngClass]="selectedP12File ? 'bx-file' : 'bx-cloud-upload'"></i>
+                  </div>
+                  <div class="file-upload-text">
+                    <span class="primary-text renewal-file-text">{{ selectedP12File ? selectedP12File.name :
+                      'Seleccionar Archivo P12' }}</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            <div class="renewal-field">
+              <label for="p12-password-inline" class="renewal-label">Contraseña</label>
+              <input type="password" id="p12-password-inline" [(ngModel)]="p12Password" placeholder="Contraseña del P12"
+                class="form-control renewal-password-input">
+            </div>
+          </div>
+          <button class="btn-primary renewal-submit-btn" (click)="submitRenewal()"
+            [disabled]="isActivating || !selectedP12File || !p12Password">
+            <span *ngIf="!isActivating"><i class='bx bx-check-shield'></i> Activar Conexión</span>
+            <span *ngIf="isActivating"><i class='bx bx-loader-alt bx-spin'></i> Activando...</span>
+          </button>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+
+  <div class="wizard-card" [class.wide]="step >= 2" *ngIf="!showDashboard && !isCheckingConfig">
+
+
+    <div class="wizard-header">
+      <div class="wizard-icon-container">
+        <i class='bx bx-file'></i>
+      </div>
+      <h2>Certificación de Cuenta ARCA</h2>
+    </div>
+
+
+    <div class="wizard-content" #wizardContent>
+
+
+      <ng-container *ngIf="step === 1">
+        <p class="intro-text">
+          Bienvenido al asistente de certificación de ARCA (AFIP).
+        </p>
+        <p class="intro-text">
+          Este proceso te guiará paso a paso para configurar tu certificado digital y habilitar la facturación
+          electrónica en el sistema.
+        </p>
+
+        <div class="info-box">
+          <i class='bx bx-info-circle'></i>
+          <div>
+            <strong>Requisitos previos:</strong>
+            <p style="margin: 0;">Asegúrate de tener acceso a la web de AFIP con tu CUIT y Clave Fiscal para generar los
+              certificados necesarios.</p>
+          </div>
+        </div>
+      </ng-container>
+
+
+      <ng-container *ngIf="step === 2">
+        <p class="intro-text">
+          Sigue los siguientes pasos en el sitio web de ARCA (AFIP):
+        </p>
+
+        <div class="instruction-list">
+          <div class="instruction-item">
+            <span class="step-number">1</span>
+            <div class="step-content">
+              <p>Acceder con <strong>Clave Fiscal</strong> en el portal de ARCA.</p>
+              <div class="image-placeholder">
+                <img src="assets/images/arca_step2_01_portal.png" alt="Portal ARCA" class="step-image">
+              </div>
+            </div>
+          </div>
+
+          <div class="instruction-item">
+            <span class="step-number">2</span>
+            <div class="step-content">
+              <p>Ingresar la <strong>CUIT</strong> del usuario y su contraseña. Usar la clave fiscal de una
+                <strong>persona física</strong> (no jurídica o de empresa).
+              </p>
+              <div class="image-placeholder">
+                <img src="assets/images/arca_step2_02_login.png" alt="Login CUIT" class="step-image">
+              </div>
+            </div>
+          </div>
+
+          <div class="instruction-item">
+            <span class="step-number">3</span>
+            <div class="step-content">
+              <p>En la sección Mis Servicios pulsar en el link <strong>"Administrador de Relaciones"</strong> o en el
+                cuadro <strong>"Administrador de Relaciones de Clave Fiscal"</strong>.</p>
+              <div class="image-placeholder">
+                <img src="assets/images/arca_step2_03_admin_relaciones.png" alt="Link Administrador Relaciones"
+                  class="step-image">
+              </div>
+            </div>
+          </div>
+
+          <div class="instruction-item">
+            <span class="step-number">4</span>
+            <div class="step-content">
+              <p>Una vez dentro del Administrador de Relaciones, presioná en <strong>"Adherir servicio"</strong>.</p>
+              <div class="image-placeholder">
+                <img src="assets/images/arca_step2_04_adherir.png" alt="Adherir Servicio" class="step-image">
+              </div>
+            </div>
+          </div>
+
+          <div class="instruction-item">
+            <span class="step-number">5</span>
+            <div class="step-content">
+              <p>Seleccionar <strong>"Servicios interactivos"</strong> de ARCA.</p>
+              <div class="image-placeholder">
+                <img src="assets/images/arca_step2_05_servicios_interactivos.png" alt="Servicios Interactivos"
+                  class="step-image">
+              </div>
+            </div>
+          </div>
+
+          <div class="instruction-item">
+            <span class="step-number">6</span>
+            <div class="step-content">
+              <p>Buscar <strong>"WSASS - Autogestión Certificados Homologación"</strong> en el buscador de servicios.
+              </p>
+              <div class="image-placeholder">
+                <img src="assets/images/arca_step2_06_buscar_wsass.png" alt="Buscar WSASS" class="step-image">
+              </div>
+            </div>
+          </div>
+
+          <div class="instruction-item">
+            <span class="step-number">7</span>
+            <div class="step-content">
+              <p>Pulsar <strong>"Continuar"</strong> en el formulario "Incorporar nueva relación".</p>
+              <div class="image-placeholder">
+                <img src="assets/images/arca_step2_07_continuar.png" alt="Formulario Nueva Relación" class="step-image">
+              </div>
+            </div>
+          </div>
+
+          <div class="instruction-item">
+            <span class="step-number">8</span>
+            <div class="step-content">
+              <p>Cerrar la sesión y volver a acceder con clave fiscal. Ir a ver todos en la sección <strong>"Mis
+                  Servicios"</strong>.</p>
+              <div class="image-placeholder">
+                <img src="assets/images/arca_step2_08_ver_todos.png" alt="Ver Todos Mis Servicios" class="step-image">
+              </div>
+            </div>
+          </div>
+
+          <div class="instruction-item">
+            <span class="step-number">9</span>
+            <div class="step-content">
+              <p>El servicio <strong>WSASS</strong> estará disponible en la sección Mis Servicios.</p>
+              <div class="image-placeholder">
+                <img src="assets/images/arca_step2_09_wsass.png" alt="Servicio WSASS Disponible" class="step-image">
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+
+      <ng-container *ngIf="step === 3">
+        <p class="intro-text">
+          Generación de Certificados en WSASS
+        </p>
+
+        <div class="instruction-list">
+          <div class="instruction-item">
+            <span class="step-number">1</span>
+            <div class="step-content">
+              <p>Tras ingresar al servicio WSASS, haz clic en <strong>"Certificados"</strong> dentro del menú principal.
+              </p>
+              <div class="image-placeholder">
+                <img src="assets/images/arca_step3_01_certificados.png" alt="Menú Certificados WSASS"
+                  class="step-image">
+              </div>
+            </div>
+          </div>
+
+          <div class="instruction-item">
+            <span class="step-number">2</span>
+            <div class="step-content">
+              <p>Generación de Clave Privada y CSR (Pedido de Firma de Certificado).</p>
+              <p class="small-text">Esta clave privada será utilizada automáticamente por el sistema para generar el
+                nuevo certificado.</p>
+
+              <div class="action-box">
+                <button class="btn-primary" (click)="generateCsr()" [disabled]="isGeneratingCsr" *ngIf="!csrGenerated">
+                  <span *ngIf="!isGeneratingCsr">Generar Clave y CSR</span>
+                  <span *ngIf="isGeneratingCsr"><i class='bx bx-loader-alt bx-spin'></i> Generando...</span>
+                </button>
+
+                <div *ngIf="csrGenerated" class="success-message">
+                  <i class='bx bx-check-circle'></i>
+                  <p>¡Clave y CSR disponibles! El CSR está listo para ser copiado.</p>
+                  <div style="display: flex; gap: 10px; align-items: center;">
+                    <button class="btn-secondary btn-sm" (click)="copyToClipboard(csr)">
+                      <i class='bx bx-copy'></i> Copiar CSR
+                    </button>
+                    <button class="btn-outline-secondary btn-sm" (click)="generateCsr()" [disabled]="isGeneratingCsr">
+                      <i class='bx bx-refresh'></i> Regenerar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="instruction-item">
+            <span class="step-number">3</span>
+            <div class="step-content">
+              <p>Deberás pegar en el espacio indicado en WSASS el certificado (CSR) previamente generado y copiado.</p>
+              <div class="image-placeholder">
+                <img src="assets/images/arca_step3_03_pegar_csr.png" alt="Pegar CSR en WSASS" class="step-image">
+              </div>
+            </div>
+          </div>
+
+          <div class="instruction-item">
+            <span class="step-number">4</span>
+            <div class="step-content">
+              <p>Cargar como nombre simbólico del DN <strong>mipymewebta</strong>. No usar mayúsculas o la vinculación
+                fallará.</p>
+              <button class="btn-secondary btn-sm" (click)="copyToClipboard('mipymewebta')">
+                <i class='bx bx-copy'></i> Copiar Nombre Simbólico
+              </button>
+              <div class="image-placeholder">
+                <img src="assets/images/arca_step3_04_nombre_simbolico.png" alt="Nombre Simbólico" class="step-image">
+              </div>
+            </div>
+          </div>
+
+          <div class="instruction-item">
+            <span class="step-number">5</span>
+            <div class="step-content">
+              <p>Pulsar el botón <strong>"Crear DN y obtener certificado"</strong>.</p>
+              <div class="image-placeholder">
+                <img src="assets/images/arca_step3_05_crear_dn.png" alt="Botón Crear DN" class="step-image">
+              </div>
+            </div>
+          </div>
+
+          <div class="instruction-item">
+            <span class="step-number">6</span>
+            <div class="step-content">
+              <p>Copiar la totalidad del contenido del cuadro <strong>"Resultado"</strong>. Asegúrate de incluir desde
+                <code>-----BEGIN CERTIFICATE-----</code> hasta <code>-----END CERTIFICATE-----</code>, sin dejar ningún
+                carácter fuera.
+              </p>
+              <div class="image-placeholder">
+                <img src="assets/images/arca_step3_06_copiar_resultado.png" alt="Copiar Resultado Completo"
+                  class="step-image">
+              </div>
+            </div>
+          </div>
+
+          <div class="instruction-item">
+            <span class="step-number">7</span>
+            <div class="step-content">
+              <p>Pegar el contenido copiado a continuación:</p>
+              <textarea [(ngModel)]="certificateContent"
+                placeholder="-----BEGIN CERTIFICATE----- ... -----END CERTIFICATE-----" rows="8"
+                class="form-control certificate-input"></textarea>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+
+      <ng-container *ngIf="step === 4">
+        <p class="intro-text">
+          Autorización de Acceso a Servicios (WSFE)
+        </p>
+
+        <div class="instruction-list">
+          <div class="instruction-item">
+            <span class="step-number">1</span>
+            <div class="step-content">
+              <p>Dentro de WSASS, volver al menú principal y hacer clic en <strong>"Certificados"</strong>.</p>
+              <div class="image-placeholder">
+                <img src="assets/images/arca_step4_01_certificados.png" alt="Menú Certificados" class="step-image">
+              </div>
+            </div>
+          </div>
+
+          <div class="instruction-item">
+            <span class="step-number">2</span>
+            <div class="step-content">
+              <p>Seleccionar el DN <strong>"mipymewebta"</strong> en "DN Origen" y luego buscar y seleccionar
+                <strong>"wsfe - Facturación Electrónica"</strong> en el campo "Servicio".
+              </p>
+              <div class="image-placeholder">
+                <img src="assets/images/arca_step4_02_seleccionar_wsfe.png" alt="Seleccionar WSFE" class="step-image">
+              </div>
+            </div>
+          </div>
+
+          <div class="instruction-item">
+            <span class="step-number">3</span>
+            <div class="step-content">
+              <p>Hacer clic en el botón <strong>"Crear Autorización de Acceso"</strong>.</p>
+              <div class="image-placeholder">
+                <img src="assets/images/arca_step4_03_crear_auth.png" alt="Botón Crear Autorización" class="step-image">
+              </div>
+            </div>
+          </div>
+
+          <div class="instruction-item">
+            <span class="step-number">4</span>
+            <div class="step-content">
+              <p><strong>Descargar Archivo P12:</strong> Este archivo contiene tu clave privada y certificado. Guárdalo
+                en un lugar seguro y no olvides su contraseña.</p>
+              <button class="btn-secondary btn-sm" (click)="downloadP12()">
+                <i class='bx bx-download'></i> Generar y Descargar P12
+              </button>
+            </div>
+          </div>
+
+          <div class="instruction-item">
+            <span class="step-number">5</span>
+            <div class="step-content">
+              <p><strong>Activar Conexión:</strong> Sube el archivo P12 que acabas de descargar para autenticarte con
+                AFIP y finalizar la configuración.</p>
+              <button class="btn-primary btn-sm" (click)="activateWithP12()">
+                <i class='bx bx-check-shield'></i> Subir P12 y Activar
+              </button>
+            </div>
+          </div>
+
+          <div class="info-box" style="background-color: #ecfdf5; border-color: #d1fae5; margin-top: 2rem;">
+            <i class='bx bx-check-circle' style="color: #059669;"></i>
+            <div>
+              <strong>¡Verificación de Resultado!</strong>
+              <p style="margin: 0; color: #065f46;">
+                Si en el resultado figura un <strong>OK</strong> y el mensaje <em>"Autorización fue creada..."</em>,
+                significa que los pasos fueron completados exitosamente.
+                Ya puedes pulsar <strong>Finalizar Configuración</strong> para cerrar el asistente.
+              </p>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+    </div>
+
+
+    <div class="wizard-actions">
+      <button class="btn-secondary" (click)="prevStep()" *ngIf="step > 1">
+        Atrás
+      </button>
+
+      <button class="btn-primary" (click)="nextStep()" *ngIf="step === 1">
+        Comenzar
+        <i class='bx bx-right-arrow-alt'></i>
+      </button>
+
+      <button class="btn-primary" (click)="nextStep()" *ngIf="step === 2">
+        Siguiente
+        <i class='bx bx-right-arrow-alt'></i>
+      </button>
+
+      <button class="btn-primary" (click)="saveCertificate()" *ngIf="step === 3"
+        [disabled]="!certificateContent || isSavingCert">
+        <span *ngIf="!isSavingCert">Siguiente <i class='bx bx-right-arrow-alt'></i></span>
+        <span *ngIf="isSavingCert"><i class='bx bx-loader-alt bx-spin'></i> Guardando...</span>
+      </button>
+
+      <button class="btn-finish" (click)="finishWizard()" *ngIf="step === 4">
+        <span>Finalizar Configuración <i class='bx bx-check-double'></i></span>
+      </button>
+    </div>
+  </div>
+</div>

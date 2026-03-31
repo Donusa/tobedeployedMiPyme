@@ -1,0 +1,121 @@
+<div class="offers-container">
+  <div class="header">
+    <button class="btn-primary" (click)="openCreateModal()">
+      <i class='bx bx-plus'></i> Generar Oferta
+    </button>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-container">
+    <app-spinner></app-spinner>
+  </div>
+
+  <div class="offers-grid" *ngIf="!isLoading">
+    <div *ngFor="let offer of offers" class="offer-card" (click)="openEditModal(offer)">
+      <div class="card-header">
+        <div class="card-title-row">
+          <h3>{{ offer.name }}</h3>
+          <span class="status-badge" [ngClass]="getStatusClass(offer.status)">
+            {{ getStatusLabel(offer.status) }}
+          </span>
+        </div>
+        <button class="btn-icon delete-btn" (click)="deleteOffer(offer); $event.stopPropagation()">
+          <i class='bx bx-trash'></i>
+        </button>
+      </div>
+      <div class="card-body">
+        <p *ngIf="offer.indefinite">Indefinida</p>
+        <p *ngIf="!offer.indefinite">{{ offer.startDate | date }} - {{ offer.endDate | date }}</p>
+        <p class="discount" *ngIf="offer.discountType !== 'X_FOR_Y'">
+          {{ offer.discountValue }} {{ offer.discountType === 'PERCENTAGE' ? '%' : '$' }} OFF
+        </p>
+        <p class="discount" *ngIf="offer.discountType === 'X_FOR_Y'">
+          {{ offer.buyQuantity }}x{{ offer.payQuantity }}
+        </p>
+        <p class="target">Aplica a: {{ offer.targetType }}</p>
+
+
+        <p class="error-msg" *ngIf="offer.errorMessage" [title]="offer.errorMessage">
+          <i class='bx bx-error-circle'></i> {{ offer.errorMessage | slice:0:80 }}{{ offer.errorMessage!.length > 80 ? '...' : '' }}
+        </p>
+
+
+        <p class="sync-info" *ngIf="offer.lastSyncedAt">
+          <i class='bx bx-time-five'></i> Sincronizado: {{ offer.lastSyncedAt | date:'short' }}
+        </p>
+      </div>
+
+      <div class="card-footer">
+
+        <div class="channel-actions" *ngIf="offer.hasTiendaNubeLinks" (click)="$event.stopPropagation()">
+          <button class="btn-publish" [class.published]="offer.publishedTiendaNube"
+                  [disabled]="processingOfferId === offer.offerId"
+                  (click)="toggleTiendaNube(offer)">
+            <i class='bx bx-cloud'></i> {{ offer.publishedTiendaNube ? 'TN ✓' : 'Publicar TN' }}
+          </button>
+          <button class="btn-sync" *ngIf="offer.publishedTiendaNube"
+                  [disabled]="processingOfferId === offer.offerId"
+                  (click)="syncTiendaNube(offer)" title="Sincronizar TiendaNube">
+            <i class='bx bx-refresh' [class.spinning]="processingOfferId === offer.offerId"></i>
+          </button>
+        </div>
+
+
+        <div class="channel-actions" *ngIf="offer.hasMercadoLibreLinks" (click)="$event.stopPropagation()">
+          <button class="btn-publish" [class.published]="offer.publishedMercadoLibre"
+                  [disabled]="processingOfferId === offer.offerId"
+                  (click)="toggleMercadoLibre(offer)">
+            <i class='bx bx-shopping-bag'></i> {{ offer.publishedMercadoLibre ? 'ML ✓' : 'Publicar ML' }}
+          </button>
+          <button class="btn-sync" *ngIf="offer.publishedMercadoLibre"
+                  [disabled]="processingOfferId === offer.offerId"
+                  (click)="syncMercadoLibre(offer)" title="Sincronizar MercadoLibre">
+            <i class='bx bx-refresh' [class.spinning]="processingOfferId === offer.offerId"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <app-offer-form *ngIf="showModal" [offer]="selectedOffer" (close)="closeModal()" (save)="onSave($event)"></app-offer-form>
+
+
+  <div class="modal-backdrop" *ngIf="showDeleteModal" (click)="closeDeleteModal()">
+    <div class="modal-content delete-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Confirmar Eliminación</h2>
+        <button class="btn-close" (click)="closeDeleteModal()"><i class='bx bx-x'></i></button>
+      </div>
+      <div class="modal-body">
+        <p>¿Estás seguro que deseas eliminar la oferta <strong>{{ offerToDelete?.name }}</strong>?</p>
+        <p class="text-muted">Esta acción no se puede deshacer.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeDeleteModal()">Cancelar</button>
+        <button class="btn-danger" (click)="confirmDelete()">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal-backdrop" *ngIf="showActionModal" (click)="closeActionModal()">
+    <div class="modal-content delete-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2 style="color: #1890ff;">{{ actionTitle }}</h2>
+        <button class="btn-close" (click)="closeActionModal()"><i class='bx bx-x'></i></button>
+      </div>
+      <div class="modal-body">
+        <p>{{ actionMessage }}</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeActionModal()">Cancelar</button>
+        <button class="btn-primary" (click)="confirmAction()">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="toast-notification" *ngIf="showToast" [ngClass]="toastType" (click)="showToast = false">
+    <i class='bx' [ngClass]="toastType === 'success' ? 'bx-check-circle' : 'bx-error-circle'"></i>
+    <span>{{ toastMessage }}</span>
+  </div>
+</div>

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>MiPyme</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+
+<body>
+  <app-root></app-root>
+
+
+  <script>
+    window.fbAsyncInit = function () {
+      FB.init({
+        appId: '1468044758169389',
+        autoLogAppEvents: true,
+        xfbml: true,
+        version: 'v25.0'
+      });
+      console.log('[FB SDK] Initialized successfully');
+    };
+  </script>
+  <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+</body>
+
+</html>

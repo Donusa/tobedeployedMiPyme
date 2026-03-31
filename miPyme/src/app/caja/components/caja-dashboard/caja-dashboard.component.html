@@ -1,0 +1,261 @@
+<div class="caja-container">
+  <app-spinner *ngIf="isLoading"></app-spinner>
+
+
+  <div class="caja-header">
+    <div class="header-left">
+      <h2><i class="bx bx-calculator"></i> Caja Diaria</h2>
+    </div>
+    <div class="header-right">
+      <select [(ngModel)]="sucursalSeleccionada" (ngModelChange)="onSucursalChange()" class="select-sucursal">
+        <option [ngValue]="null">Seleccionar sucursal...</option>
+        <option *ngFor="let s of sucursales" [ngValue]="s.warehouseId">{{ s.warehouseName }}</option>
+      </select>
+    </div>
+  </div>
+
+
+  <div *ngIf="!sucursalSeleccionada" class="empty-state">
+    <i class="bx bx-store-alt"></i>
+    <p>Seleccioná una sucursal para gestionar la caja</p>
+    <a *ngIf="sucursales.length === 0 && isAdmin" routerLink="/stock/warehouses" class="btn btn-outline btn-sm" style="margin-top:8px">
+      <i class="bx bx-plus"></i> Crear sucursales
+    </a>
+  </div>
+
+
+  <div *ngIf="sucursalSeleccionada && !cajaActual && !isLoading" class="empty-state">
+    <i class="bx bx-lock-open-alt"></i>
+    <p>No hay caja abierta para <strong>{{ getSucursalNombre() }}</strong></p>
+    <button class="btn btn-primary" (click)="onAbrirCaja()">
+      <i class="bx bx-play-circle"></i> Abrir Caja
+    </button>
+  </div>
+
+
+  <div *ngIf="cajaActual" class="caja-activa">
+
+
+    <div class="caja-status-bar">
+      <div class="status-info">
+        <span class="badge" [ngClass]="getEstadoClass(cajaActual.estado)">{{ getEstadoLabel(cajaActual.estado) }}</span>
+        <span class="status-detail">
+          {{ cajaActual.sucursalNombre }} — Abierta por <strong>{{ cajaActual.usuarioApertura }}</strong>
+          el {{ cajaActual.fechaHoraApertura | date:'dd/MM/yy HH:mm' }}
+          — Apertura: <strong>{{ cajaActual.montoAperturaEfectivo | currency:'ARS':'symbol':'1.2-2' }}</strong>
+        </span>
+      </div>
+      <div class="status-actions">
+        <button class="btn btn-primary btn-sm" (click)="onNuevaVenta()" title="Nueva Venta">
+          <i class="bx bx-cart-add"></i> Nueva Venta
+        </button>
+        <button class="btn btn-outline btn-sm" (click)="onRegistrarIngreso()" title="Ingreso manual">
+          <i class="bx bx-plus-circle"></i> Ingreso
+        </button>
+        <button class="btn btn-outline btn-sm btn-warning-outline" (click)="onRegistrarEgreso()" title="Registrar egreso">
+          <i class="bx bx-minus-circle"></i> Egreso
+        </button>
+        <button class="btn btn-danger btn-sm" (click)="onCerrarCaja()">
+          <i class="bx bx-stop-circle"></i> Cerrar Caja
+        </button>
+      </div>
+    </div>
+
+
+    <div class="caja-tabs">
+      <button class="tab" [class.active]="activeTab === 'resumen'" (click)="onTabChange('resumen')">
+        <i class="bx bx-pie-chart-alt-2"></i> Resumen
+      </button>
+      <button class="tab" [class.active]="activeTab === 'ventas'" (click)="onTabChange('ventas')">
+        <i class="bx bx-cart"></i> Ventas
+      </button>
+      <button class="tab" [class.active]="activeTab === 'movimientos'" (click)="onTabChange('movimientos')">
+        <i class="bx bx-list-ul"></i> Movimientos
+      </button>
+      <button class="tab" [class.active]="activeTab === 'historial'" (click)="onTabChange('historial')">
+        <i class="bx bx-history"></i> Historial
+      </button>
+    </div>
+
+
+    <div *ngIf="activeTab === 'resumen' && resumen" class="tab-content">
+
+      <div class="resumen-grid">
+        <div class="resumen-card">
+          <span class="resumen-label">Total vendido</span>
+          <span class="resumen-value positive">{{ resumen.totalVendido | currency:'ARS':'symbol':'1.2-2' }}</span>
+          <small class="resumen-sub">{{ resumen.cantidadVentas }} ventas</small>
+        </div>
+        <div class="resumen-card">
+          <span class="resumen-label">Total cobrado</span>
+          <span class="resumen-value">{{ resumen.totalCobrado | currency:'ARS':'symbol':'1.2-2' }}</span>
+        </div>
+        <div class="resumen-card">
+          <span class="resumen-label">Egresos</span>
+          <span class="resumen-value negative">{{ resumen.cantidadEgresos }} mov.</span>
+        </div>
+        <div class="resumen-card">
+          <span class="resumen-label">Efectivo esperado</span>
+          <span class="resumen-value">{{ resumen.cajaFisica?.efectivoEsperado | currency:'ARS':'symbol':'1.2-2' }}</span>
+        </div>
+      </div>
+
+
+      <div *ngIf="resumen.cajaFisica" class="efectivo-breakdown">
+        <h4>Composición del efectivo</h4>
+        <div class="breakdown-rows">
+          <div class="breakdown-row">
+            <span>Apertura de caja</span>
+            <span class="breakdown-value">{{ resumen.cajaFisica.aperturaEfectivo | currency:'ARS':'symbol':'1.2-2' }}</span>
+          </div>
+          <div class="breakdown-row positive">
+            <span>+ Ingresos en efectivo</span>
+            <span class="breakdown-value">{{ resumen.cajaFisica.ingresosEfectivo | currency:'ARS':'symbol':'1.2-2' }}</span>
+          </div>
+          <div class="breakdown-row negative">
+            <span>− Egresos en efectivo</span>
+            <span class="breakdown-value">{{ resumen.cajaFisica.egresosEfectivo | currency:'ARS':'symbol':'1.2-2' }}</span>
+          </div>
+          <div class="breakdown-row total">
+            <span><strong>= Efectivo esperado</strong></span>
+            <span class="breakdown-value"><strong>{{ resumen.cajaFisica.efectivoEsperado | currency:'ARS':'symbol':'1.2-2' }}</strong></span>
+          </div>
+        </div>
+      </div>
+
+
+      <div *ngIf="resumen.resumenPorMedioPago" class="medio-pago-section">
+        <h4>Desglose por medio de pago</h4>
+        <div class="medio-pago-grid">
+          <div *ngFor="let entry of resumen.resumenPorMedioPago | keyvalue" class="medio-pago-item">
+            <span class="mp-label">{{ getMedioPagoLabel(entry.key) }}</span>
+            <span class="mp-value">{{ entry.value | currency:'ARS':'symbol':'1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div *ngIf="activeTab === 'movimientos'" class="tab-content">
+      <app-movimientos-list
+        [movimientos]="movimientos"
+        [cajaId]="cajaActual.id"
+        [cajaAbierta]="cajaActual.estado === 'ABIERTA'"
+        [isAdmin]="isAdmin"
+        (movimientoAnulado)="onMovimientoAnulado()">
+      </app-movimientos-list>
+    </div>
+
+
+    <div *ngIf="activeTab === 'ventas'" class="tab-content">
+      <div class="ventas-table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Hora</th>
+              <th>Venta #</th>
+              <th>Medio de pago</th>
+              <th>Total</th>
+              <th>Productos</th>
+              <th>Creado por</th>
+              <th>Facturado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let v of ventas">
+              <td>{{ v.saleDate | date:'HH:mm' }}</td>
+              <td>#{{ v.saleId }}</td>
+              <td>
+                <span class="badge-mp">{{ v.medioPago || '?' }}</span>
+              </td>
+              <td class="monto-cell positive">{{ v.totalAmount | currency:'ARS':'symbol':'1.2-2' }}</td>
+              <td>
+                <span class="items-summary" [title]="v.items | json">
+                  {{ v.items.length }} ítem{{ v.items.length !== 1 ? 's' : '' }}
+                </span>
+              </td>
+              <td>{{ v.createdBy }}</td>
+              <td>
+                <span class="estado-badge" [ngClass]="v.facturado ? 'activo' : 'anulado-badge'">
+                  {{ v.facturado ? 'Sí' : 'No' }}
+                </span>
+              </td>
+            </tr>
+            <tr *ngIf="ventas.length === 0">
+              <td colspan="7" class="no-data">No hay ventas registradas en el período de esta caja.</td>
+            </tr>
+          </tbody>
+        </table>
+        <div *ngIf="ventas.length > 0" class="ventas-footer">
+          <strong>Total: {{ ventas.length }} venta{{ ventas.length !== 1 ? 's' : '' }}</strong>
+          <strong class="positive">{{ getTotalVentas() | currency:'ARS':'symbol':'1.2-2' }}</strong>
+        </div>
+      </div>
+    </div>
+
+
+    <div *ngIf="activeTab === 'historial'" class="tab-content">
+      <div class="historial-table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Estado</th>
+              <th>Apertura</th>
+              <th>Cierre</th>
+              <th>Diferencia</th>
+              <th>Usuario</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let h of historial">
+              <td>{{ h.fechaOperativa | date:'dd/MM/yy' }}</td>
+              <td><span class="badge" [ngClass]="getEstadoClass(h.estado)">{{ getEstadoLabel(h.estado) }}</span></td>
+              <td>{{ h.montoAperturaEfectivo | currency:'ARS':'symbol':'1.2-2' }}</td>
+              <td>{{ h.montoContadoEfectivo != null ? (h.montoContadoEfectivo | currency:'ARS':'symbol':'1.2-2') : '—' }}</td>
+              <td [class.negative]="h.montoDiferencia && h.montoDiferencia < 0"
+                  [class.positive]="h.montoDiferencia && h.montoDiferencia > 0">
+                {{ h.montoDiferencia != null ? (h.montoDiferencia | currency:'ARS':'symbol':'1.2-2') : '—' }}
+              </td>
+              <td>{{ h.usuarioApertura }}</td>
+            </tr>
+            <tr *ngIf="historial.length === 0">
+              <td colspan="6" class="no-data">No hay registros en el historial.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<app-abrir-caja
+  *ngIf="showAbrirCaja"
+  [sucursalId]="sucursalSeleccionada!"
+  [sucursalNombre]="getSucursalNombre()"
+  (cajaAbierta)="onCajaAbierta($event)"
+  (cerrar)="onCerrar()">
+</app-abrir-caja>
+
+<app-cerrar-caja
+  *ngIf="showCerrarCaja && cajaActual"
+  [caja]="cajaActual"
+  [resumen]="resumen"
+  (cajaCerrada)="onCajaCerrada($event)"
+  (cerrar)="onCerrar()">
+</app-cerrar-caja>
+
+<app-registrar-egreso
+  *ngIf="showRegistrarEgreso && cajaActual"
+  [cajaId]="cajaActual.id"
+  (egresoRegistrado)="onEgresoRegistrado()"
+  (cerrar)="onCerrar()">
+</app-registrar-egreso>
+
+<app-registrar-ingreso
+  *ngIf="showRegistrarIngreso && cajaActual"
+  [cajaId]="cajaActual.id"
+  (ingresoRegistrado)="onIngresoRegistrado()"
+  (cerrar)="onCerrar()">
+</app-registrar-ingreso>

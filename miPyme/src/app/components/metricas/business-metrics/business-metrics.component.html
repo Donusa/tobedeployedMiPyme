@@ -1,0 +1,198 @@
+<div class="metrics-dashboard">
+
+    <app-spinner *ngIf="isLoading"></app-spinner>
+
+
+    <div class="error-state" *ngIf="errorMessage && !isLoading">
+        <div class="error-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <p class="error-title">Error al cargar los datos</p>
+        <p class="error-msg">{{ errorMessage }}</p>
+        <button class="retry-btn" (click)="loadData()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4"/></svg>
+            Reintentar
+        </button>
+    </div>
+
+
+    <div class="dashboard-header">
+        <div class="header-title">
+            <div class="header-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            </div>
+            <div>
+                <h2 class="section-title">Negocio y Reportes</h2>
+                <p class="section-subtitle">Métricas clave de rendimiento del período seleccionado</p>
+            </div>
+        </div>
+
+
+        <div class="date-range">
+            <div class="date-field">
+                <label>Desde</label>
+                <input type="date" [(ngModel)]="startDate" (change)="loadData()">
+            </div>
+            <div class="date-separator">→</div>
+            <div class="date-field">
+                <label>Hasta</label>
+                <input type="date" [(ngModel)]="endDate" (change)="loadData()">
+            </div>
+        </div>
+    </div>
+
+
+    <div class="kpi-row" *ngIf="isLoading">
+        <div class="kpi-card-skeleton" *ngFor="let i of [1,2,3]">
+            <div class="skeleton-line short"></div>
+            <div class="skeleton-line tall"></div>
+            <div class="skeleton-line medium"></div>
+        </div>
+    </div>
+
+
+    <div class="kpi-row" *ngIf="!isLoading && !errorMessage">
+        <div class="kpi-card kpi-card--blue">
+            <div class="kpi-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <div class="kpi-content">
+                <span class="kpi-label">Ventas Totales</span>
+                <div class="kpi-value">{{ totalSales | currency:'USD':'symbol':'1.0-0' }}</div>
+                <div class="kpi-sub">
+                    <span class="kpi-badge">{{ totalOrders }} órdenes</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="kpi-card kpi-card--violet">
+            <div class="kpi-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            </div>
+            <div class="kpi-content">
+                <span class="kpi-label">Ticket Promedio</span>
+                <div class="kpi-value">{{ averageTicket | currency:'USD':'symbol':'1.0-0' }}</div>
+                <div class="kpi-sub">por transacción</div>
+            </div>
+        </div>
+
+        <div class="kpi-card kpi-card--green">
+            <div class="kpi-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+            </div>
+            <div class="kpi-content">
+                <span class="kpi-label">Margen Bruto</span>
+                <div class="kpi-value">{{ grossMargin | currency:'USD':'symbol':'1.0-0' }}</div>
+                <div class="kpi-sub">
+                    <span class="kpi-badge green">{{ grossMarginPercent | percent:'1.1-1' }} del total</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <ng-container *ngIf="isLoading">
+        <div class="charts-row">
+            <div class="chart-skeleton large-skeleton">
+                <div class="skeleton-line short" style="margin-bottom:16px"></div>
+                <div class="skeleton-bar-group">
+                    <div class="skeleton-bar" style="height:60%"></div>
+                    <div class="skeleton-bar" style="height:85%"></div>
+                    <div class="skeleton-bar" style="height:45%"></div>
+                    <div class="skeleton-bar" style="height:70%"></div>
+                    <div class="skeleton-bar" style="height:55%"></div>
+                    <div class="skeleton-bar" style="height:90%"></div>
+                </div>
+            </div>
+        </div>
+        <div class="charts-row">
+            <div class="chart-skeleton half-skeleton">
+                <div class="skeleton-line short" style="margin-bottom:16px"></div>
+                <div class="skeleton-wave"></div>
+            </div>
+            <div class="chart-skeleton half-skeleton">
+                <div class="skeleton-line short" style="margin-bottom:16px"></div>
+                <div class="skeleton-bar-group horizontal">
+                    <div class="skeleton-hbar" style="width:80%"></div>
+                    <div class="skeleton-hbar" style="width:65%"></div>
+                    <div class="skeleton-hbar" style="width:90%"></div>
+                    <div class="skeleton-hbar" style="width:50%"></div>
+                    <div class="skeleton-hbar" style="width:75%"></div>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+
+
+    <div class="charts-row" *ngIf="!isLoading && !errorMessage && !layoutService.isMobile()">
+        <div class="chart-container large">
+            <div class="chart-header">
+                <span class="chart-dot blue"></span>
+                <h4>Ventas por Empleado / Canal</h4>
+            </div>
+            <div class="chart-fixed-height">
+                <canvas id="chartSalesByEmployee"></canvas>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="charts-row" *ngIf="!isLoading && !errorMessage && !layoutService.isMobile()">
+        <div class="chart-container half">
+            <div class="chart-header">
+                <span class="chart-dot violet"></span>
+                <h4>Evolución Diaria</h4>
+            </div>
+            <div class="chart-fixed-height">
+                <canvas id="chartEvolution"></canvas>
+            </div>
+        </div>
+        <div class="chart-container half">
+            <div class="chart-header">
+                <span class="chart-dot green"></span>
+                <h4>Top 10 Productos</h4>
+            </div>
+            <div class="chart-fixed-height">
+                <canvas id="chartTopProducts"></canvas>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="mobile-chart-carousel" *ngIf="!isLoading && !errorMessage && layoutService.isMobile()">
+
+        <div class="carousel-header">
+            <button class="carousel-btn" (click)="prevChart()" aria-label="Anterior">
+                <i class='bx bx-chevron-left'></i>
+            </button>
+            <div class="carousel-info">
+                <span class="carousel-title">{{ chartTitles[currentChartIdx] }}</span>
+                <span class="carousel-counter">{{ currentChartIdx + 1 }}/{{ chartCount }}</span>
+            </div>
+            <button class="carousel-btn" (click)="nextChart()" aria-label="Siguiente">
+                <i class='bx bx-chevron-right'></i>
+            </button>
+        </div>
+
+
+        <div class="carousel-chart-body">
+            <div class="chart-canvas-wrapper" *ngIf="currentChartIdx === 0">
+                <canvas id="chartSalesByEmployee"></canvas>
+            </div>
+            <div class="chart-canvas-wrapper" *ngIf="currentChartIdx === 1">
+                <canvas id="chartEvolution"></canvas>
+            </div>
+            <div class="chart-canvas-wrapper" *ngIf="currentChartIdx === 2">
+                <canvas id="chartTopProducts"></canvas>
+            </div>
+        </div>
+
+
+        <div class="carousel-dots">
+            <span class="dot" [class.active]="currentChartIdx === 0" (click)="goToChart(0)"></span>
+            <span class="dot" [class.active]="currentChartIdx === 1" (click)="goToChart(1)"></span>
+            <span class="dot" [class.active]="currentChartIdx === 2" (click)="goToChart(2)"></span>
+        </div>
+    </div>
+
+</div>

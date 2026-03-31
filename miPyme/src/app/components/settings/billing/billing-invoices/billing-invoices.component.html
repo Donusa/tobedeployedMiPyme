@@ -1,0 +1,43 @@
+<div class="billing-container slide-in-bottom">
+    <div class="header-section">
+        <h2>Historial de Pagos</h2>
+        <p class="subtitle">Historial de pagos y comprobantes de tu suscripción.</p>
+    </div>
+
+    <div class="invoices-list glass-panel" *ngIf="!isLoading && payments.length > 0">
+        <table>
+            <thead>
+                <tr>
+                    <th>Estado</th>
+                    <th>Fecha</th>
+                    <th>ID de Pago</th>
+                    <th>Monto</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let payment of payments">
+                    <td>
+                        <span class="status-badge" [ngClass]="getStatusClass(payment.status)">
+                            {{ getStatusLabel(payment.status) }}
+                        </span>
+                    </td>
+                    <td>{{ payment.approvedAt ? (payment.approvedAt | date:'dd/MM/yyyy') : '-' }}</td>
+                    <td>{{ payment.paymentId }}</td>
+                    <td>${{ payment.amount }} {{ payment.currency || 'ARS' }}</td>
+                    <td>{{ payment.payerEmail || '-' }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="empty-state glass-panel" *ngIf="!isLoading && payments.length === 0">
+        <i class='bx bx-receipt'></i>
+        <p>No hay pagos registrados todavía.</p>
+    </div>
+
+    <div class="loading-state" *ngIf="isLoading">
+        <i class='bx bx-loader-alt bx-spin'></i>
+        <p>Cargando historial...</p>
+    </div>
+</div>

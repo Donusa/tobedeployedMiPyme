@@ -1,0 +1,23 @@
+<div class="changelog-container">
+  <div class="header-section">
+    <h1>Novedades y Actualizaciones</h1>
+    <p>Mantente al día con las últimas mejoras de la plataforma.</p>
+  </div>
+
+  <div class="timeline">
+    <div class="timeline-item" *ngFor="let item of changelog">
+      <div class="timeline-marker"></div>
+      <div class="timeline-content">
+        <div class="version-badge" [ngClass]="item.type">v{{ item.version }}</div>
+        <div class="date">{{ item.date | date:'longDate' }}</div>
+        <h3 class="title">{{ item.title }}</h3>
+        <p class="description">{{ item.description }}</p>
+        <ul class="changes-list">
+          <li *ngFor="let change of item.changes">
+            <i class='bx bx-check'></i> {{ change }}
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

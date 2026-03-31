@@ -1,0 +1,157 @@
+.security-container {
+  padding: 24px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+h3 {
+  margin-bottom: 8px;
+  color: #1a1a1a;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.subtitle {
+  color: #666;
+  font-size: 0.95rem;
+  margin-bottom: 32px;
+  line-height: 1.5;
+}
+
+:host-context(body.dark-theme) .security-container {
+  background: #1f2937;
+}
+
+:host-context(body.dark-theme) h3 {
+  color: #f9fafb;
+}
+
+:host-context(body.dark-theme) .subtitle {
+  color: #9ca3af;
+}
+
+.loading-state {
+  display: flex;
+  justify-content: center;
+  padding: 60px;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 26px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #2563eb;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2563eb;
+}
+
+input:checked + .slider:before {
+  transform: translateX(24px);
+}
+
+.tfa-alert {
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+.tfa-card {
+  padding: 24px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.tfa-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tfa-text {
+  flex: 1;
+  margin-right: 1.5rem;
+}
+
+.tfa-title {
+  margin: 0 0 8px 0;
+  font-size: 1.1rem;
+  color: #111827;
+}
+
+.tfa-desc {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.tfa-active-notice {
+  margin-top: 16px;
+  padding: 12px;
+  background-color: #f0fdf4;
+  border-left: 4px solid #10b981;
+  border-radius: 4px;
+}
+
+.tfa-active-inner {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.tfa-active-icon {
+  color: #10b981;
+  font-size: 1.25rem;
+  margin-top: 2px;
+}
+
+.tfa-active-title {
+  margin: 0;
+  font-weight: 500;
+  color: #064e3b;
+}
+
+.tfa-active-desc {
+  margin: 4px 0 0 0;
+  font-size: 0.85rem;
+  color: #065f46;
+}

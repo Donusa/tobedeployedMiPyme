@@ -1,0 +1,469 @@
+<div class="abm-container">
+    <app-spinner *ngIf="isLoading"></app-spinner>
+
+
+    <div class="filters-bar">
+        <div class="search-group">
+            <button class="scan-toggle-btn" (click)="toggleEmbeddedScanner()"
+                [title]="showEmbeddedScanner ? 'Ocultar Escáner' : 'Mostrar Escáner'">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
+                    <path d="M17 3h2a2 2 0 0 1 2 2v2"></path>
+                    <path d="M21 17v2a2 2 0 0 1-2 2h-2"></path>
+                    <path d="M7 21H5a2 2 0 0 1-2-2v-2"></path>
+                    <line x1="12" y1="12" x2="12" y2="12"></line>
+                </svg>
+            </button>
+            <input type="text" [(ngModel)]="searchTerm" (input)="filterProducts()"
+                placeholder="Buscar por nombre o código..." class="search-input">
+        </div>
+        <div class="filter-divider"></div>
+        <div class="filter-group">
+            <label>Depósito</label>
+            <select [ngModel]="selectedGlobalWarehouse" (ngModelChange)="onGlobalWarehouseChange($event)">
+                <option [ngValue]="undefined">Ninguno (Ver Todos)</option>
+                <option *ngFor="let w of warehouses" [ngValue]="w">{{ w.warehouseName }}</option>
+                <option [ngValue]="'NEW'" class="create-option">+ Crear Nuevo Depósito...</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Ubicación</label>
+            <select [ngModel]="selectedGlobalLocation" (ngModelChange)="onGlobalLocationChange($event)"
+                [disabled]="!selectedGlobalWarehouse">
+                <option [ngValue]="undefined">Ninguna (Ver Todas)</option>
+                <option *ngFor="let l of filteredLocations" [ngValue]="l">{{ l.locationCode }} - {{
+                    l.locationDescription }}</option>
+                <option [ngValue]="'NEW'" class="create-option">+ Crear Nueva Ubicación...</option>
+            </select>
+        </div>
+    </div>
+
+
+    <div class="embedded-scanner-section" *ngIf="showEmbeddedScanner">
+        <div class="scanner-container">
+            <div class="scanner-header">
+                <h3>Escáner Continuo</h3>
+                <div class="scanner-controls" *ngIf="availableDevices.length > 1">
+                    <select #deviceSelect (change)="onDeviceSelectChange(deviceSelect.value)" class="device-select">
+                        <option *ngFor="let device of availableDevices" [value]="device.deviceId"
+                            [selected]="currentDevice && device.deviceId === currentDevice.deviceId">
+                            {{ device.label || 'Cámara ' + (availableDevices.indexOf(device) + 1) }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="scanner-wrapper">
+                <zxing-scanner *ngIf="scannerEnabled" [formats]="allowedFormats" [device]="currentDevice"
+                    (camerasFound)="onCamerasFound($event)" (permissionResponse)="onPermissionResponse($event)"
+                    (scanSuccess)="handleScanSuccess($event)">
+                </zxing-scanner>
+
+                <div class="scanner-status" *ngIf="!hasPermission">
+                    <p class="error-text">Permiso de cámara denegado.</p>
+                    <button (click)="checkCameraPermission()" class="retry-permission-btn">Habilitar Cámara</button>
+                </div>
+                <div class="scanner-status" *ngIf="hasPermission && !hasDevices">
+                    <p class="info-text">Buscando cámaras...</p>
+                </div>
+            </div>
+
+            <button class="close-scanner-btn" (click)="toggleEmbeddedScanner()">Cerrar Escáner</button>
+        </div>
+    </div>
+
+
+    <div class="load-error" *ngIf="!isLoading && loadError">
+        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <p class="load-error__title">No se pudo cargar el catálogo</p>
+        <p class="load-error__sub">Verificá la conexión con el servidor e intentá nuevamente.</p>
+        <button (click)="loadData()" class="retry-btn">Reintentar</button>
+    </div>
+
+
+    <div class="empty-state" *ngIf="!isLoading && !loadError && displayedProducts.length === 0">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"></path>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+        </svg>
+        <p class="empty-state__title">{{ searchTerm ? 'Sin resultados' : 'No hay productos aún' }}</p>
+        <p class="empty-state__sub">{{ searchTerm ? 'Intentá con otro término de búsqueda.' : 'Usá el botón + para crear tu primer producto.' }}</p>
+    </div>
+
+    <div class="list-container" *ngIf="!isLoading && !loadError && displayedProducts.length > 0">
+
+
+        @if (!layoutService.isMobile()) {
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Categoría</th>
+                    <th>Precio</th>
+                    <th>Stock</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let p of displayedProducts; trackBy: trackByProduct">
+                    <td>
+                        <div class="product-info">
+                            <span class="product-name">{{ p.productName }}</span>
+                            <span class="product-code-sub" *ngIf="p.internalCode">{{ p.internalCode }}</span>
+                            <div class="product-badges">
+                                <span *ngIf="p.tiendaNubeId" title="TiendaNube" class="badge-tn">TN</span>
+                                <span *ngIf="p.mercadoLibreId" title="MercadoLibre" class="badge-ml">ML</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="category-tag" *ngIf="p.productCategory?.categoryName">{{
+                            p.productCategory?.categoryName }}</span>
+                    </td>
+                    <td class="col-price">{{ p.price | currency:'ARS':'symbol':'1.0-0' }}</td>
+                    <td>
+                        <span class="stock-value"
+                            [class.stock-ok]="(p.minStock || 0) === 0 || (p.stockQuantity || 0) > (p.minStock || 0) * 1.5"
+                            [class.stock-warning]="(p.minStock || 0) > 0 && (p.stockQuantity || 0) > (p.minStock || 0) && (p.stockQuantity || 0) <= (p.minStock || 0) * 1.5"
+                            [class.stock-danger]="(p.minStock || 0) > 0 && (p.stockQuantity || 0) <= (p.minStock || 0)">
+                            {{ p.stockQuantity || 0 }}
+                        </span>
+                    </td>
+                    <td class="actions-cell">
+                        <button class="icon-btn edit-btn" (click)="edit(p)" title="Editar">
+                            <i class='bx bx-edit-alt'></i>
+                        </button>
+                        <button class="icon-btn" *ngIf="planService.hasAccess('pro')" (click)="openPublishModal(p)"
+                            [title]="(p.tiendaNubeId || p.mercadoLibreId) ? 'Editar Publicación' : 'Publicar'">
+                            <i class='bx bx-cloud-upload'
+                                [style.color]="(p.tiendaNubeId || p.mercadoLibreId) ? '#059669' : ''"></i>
+                        </button>
+                        <button class="icon-btn" *ngIf="!planService.hasAccess('pro')"
+                            title="Requiere plan Pro para publicar" style="opacity: 0.4; cursor: not-allowed;">
+                            <i class='bx bx-lock-alt'></i>
+                        </button>
+                        <button class="icon-btn delete-btn" (click)="delete(p)" title="Eliminar">
+                            <i class='bx bx-trash'></i>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        }
+
+
+        @if (layoutService.isMobile()) {
+        <app-mobile-card-list
+            [items]="displayedProducts"
+            [columns]="mobileColumns"
+            [actions]="mobileActions"
+            emptyMessage="No hay productos.">
+        </app-mobile-card-list>
+        }
+
+    </div>
+
+
+    <div class="modal-overlay" *ngIf="showDeleteModal" (click)="closeDeleteModal()">
+        <div class="modal-content delete-modal" (click)="$event.stopPropagation()">
+            <h3>Confirmar Eliminación</h3>
+            <p>¿Está seguro de eliminar {{ deleteType === 'variant' ? 'la variante' : 'el producto' }} "{{
+                itemToDeleteName }}"?</p>
+            <div class="modal-actions">
+                <button class="delete-btn-confirm" (click)="confirmDelete()">Eliminar</button>
+                <button class="cancel-btn" (click)="closeDeleteModal()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="scanner-overlay" *ngIf="showScanner" (click)="closeScanner()">
+        <div class="scanner-content" (click)="$event.stopPropagation()">
+            <h3>Escaneando {{ scanningField === 'search' ? 'Búsqueda' : 'Código Producto' }}</h3>
+
+            <div class="scanner-controls" *ngIf="availableDevices.length > 1">
+                <select #deviceSelect (change)="onDeviceSelectChange(deviceSelect.value)" class="device-select">
+                    <option *ngFor="let device of availableDevices" [value]="device.deviceId"
+                        [selected]="currentDevice && device.deviceId === currentDevice.deviceId">
+                        {{ device.label || 'Cámara ' + (availableDevices.indexOf(device) + 1) }}
+                    </option>
+                </select>
+            </div>
+
+            <div class="scanner-wrapper">
+                <zxing-scanner *ngIf="scannerEnabled" [formats]="allowedFormats" [device]="currentDevice"
+                    (camerasFound)="onCamerasFound($event)" (permissionResponse)="onPermissionResponse($event)"
+                    (scanSuccess)="handleScanSuccess($event)">
+                </zxing-scanner>
+
+                <div class="scanner-status" *ngIf="!hasPermission">
+                    <p class="error-text">Permiso de cámara denegado.</p>
+                    <button (click)="checkCameraPermission()" class="retry-permission-btn">Habilitar Cámara</button>
+                </div>
+                <div class="scanner-status" *ngIf="hasPermission && !hasDevices">
+                    <p class="info-text">Buscando cámaras...</p>
+                </div>
+            </div>
+
+            <button class="close-scanner-btn" (click)="closeScanner()">Cancelar</button>
+        </div>
+    </div>
+
+
+    <div class="product-modal-overlay publish-overlay" *ngIf="showPublishModal" (mousedown)="closePublishModal()">
+        <div class="product-modal-content publish-modal" (mousedown)="$event.stopPropagation()">
+
+            <div class="stepper-header" *ngIf="publishChannel === 'mercadolibre'">
+                <div class="step" [class.active]="publishStep >= 1" [class.completed]="publishStep > 1">
+                    <div class="step-circle">1</div>
+                    <div class="step-label">Datos Generales</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step" [class.active]="publishStep >= 2">
+                    <div class="step-circle">2</div>
+                    <div class="step-label">Atributos</div>
+                </div>
+            </div>
+
+
+            <div class="publish-channel-selector" *ngIf="publishStep === 1 || publishChannel === 'tiendanube'">
+                <button class="channel-btn" [class.active]="publishChannel === 'tiendanube'"
+                    [class.disabled]="!tnConnected" (click)="tnConnected && (publishChannel = 'tiendanube')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+                    </svg>
+                    TiendaNube
+                    <span class="channel-published-badge" *ngIf="publishProduct_?.tiendaNubeId">Publicado</span>
+                </button>
+                <button class="channel-btn" [class.active]="publishChannel === 'mercadolibre'"
+                    [class.disabled]="!mlConnected" (click)="mlConnected && (publishChannel = 'mercadolibre')"
+                    [title]="mlConnected ? 'MercadoLibre Conectado' : 'MercadoLibre Desconectado (Verifique configuración)'">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <path d="M16 10a4 4 0 0 1-8 0"></path>
+                    </svg>
+                    MercadoLibre
+                    <span class="channel-published-badge" *ngIf="publishProduct_?.mercadoLibreId">Publicado</span>
+                </button>
+            </div>
+
+
+            <div class="publish-fields" *ngIf="publishChannel === 'tiendanube'">
+                <div class="form-group">
+                    <label>Nombre (español)</label>
+                    <input [(ngModel)]="publishFields.name.es" placeholder="Nombre del producto">
+                </div>
+                <div class="form-group">
+                    <label>Descripción</label>
+                    <textarea [(ngModel)]="publishFields.description" placeholder="Descripción del producto"
+                        rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>URL de Imagen (opcional)</label>
+                    <input [(ngModel)]="publishFields.imageUrl" placeholder="https://...">
+                </div>
+            </div>
+
+
+            <div class="publish-fields" *ngIf="publishChannel === 'mercadolibre' && publishStep === 1">
+                <div class="form-group">
+                    <label>Título</label>
+                    <input [(ngModel)]="publishFields.title" placeholder="Título del producto">
+                </div>
+                <div class="form-group category-search-group">
+                    <label>Categoría</label>
+                    <div class="category-input-group" style="display: flex; gap: 5px; align-items: center;">
+                        <input [(ngModel)]="categorySearchTerm" (ngModelChange)="searchMLCategories()"
+                            placeholder="Escriba para buscar categoría (min 3 letras)..." autocomplete="off"
+                            style="flex: 1;">
+                        <button class="explore-btn" (click)="openCategoryBrowser()" title="Explorar Categorías"
+                            style="padding: 8px 12px; background: #eee; border: 1px solid #ccc; border-radius: 4px; cursor: pointer;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <line x1="8" y1="6" x2="21" y2="6"></line>
+                                <line x1="8" y1="12" x2="21" y2="12"></line>
+                                <line x1="8" y1="18" x2="21" y2="18"></line>
+                                <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                                <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                                <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="category-dropdown"
+                        *ngIf="showCategoryDropdown || (publishLoading && categorySearchTerm.length >= 3)">
+                        <div class="dropdown-loading" *ngIf="publishLoading">Buscando...</div>
+                        <ng-container *ngIf="!publishLoading">
+                            <div class="category-option" *ngFor="let cat of mlCategories"
+                                (click)="selectMLCategory(cat)">
+                                <span class="cat-name">{{ cat.path_from_root || cat.category_name }}</span>
+                                <span class="cat-id">{{ cat.category_id }}</span>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+
+
+                <div class="category-browser-overlay" *ngIf="showCategoryBrowser"
+                    style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; display: flex; justify-content: center; align-items: center;"
+                    (click)="closeCategoryBrowser()">
+                    <div class="category-browser-content" (click)="$event.stopPropagation()"
+                        style="background: white; width: 500px; max-height: 80vh; border-radius: 8px; display: flex; flex-direction: column;">
+                        <div class="browser-header"
+                            style="padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+                            <h3 style="margin: 0;">Explorar Categorías</h3>
+                            <button (click)="closeCategoryBrowser()"
+                                style="border: none; background: none; font-size: 20px; cursor: pointer;">&times;</button>
+                        </div>
+                        <div class="browser-breadcrumbs"
+                            style="padding: 10px 15px; background: #f9f9f9; border-bottom: 1px solid #eee; overflow-x: auto; white-space: nowrap;">
+                            <span *ngFor="let crumb of browseBreadcrumbs; let last = last; let i = index">
+                                <span (click)="onBreadcrumbClick(i)" [style.cursor]="last ? 'default' : 'pointer'"
+                                    [style.color]="last ? '#333' : '#3498db'"
+                                    [style.fontWeight]="last ? 'bold' : 'normal'">
+                                    {{ crumb.name }}
+                                </span>
+                                <span *ngIf="!last" style="margin: 0 5px; color: #999;">&gt;</span>
+                            </span>
+                        </div>
+                        <div class="browser-list" style="flex: 1; overflow-y: auto; padding: 10px;">
+                            <div *ngIf="browseLoading" style="text-align: center; padding: 20px; color: #666;">
+                                Cargando...
+                            </div>
+                            <div *ngIf="!browseLoading && browseCategories.length === 0"
+                                style="text-align: center; padding: 20px; color: #666;">
+                                No se encontraron subcategorías.
+                            </div>
+                            <div *ngFor="let cat of browseCategories" (click)="selectBrowseCategory(cat)"
+                                style="padding: 10px; border-bottom: 1px solid #f0f0f0; cursor: pointer; display: flex; justify-content: space-between; align-items: center;"
+                                onmouseover="this.style.background='#f5faff'"
+                                onmouseout="this.style.background='white'">
+                                <span>{{ cat.name }}</span>
+                                <span style="color: #ccc;">&gt;</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Condición</label>
+                        <select [(ngModel)]="publishFields.condition">
+                            <option value="new">Nuevo</option>
+                            <option value="used">Usado</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de Publicación</label>
+                        <select [(ngModel)]="publishFields.listing_type_id">
+                            <ng-container *ngIf="mlListingTypes.length > 0; else defaultListingTypes">
+                                <option *ngFor="let lt of mlListingTypes" [value]="lt.id">{{ lt.name }}</option>
+                            </ng-container>
+                            <ng-template #defaultListingTypes>
+                                <option value="gold_special">Clásica</option>
+                                <option value="gold_pro">Premium</option>
+                                <option value="free">Gratuita</option>
+                            </ng-template>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Precio (ARS)</label>
+                        <input type="number" [(ngModel)]="publishFields.price"
+                            [placeholder]="'Original: ' + publishProduct_?.price">
+                    </div>
+                    <div class="form-group">
+                        <label>Stock Disponible</label>
+                        <input type="number" [(ngModel)]="publishFields.available_quantity"
+                            [placeholder]="'Original: ' + publishProduct_?.stockQuantity">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>URLs de Imágenes (separadas por coma)</label>
+                    <input [(ngModel)]="publishFields.pictureUrls" placeholder="https://img1.jpg, https://img2.jpg">
+                </div>
+            </div>
+
+
+            <div class="publish-fields scrollable-step" *ngIf="publishChannel === 'mercadolibre' && publishStep === 2">
+                <h4>Características del Producto</h4>
+                <p class="step-desc">Complete las características requeridas para mejor exposición.</p>
+
+                <div class="attributes-grid">
+                    <div class="form-group" *ngFor="let attr of mlAttributes">
+                        <label>{{ attr.name }} <span *ngIf="attr.tags?.required" class="required">*</span></label>
+
+
+
+
+                        <ng-container *ngIf="attr.values && attr.values.length > 0; else textInput">
+                            <select [(ngModel)]="mlAttributesValues[attr.id]">
+                                <option [ngValue]="undefined">Seleccionar</option>
+                                <option *ngFor="let val of attr.values" [value]="val.name">{{ val.name }}</option>
+                            </select>
+                        </ng-container>
+                        <ng-template #textInput>
+                            <input [(ngModel)]="mlAttributesValues[attr.id]" [placeholder]="attr.name">
+                        </ng-template>
+                        <small class="field-hint" *ngIf="attr.hint">{{ attr.hint }}</small>
+                    </div>
+                </div>
+                <div *ngIf="mlAttributes.length === 0" class="no-attributes">
+                    <p>No se encontraron atributos requeridos para esta categoría.</p>
+                </div>
+            </div>
+
+
+            <div class="publish-alert error" *ngIf="publishError">{{ publishError }}</div>
+            <div class="publish-alert success" *ngIf="publishSuccess">{{ publishSuccess }}</div>
+
+
+            <div class="publish-actions">
+                <button class="publish-cancel-btn" (click)="closePublishModal()"
+                    *ngIf="!publishLoading">Cancelar</button>
+
+
+                <button class="publish-nav-btn" (click)="prevStep()"
+                    *ngIf="publishChannel === 'mercadolibre' && publishStep > 1 && !publishLoading">
+                    Atrás
+                </button>
+
+
+                <button class="publish-nav-btn" (click)="nextStep()"
+                    *ngIf="publishChannel === 'mercadolibre' && publishStep === 1 && !publishLoading">
+                    Siguiente
+                </button>
+
+
+                <button class="publish-submit-btn" (click)="submitPublish()" [disabled]="publishLoading"
+                    *ngIf="publishChannel === 'tiendanube' || (publishChannel === 'mercadolibre' && publishStep === 2)">
+                    {{ publishLoading ? 'Procesando...' : (isEditForCurrentChannel() ? 'Actualizar' : 'Publicar') }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <button class="fab-create" (click)="openCreateForm()" title="Nuevo Producto">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        <span class="fab-create__label">Nuevo Producto</span>
+    </button>
+
+</div>

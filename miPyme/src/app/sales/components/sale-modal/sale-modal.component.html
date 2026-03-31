@@ -1,0 +1,143 @@
+<div class="modal-overlay" (click)="close.emit()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>Nueva Venta</h3>
+            <button class="close-btn" (click)="close.emit()">×</button>
+        </div>
+
+        <div class="modal-body">
+            <div class="selection-section">
+                <h4>Agregar Producto</h4>
+
+                <div class="scanner-toggle-section">
+                    <button class="btn-toggle-scanner" (click)="toggleScanner()">
+                        {{ showScanner ? 'Ocultar Escáner' : 'Activar Escáner' }}
+                    </button>
+                </div>
+
+                <div class="scanner-container" *ngIf="showScanner">
+                    <div class="scanner-controls" *ngIf="availableDevices.length > 1">
+                        <select #deviceSelect (change)="onDeviceSelectChange(deviceSelect.value)" class="device-select">
+                            <option *ngFor="let device of availableDevices" [value]="device.deviceId"
+                                    [selected]="currentDevice && device.deviceId === currentDevice.deviceId">
+                                {{ device.label || 'Cámara ' + (availableDevices.indexOf(device) + 1) }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="scanner-wrapper">
+                        <zxing-scanner
+                            *ngIf="scannerEnabled"
+                            [formats]="allowedFormats"
+                            [device]="currentDevice"
+                            (camerasFound)="onCamerasFound($event)"
+                            (permissionResponse)="onPermissionResponse($event)"
+                            (scanSuccess)="handleScanSuccess($event)">
+                        </zxing-scanner>
+                        <div class="scanner-status" *ngIf="!hasPermission">
+                            <p class="error-text">Permiso de cámara denegado.</p>
+                            <button (click)="checkCameraPermission()" class="retry-permission-btn">Habilitar Cámara</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="search-box" *ngIf="!selectedProduct">
+                    <input type="text"
+                           [(ngModel)]="searchTerm"
+                           (input)="filterProducts()"
+                           (focus)="onSearchFocus()"
+                           (blur)="onSearchBlur()"
+                           placeholder="Buscar producto por nombre o código...">
+
+                    <div class="product-list" *ngIf="showDropdown">
+                        <div *ngFor="let product of filteredProducts"
+                             class="product-item"
+                             (click)="selectProduct(product)">
+                            {{ product.productName }} ({{ product.internalCode }})
+                            <span class="stock-badge">Stock: {{ product.stockQuantity }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="selected-product-panel" *ngIf="selectedProduct">
+                    <div class="panel-header">
+                        <strong>{{ selectedProduct.productName }}</strong>
+                        <button class="btn-link" (click)="clearSelection()">Cambiar</button>
+                    </div>
+
+                    <div class="variants-section" *ngIf="loadingVariants">
+                        Cargando variantes...
+                    </div>
+
+                    <div class="variants-section" *ngIf="!loadingVariants && variants.length > 0">
+                        <label>Variante:</label>
+                        <select [(ngModel)]="selectedVariant">
+                            <option [ngValue]="null">Seleccionar variante...</option>
+                            <option *ngFor="let v of variants" [ngValue]="v">
+                                {{ v.variantSku }} - {{ v.attributes?.[0]?.attributeValue }} (Stock: {{ v.stockQuantity }} - ${{ v.price }})
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="quantity-section">
+                        <label>Cantidad:</label>
+                        <input type="number" [(ngModel)]="quantity" min="1">
+                    </div>
+
+                    <button class="btn-add" (click)="addToCart()" [disabled]="variants.length > 0 && !selectedVariant">
+                        Agregar al Carrito
+                    </button>
+                </div>
+            </div>
+
+            <div class="cart-section">
+                <h4>Carrito de Venta</h4>
+                <div class="cart-table-wrapper">
+                <table class="cart-table">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cant.</th>
+                            <th>Precio</th>
+                            <th>Subtotal</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of cartItems; let i = index">
+                            <td>
+                                {{ item.product.productName }}
+                                <small *ngIf="item.variant">({{ item.variant.variantSku }})</small>
+                            </td>
+                            <td>{{ item.quantity }}</td>
+                            <td>{{ item.price | currency }}</td>
+                            <td>{{ item.subtotal | currency }}</td>
+                            <td>
+                                <button class="btn-remove" (click)="removeFromCart(i)">×</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                </div>
+                <div class="cart-total-row">
+                    <span>Total</span>
+                    <span class="cart-total-amount">{{ total | currency }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <div class="footer-selects">
+                <div class="footer-select-group">
+                    <label class="footer-select-label">Medio de Pago</label>
+                    <select class="footer-select" [(ngModel)]="selectedMedioPago">
+                        <option *ngFor="let mp of mediosPago" [value]="mp.value">{{ mp.label }}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="footer-actions">
+                <button class="btn-secondary" (click)="close.emit()">Cancelar</button>
+                <button class="btn-primary" (click)="submitSale()" [disabled]="cartItems.length === 0">Confirmar Venta</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,67 @@
+<div class="modal-overlay" (click)="cerrar.emit()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3><i class="bx bx-minus-circle"></i> Registrar Egreso</h3>
+      <button class="close-btn" (click)="cerrar.emit()"><i class="bx bx-x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group flex-1">
+          <label>Tipo de egreso</label>
+          <select [(ngModel)]="tipo">
+            <option *ngFor="let t of tiposEgreso" [value]="t.value">{{ t.label }}</option>
+          </select>
+        </div>
+        <div class="form-group flex-1">
+          <label>Medio de pago</label>
+          <select [(ngModel)]="medioPago">
+            <option *ngFor="let m of mediosPago" [value]="m.value">{{ m.label }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Monto *</label>
+        <div class="input-with-prefix">
+          <span class="prefix">$</span>
+          <input type="number" [(ngModel)]="monto" min="0.01" step="0.01" placeholder="0.00" autofocus>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Categoría</label>
+        <select [(ngModel)]="categoriaId">
+          <option [ngValue]="null">Sin categoría</option>
+          <option *ngFor="let c of categorias" [ngValue]="c.categoriaEgresoId">{{ c.nombre }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Justificación *</label>
+        <input type="text" [(ngModel)]="justificacion" placeholder="Motivo del egreso">
+      </div>
+
+      <div class="form-group">
+        <label>Comprobante (descripción) *</label>
+        <input type="text" [(ngModel)]="comprobanteTexto" placeholder="Ej: Factura de proveedor, ticket, recibo...">
+      </div>
+
+      <div class="form-group">
+        <label>Nro. comprobante (opcional)</label>
+        <input type="text" [(ngModel)]="comprobanteNumero" placeholder="Ej: FC-0001-00001234">
+      </div>
+
+      <div class="form-group">
+        <label>Observación (opcional)</label>
+        <textarea [(ngModel)]="observacion" rows="2" placeholder="Notas adicionales..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="cerrar.emit()">Cancelar</button>
+      <button class="btn btn-primary" (click)="submit()" [disabled]="isSubmitting">
+        <i class="bx" [ngClass]="isSubmitting ? 'bx-loader-alt bx-spin' : 'bx-check'"></i>
+        {{ isSubmitting ? 'Registrando...' : 'Registrar Egreso' }}
+      </button>
+    </div>
+  </div>
+</div>

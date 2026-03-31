@@ -1,0 +1,42 @@
+<div class="operational-container">
+
+    <div class="metrics-nav-wrapper desktop-nav">
+        <div class="metrics-nav">
+            <button class="nav-item" [class.active]="currentTab === 'SALES_OPS'" (click)="selectTab('SALES_OPS')">
+                Operaciones de Ventas
+            </button>
+            <button class="nav-item" [class.active]="currentTab === 'BUSINESS'" (click)="selectTab('BUSINESS')">
+                Negocio y Reportes
+            </button>
+            <button class="nav-item" [class.active]="currentTab === 'STOCK_ANALYSIS'" (click)="selectTab('STOCK_ANALYSIS')">
+                Análisis de Stock
+            </button>
+        </div>
+    </div>
+
+
+    <div class="metrics-nav-carousel mobile-nav">
+        <button class="carousel-nav-btn prev-btn" (click)="goToPreviousTab()" aria-label="Pestaña anterior">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+        </button>
+        <div class="carousel-tab-display">
+            <span class="carousel-tab-label">{{ getCurrentTabLabel() }}</span>
+        </div>
+        <button class="carousel-nav-btn next-btn" (click)="goToNextTab()" aria-label="Pestaña siguiente">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+        </button>
+    </div>
+
+
+    <div>
+        <app-sales-operational-v2 *ngIf="currentTab === 'SALES_OPS'"></app-sales-operational-v2>
+        <app-business-metrics *ngIf="currentTab === 'BUSINESS'"></app-business-metrics>
+        <app-stock-analysis *ngIf="currentTab === 'STOCK_ANALYSIS'"></app-stock-analysis>
+    </div>
+</div>

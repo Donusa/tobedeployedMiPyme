@@ -1,0 +1,103 @@
+<div class="modal-overlay" (click)="close.emit()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+
+        <div class="modal-header">
+            <div class="header-left">
+                <div class="header-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10 9 9 9 8 9"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3>Venta #{{ sale.saleId }}</h3>
+                    <span class="header-date">{{ sale.saleDate | date:'d MMM yyyy, HH:mm' }}</span>
+                </div>
+            </div>
+            <button class="close-btn" (click)="close.emit()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="modal-body">
+
+            <div class="info-cards">
+                <div class="info-card full-width">
+                    <span class="info-label">Vendedor</span>
+                    <span class="info-value">{{ sale.createdBy || 'Sin asignar' }}</span>
+                </div>
+                <div class="info-card">
+                    <span class="info-label">Estado</span>
+                    <span class="status-badge" [class.status-billed]="sale.facturado" [class.status-pending]="!sale.facturado">
+                        <span class="status-dot"></span>
+                        {{ sale.facturado ? 'Facturado' : 'Pendiente' }}
+                    </span>
+                </div>
+                <div class="info-card">
+                    <span class="info-label">Artículos</span>
+                    <span class="info-value">{{ sale.items.length }}</span>
+                </div>
+            </div>
+
+
+            <div class="items-section">
+                <h4 class="section-title">Detalle de productos</h4>
+
+                <div class="item-list">
+                    <div class="item-row" *ngFor="let item of sale.items; let last = last" [class.last]="last">
+                        <div class="item-info">
+                            <span class="item-name">
+                                {{ item.productName || 'Producto' }}
+                            </span>
+                            <span class="item-meta">
+                                <span *ngIf="item.variantSku" class="variant-sku">{{ item.variantSku }}</span>
+                                <span class="item-qty">{{ item.quantity }} × {{ item.unitPrice | currency }}</span>
+                            </span>
+                        </div>
+                        <span class="item-subtotal">{{ item.subtotal | currency }}</span>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="total-section">
+                <div class="total-row">
+                    <span class="total-label">Total</span>
+                    <span class="total-amount">{{ sale.totalAmount | currency }}</span>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal-footer">
+            <button class="btn-secondary" (click)="close.emit()">Cerrar</button>
+            <div class="footer-actions">
+                <button class="btn-action" disabled title="Próximamente">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                    </svg>
+                    Facturar
+                </button>
+                <button class="btn-action" disabled title="Próximamente">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 6 2 18 2 18 9"/>
+                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                        <rect x="6" y="14" width="12" height="8"/>
+                    </svg>
+                    Comprobante
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

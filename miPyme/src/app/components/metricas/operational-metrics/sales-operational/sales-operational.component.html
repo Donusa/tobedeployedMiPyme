@@ -1,0 +1,69 @@
+<div class="operations-panel">
+    <div class="controls-row">
+        <div class="btn-group">
+            <button class="btn-toggle" [class.active]="salesRange === 'TODAY'"
+                (click)="changeSalesRange('TODAY')">Hoy</button>
+            <button class="btn-toggle" [class.active]="salesRange === '7D'" (click)="changeSalesRange('7D')">7D</button>
+            <button class="btn-toggle" [class.active]="salesRange === '30D'"
+                (click)="changeSalesRange('30D')">30D</button>
+            <button class="btn-toggle" [class.active]="salesRange === '1Y'" (click)="changeSalesRange('1Y')">1
+                año</button>
+            <button class="btn-toggle" [class.active]="salesRange === 'CUSTOM'"
+                (click)="changeSalesRange('CUSTOM')">Personalizado</button>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn-toggle" [class.active]="salesMetricType === 'AMOUNT'"
+                (click)="changeSalesMetricType('AMOUNT')">Ventas ($)</button>
+            <button class="btn-toggle" [class.active]="salesMetricType === 'ORDERS'"
+                (click)="changeSalesMetricType('ORDERS')">Órdenes</button>
+            <button class="btn-toggle" [class.active]="salesMetricType === 'UNITS'"
+                (click)="changeSalesMetricType('UNITS')">Unidades</button>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn-toggle" [class.active]="salesChartType === 'LINE'" (click)="changeSalesChartType('LINE')"
+                title="Línea">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+            </button>
+            <button class="btn-toggle" [class.active]="salesChartType === 'BAR'" (click)="changeSalesChartType('BAR')"
+                title="Barras">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="20" x2="18" y2="10"></line>
+                    <line x1="12" y1="20" x2="12" y2="4"></line>
+                    <line x1="6" y1="20" x2="6" y2="14"></line>
+                </svg>
+            </button>
+        </div>
+
+
+        <div *ngIf="salesRange === 'CUSTOM'" class="custom-range-row">
+            <input type="date" [(ngModel)]="salesCustomStart">
+            <span class="text-slate-400 font-medium">hasta</span>
+            <input type="date" [(ngModel)]="salesCustomEnd">
+            <button class="btn-cta-correct" (click)="loadSalesMetrics()">Aplicar</button>
+            <span *ngIf="salesCustomError" class="text-red-500 text-sm ml-2">{{ salesCustomError }}</span>
+        </div>
+    </div>
+
+
+    <div class="summary-cards-row">
+        <div class="summary-kpi-card">
+            <div class="kpi-label">Ventas Totales</div>
+            <div class="kpi-value">{{ metrics.operations.totalSales | currency:'USD':'symbol':'1.0-0' }}</div>
+        </div>
+        <div class="summary-kpi-card">
+            <div class="kpi-label">Total Órdenes</div>
+            <div class="kpi-value">{{ metrics.operations.totalOrders }}</div>
+        </div>
+    </div>
+
+
+    <div class="chart-container" style="position: relative; height: 380px; width: 100%;">
+        <canvas id="salesChart"></canvas>
+    </div>
+</div>

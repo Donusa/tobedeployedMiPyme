@@ -1,0 +1,84 @@
+<div class="company-data-container">
+
+    <div *ngIf="isLoading" class="loading-state">
+        <app-spinner></app-spinner>
+    </div>
+
+    <div *ngIf="!isLoading && company" class="content-card">
+        <div class="info-section">
+            <div class="info-item">
+                <span class="label">Código SSO:</span>
+                <span class="value highlight">{{ company.ssoCode }}</span>
+            </div>
+        </div>
+
+        <form (ngSubmit)="onSubmit()" #companyForm="ngForm" class="data-form">
+            <div class="form-section">
+                <h3>Información General</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="tradeName">Nombre de Fantasía *</label>
+                        <input type="text" id="tradeName" name="tradeName" [(ngModel)]="formData.tradeName" required class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="businessName">Razón Social</label>
+                        <input type="text" id="businessName" name="businessName" [(ngModel)]="formData.businessName" class="form-control">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="cuit">CUIT/RUT</label>
+                        <input type="text" id="cuit" name="cuit" [(ngModel)]="formData.cuit" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="industry">Industria / Rubro</label>
+                        <input type="text" id="industry" name="industry" [(ngModel)]="formData.industry" class="form-control">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Ubicación y Contacto</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="country">País</label>
+                        <input type="text" id="country" name="country" [(ngModel)]="formData.country" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="province">Provincia / Estado</label>
+                        <input type="text" id="province" name="province" [(ngModel)]="formData.province" class="form-control">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="city">Ciudad</label>
+                        <input type="text" id="city" name="city" [(ngModel)]="formData.city" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="fiscalAddress">Dirección Fiscal</label>
+                        <input type="text" id="fiscalAddress" name="fiscalAddress" [(ngModel)]="formData.fiscalAddress" class="form-control">
+                    </div>
+                </div>
+                 <div class="form-row">
+                    <div class="form-group">
+                        <label for="companyEmail">Email de Contacto</label>
+                        <input type="email" id="companyEmail" name="companyEmail" [(ngModel)]="formData.companyEmail" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Teléfono</label>
+                        <input type="text" id="phone" name="phone" [(ngModel)]="formData.phone" class="form-control">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <div *ngIf="successMessage" class="alert success">{{ successMessage }}</div>
+                <div *ngIf="errorMessage" class="alert error">{{ errorMessage }}</div>
+                <button type="submit" [disabled]="!companyForm.form.valid || isSaving" class="btn-save">
+                    <span *ngIf="isSaving">Guardando...</span>
+                    <span *ngIf="!isSaving">Guardar Cambios</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

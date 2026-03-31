@@ -1,0 +1,79 @@
+<div class="mcl-container">
+
+
+  <div *ngIf="rows.length === 0" class="mcl-empty">
+    <i class="bx bx-inbox mcl-empty-icon"></i>
+    <p class="mcl-empty-text">{{ emptyMessage }}</p>
+  </div>
+
+
+  <div
+    *ngFor="let row of rows; trackBy: trackByIndex"
+    class="mcl-card"
+    [class.mcl-card--expanded]="row.expanded"
+  >
+
+    <div class="mcl-primary" *ngIf="getPrimaryColumn() as primary">
+      <span class="mcl-primary-value">{{ getValue(row.item, primary) }}</span>
+    </div>
+
+
+    <dl class="mcl-fields">
+      <ng-container *ngFor="let col of getSecondaryColumns(row.expanded); trackBy: trackByIndex">
+        <div class="mcl-field-row">
+          <dt class="mcl-field-label">{{ col.label }}</dt>
+          <dd class="mcl-field-value">
+
+            <span
+              *ngIf="col.isBadge; else plainValue"
+              class="mcl-badge"
+              [ngClass]="getBadgeClass(row.item, col)"
+            >{{ getValue(row.item, col) }}</span>
+
+
+            <ng-template #plainValue>{{ getValue(row.item, col) }}</ng-template>
+          </dd>
+        </div>
+      </ng-container>
+    </dl>
+
+
+    <button
+      *ngIf="hasExpandableContent(row)"
+      class="mcl-expand-btn"
+      (click)="toggleExpand(row)"
+      type="button"
+    >
+      <span>{{ row.expanded ? 'Ver menos' : 'Ver más' }}</span>
+      <i class="bx" [class.bx-chevron-down]="!row.expanded" [class.bx-chevron-up]="row.expanded"></i>
+    </button>
+
+
+    <div class="mcl-actions" *ngIf="getVisibleActions(row.item).length > 0">
+      <ng-container *ngFor="let action of getVisibleActions(row.item); let i = index; trackBy: trackByIndex">
+
+        <button
+          *ngIf="i < 2"
+          class="mcl-action-btn"
+          [class.mcl-action-btn--danger]="action.variant === 'danger'"
+          [class.mcl-action-btn--success]="action.variant === 'success'"
+          (click)="action.callback(row.item)"
+          [attr.aria-label]="action.label"
+          type="button"
+        >
+          <i [class]="action.icon"></i>
+          <span class="mcl-action-label">{{ action.label }}</span>
+        </button>
+      </ng-container>
+
+
+      <div class="mcl-overflow" *ngIf="getVisibleActions(row.item).length > 2">
+        <button class="mcl-action-btn mcl-overflow-trigger" type="button" aria-label="Más acciones"
+          (click)="row.expanded = !row.expanded">
+          <i class="bx bx-dots-vertical-rounded"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,488 @@
+<div class="metrics-container">
+  <app-spinner *ngIf="isLoading"></app-spinner>
+
+
+  <div class="mobile-section-grid mobile-only" *ngIf="mobilePage === 'sections' && !isLoading">
+    <div class="mobile-section-card ms-blue" (click)="mobileSelectSection('PRODUCTS')">
+      <div class="ms-card-left">
+        <div class="ms-icon"><i class='bx bx-package'></i></div>
+        <div class="ms-info">
+          <span class="ms-label">Productos</span>
+          <span class="ms-value">{{ metrics.products.active }}</span>
+          <span class="ms-sub">activos</span>
+        </div>
+      </div>
+      <div class="ms-card-right">
+        <span class="ms-badge error" *ngIf="metrics.products.issues.inactive > 0">
+          {{ metrics.products.issues.inactive }} inactivos
+        </span>
+        <i class='bx bx-chevron-right ms-arrow'></i>
+      </div>
+    </div>
+    <div class="mobile-section-card ms-violet" (click)="mobileSelectSection('INVENTARIO')">
+      <div class="ms-card-left">
+        <div class="ms-icon"><i class='bx bx-layer'></i></div>
+        <div class="ms-info">
+          <span class="ms-label">Inventario</span>
+          <span class="ms-value">{{ metrics.inventory.variants }}</span>
+          <span class="ms-sub">variantes</span>
+        </div>
+      </div>
+      <div class="ms-card-right">
+        <span class="ms-badge warning" *ngIf="metrics.inventory.issues.noGtin > 0">
+          {{ metrics.inventory.issues.noGtin }} sin GTIN
+        </span>
+        <i class='bx bx-chevron-right ms-arrow'></i>
+      </div>
+    </div>
+    <div class="mobile-section-card ms-orange" (click)="mobileSelectSection('MINIMUM')">
+      <div class="ms-card-left">
+        <div class="ms-icon"><i class='bx bx-refresh'></i></div>
+        <div class="ms-info">
+          <span class="ms-label">Reposición</span>
+          <span class="ms-value">{{ metrics.stockMin.below }}</span>
+          <span class="ms-sub">críticos</span>
+        </div>
+      </div>
+      <div class="ms-card-right">
+        <span class="ms-badge alert" *ngIf="metrics.stockMin.issues.noMinConfig > 0">
+          {{ metrics.stockMin.issues.noMinConfig }} sin mín
+        </span>
+        <i class='bx bx-chevron-right ms-arrow'></i>
+      </div>
+    </div>
+    <div class="mobile-section-card ms-green" (click)="mobileSelectSection('GROWTH')">
+      <div class="ms-card-left">
+        <div class="ms-icon"><i class='bx bx-trending-up'></i></div>
+        <div class="ms-info">
+          <span class="ms-label">Rentabilidad</span>
+          <span class="ms-value">{{ metrics.growth.itemsNegativeMargin }}</span>
+          <span class="ms-sub">margen neg.</span>
+        </div>
+      </div>
+      <div class="ms-card-right">
+        <span class="ms-badge error" *ngIf="metrics.growth.issues.noCost > 0">
+          {{ metrics.growth.issues.noCost }} sin costo
+        </span>
+        <i class='bx bx-chevron-right ms-arrow'></i>
+      </div>
+    </div>
+    <div class="mobile-section-card ms-red ms-full" (click)="mobileSelectSection('CONFLICTS')">
+      <div class="ms-card-left">
+        <div class="ms-icon"><i class='bx bx-error-alt'></i></div>
+        <div class="ms-info">
+          <span class="ms-label">Conflictos</span>
+          <span class="ms-value">{{ metrics.conflicts.total }}</span>
+          <span class="ms-sub">detectados</span>
+        </div>
+      </div>
+      <div class="ms-card-right">
+        <span class="ms-badge error" *ngIf="metrics.conflicts.total > 0">
+          requieren acción
+        </span>
+        <i class='bx bx-chevron-right ms-arrow'></i>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="metrics-row compact desktop-only" #carousel (mousedown)="startDrag($event, carousel)" (mouseleave)="stopDrag()"
+    (mouseup)="stopDrag()" (mousemove)="moveDrag($event, carousel)" (touchstart)="startDrag($event, carousel)"
+    (touchend)="stopDrag()" (touchmove)="moveDrag($event, carousel)">
+
+
+    <div class="kpi-card kpi-blue" [class.active]="selectedSection === 'PRODUCTS'" (click)="selectSection('PRODUCTS')">
+      <div class="kpi-icon-wrap"><i class='bx bx-package'></i></div>
+      <div class="kpi-content">
+        <div class="kpi-header">
+          <span class="kpi-label">Productos</span>
+          <div class="kpi-info-icon custom-tooltip" [attr.data-tooltip]="getKpiTooltip('PRODUCTS')">
+            <i class='bx bx-info-circle'></i>
+          </div>
+        </div>
+        <div class="kpi-issue-badge" *ngIf="metrics.products.issues.inactive > 0">
+          <span class="kpi-issue-text">Inactivos</span>
+          <span class="kpi-pill-number error">{{ metrics.products.issues.inactive }}</span>
+        </div>
+        <div class="kpi-value">{{ metrics.products.active }}</div>
+        <div class="kpi-sub">Activos</div>
+      </div>
+    </div>
+
+
+    <div class="kpi-card kpi-violet" [class.active]="selectedSection === 'INVENTARIO'" (click)="selectSection('INVENTARIO')">
+      <div class="kpi-icon-wrap"><i class='bx bx-layer'></i></div>
+      <div class="kpi-content">
+        <div class="kpi-header">
+          <span class="kpi-label">Inventario</span>
+          <div class="kpi-info-icon custom-tooltip" [attr.data-tooltip]="getKpiTooltip('INVENTARIO')">
+            <i class='bx bx-info-circle'></i>
+          </div>
+        </div>
+        <div class="kpi-issue-badge" *ngIf="metrics.inventory.issues.noGtin > 0">
+          <span class="kpi-issue-text">Sin GTIN</span>
+          <span class="kpi-pill-number warning">{{ metrics.inventory.issues.noGtin }}</span>
+        </div>
+        <div class="kpi-value">{{ metrics.inventory.variants }}</div>
+        <div class="kpi-sub">Variantes</div>
+      </div>
+    </div>
+
+
+    <div class="kpi-card kpi-orange" [class.active]="selectedSection === 'MINIMUM'" (click)="selectSection('MINIMUM')">
+      <div class="kpi-icon-wrap"><i class='bx bx-refresh'></i></div>
+      <div class="kpi-content">
+        <div class="kpi-header">
+          <span class="kpi-label">Reposición</span>
+          <div class="kpi-info-icon custom-tooltip" [attr.data-tooltip]="getKpiTooltip('MINIMUM')">
+            <i class='bx bx-info-circle'></i>
+          </div>
+        </div>
+        <div class="kpi-issue-badge" *ngIf="metrics.stockMin.issues.noMinConfig > 0">
+          <span class="kpi-issue-text">Sin Min</span>
+          <span class="kpi-pill-number alert">{{ metrics.stockMin.issues.noMinConfig }}</span>
+        </div>
+        <div class="kpi-value">{{ metrics.stockMin.below }}</div>
+        <div class="kpi-sub">Críticos</div>
+      </div>
+    </div>
+
+
+    <div class="kpi-card kpi-green" [class.active]="selectedSection === 'GROWTH'" (click)="selectSection('GROWTH')">
+      <div class="kpi-icon-wrap"><i class='bx bx-trending-up'></i></div>
+      <div class="kpi-content">
+        <div class="kpi-header">
+          <span class="kpi-label">Rentabilidad</span>
+          <div class="kpi-info-icon custom-tooltip" [attr.data-tooltip]="getKpiTooltip('GROWTH')">
+            <i class='bx bx-info-circle'></i>
+          </div>
+        </div>
+        <div class="kpi-issue-badge" *ngIf="metrics.growth.issues.noCost > 0">
+          <span class="kpi-issue-text">Sin Costo</span>
+          <span class="kpi-pill-number error">{{ metrics.growth.issues.noCost }}</span>
+        </div>
+        <div class="kpi-value">{{ metrics.growth.itemsNegativeMargin }}</div>
+        <div class="kpi-sub">Margen Neg.</div>
+      </div>
+    </div>
+
+
+    <div class="kpi-card kpi-red" [class.active]="selectedSection === 'CONFLICTS'" (click)="selectSection('CONFLICTS')">
+      <div class="kpi-icon-wrap"><i class='bx bx-error-alt'></i></div>
+      <div class="kpi-content">
+        <div class="kpi-header">
+          <span class="kpi-label">Conflictos</span>
+          <div class="kpi-info-icon custom-tooltip" [attr.data-tooltip]="getKpiTooltip('CONFLICTS')">
+            <i class='bx bx-info-circle'></i>
+          </div>
+        </div>
+        <div class="kpi-issue-badge" *ngIf="metrics.conflicts.total > 0">
+          <span class="kpi-issue-text">Duplicados</span>
+          <span class="kpi-pill-number error">{{ metrics.conflicts.total }}</span>
+        </div>
+        <div class="kpi-value">{{ metrics.conflicts.total }}</div>
+        <div class="kpi-sub">Conflictos</div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="action-panel" *ngIf="!layoutService.isMobile() || mobilePage === 'detail'">
+
+
+    <div class="mobile-detail-header mobile-only">
+      <button class="mobile-back-btn" (click)="mobileBack()" aria-label="Volver">
+        <i class='bx bx-arrow-back'></i>
+      </button>
+      <span class="mobile-detail-title">{{ getSectionTitle(selectedSection) }}</span>
+    </div>
+
+
+    <div class="panel-header-compact">
+      <div class="header-top-row">
+        <div class="section-title-group">
+          <span class="section-name">{{ getSectionTitle(selectedSection) }}</span>
+          <span class="items-attention-count" *ngIf="getActionableCount() > 0">
+            {{ getActionableCount() }} items requieren atención
+          </span>
+        </div>
+
+      </div>
+
+
+      <div class="chips-scroll-container">
+        <div class="chip-item" *ngFor="let m of issueMetrics" [class.active]="selectedIssue === m.type"
+          (click)="selectIssue(m.type)">
+          <span class="chip-label">{{ m.label }}</span>
+          <span class="chip-count">{{ m.count }}</span>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="panel-content-flow">
+
+
+      <div class="growth-panel" *ngIf="selectedSection === 'GROWTH'">
+
+
+        <div class="margin-control">
+          <label>Margen Objetivo:</label>
+          <input type="range" min="0.05" max="1.0" step="0.05" [value]="targetMargin"
+            (input)="targetMargin = $any($event.target).value; onTargetMarginChange()">
+          <span class="margin-value">{{ targetMargin | percent }}</span>
+        </div>
+      </div>
+
+
+      <div class="action-callout">
+        <div class="callout-info">
+          <span class="callout-count">
+            {{ selectedSection === 'PRODUCTS' ? filteredProducts.length :
+            selectedSection === 'INVENTARIO' ? filteredInventory.length :
+            selectedSection === 'MINIMUM' ? filteredMinimum.length :
+            filteredGrowth.length }}
+          </span>
+          <span class="callout-text">items requieren atención</span>
+        </div>
+        <button class="btn-view-all" (click)="toggleFullTable()">
+          Ver listado completo
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-arrow">
+            <path d="M5 12h14"></path>
+            <path d="M12 5l7 7-7 7"></path>
+          </svg>
+        </button>
+      </div>
+
+
+      <div class="action-table-container">
+
+        <div class="cards-list-container">
+
+
+          <ng-container *ngIf="selectedSection === 'PRODUCTS'">
+            <div *ngIf="filteredProducts.length === 1" class="metric-card single-mode">
+              <div class="metric-card-title">{{ filteredProducts[0].productName }}</div>
+              <div class="metric-card-subtitle">{{ filteredProducts[0].internalCode }}</div>
+              <div class="metric-reason-badge">{{ getIssueTitle(selectedIssue) }}</div>
+              <button class="btn-cta-correct" (click)="editProduct(filteredProducts[0])">Corregir ahora</button>
+            </div>
+            <ng-container *ngIf="filteredProducts.length > 1">
+              <div class="metric-card" *ngFor="let p of filteredProducts | slice:0:5">
+                <div class="metric-card-content">
+                  <div class="metric-card-title">{{ p.productName }}</div>
+                  <div class="metric-card-subtitle">{{ p.internalCode }}</div>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+                  <span class="metric-reason-badge">{{ getIssueTitle(selectedIssue) }}</span>
+                  <button class="btn-icon-edit" (click)="editProduct(p)"><svg xmlns="http://www.w3.org/2000/svg"
+                      width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg></button>
+                </div>
+              </div>
+            </ng-container>
+          </ng-container>
+
+
+          <ng-container *ngIf="selectedSection === 'INVENTARIO'">
+            <div *ngIf="filteredInventory.length === 1" class="metric-card single-mode">
+              <div class="metric-card-title">{{ filteredInventory[0].product.productName }}</div>
+              <div class="metric-card-subtitle">{{ filteredInventory[0].variantName || filteredInventory[0].variantSku
+                }}</div>
+              <div class="metric-reason-badge">{{ getIssueTitle(selectedIssue) }}</div>
+              <button class="btn-cta-correct" (click)="editVariant(filteredInventory[0])">Corregir ahora</button>
+            </div>
+            <ng-container *ngIf="filteredInventory.length > 1">
+              <div class="metric-card" *ngFor="let v of filteredInventory | slice:0:5">
+                <div class="metric-card-content">
+                  <div class="metric-card-title">{{ v.product.productName }}</div>
+                  <div class="metric-card-subtitle">{{ v.variantName || v.variantSku }}</div>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+                  <span class="metric-reason-badge">{{ getIssueTitle(selectedIssue) }}</span>
+                  <button class="btn-icon-edit" (click)="editVariant(v)"><svg xmlns="http://www.w3.org/2000/svg"
+                      width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg></button>
+                </div>
+              </div>
+            </ng-container>
+          </ng-container>
+
+
+          <ng-container *ngIf="selectedSection === 'MINIMUM'">
+            <div *ngIf="filteredMinimum.length === 1" class="metric-card single-mode">
+              <div class="metric-card-title">{{ filteredMinimum[0].name }}</div>
+              <div class="metric-card-subtitle">{{ filteredMinimum[0].variant }}</div>
+              <div class="metric-reason-badge">{{ filteredMinimum[0].current }} / {{ filteredMinimum[0].min }}</div>
+              <button class="btn-cta-correct"
+                (click)="filteredMinimum[0].type === 'Prod' ? editProduct(filteredMinimum[0].ref) : editVariant(filteredMinimum[0].ref)">Corregir
+                ahora</button>
+            </div>
+            <ng-container *ngIf="filteredMinimum.length > 1">
+              <div class="metric-card" *ngFor="let m of filteredMinimum | slice:0:5">
+                <div class="metric-card-content">
+                  <div class="metric-card-title">{{ m.name }}</div>
+                  <div class="metric-card-subtitle">{{ m.variant !== '-' ? m.variant : '' }}</div>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+                  <span class="metric-reason-badge">{{ m.current }} / {{ m.min }}</span>
+                  <button class="btn-icon-edit"
+                    (click)="m.type === 'Prod' ? editProduct(m.ref) : editVariant(m.ref)"><svg
+                      xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg></button>
+                </div>
+              </div>
+            </ng-container>
+          </ng-container>
+
+
+          <ng-container *ngIf="selectedSection === 'GROWTH'">
+            <div *ngIf="filteredGrowth.length === 1" class="metric-card single-mode">
+              <div class="metric-card-title">{{ filteredGrowth[0].name }}</div>
+              <div class="metric-card-subtitle">{{ filteredGrowth[0].code }}</div>
+              <div class="metric-reason-badge">{{ filteredGrowth[0].margenPct | percent:'1.1-1' }}</div>
+              <button class="btn-cta-correct" (click)="openGrowthItem(filteredGrowth[0])">Corregir ahora</button>
+            </div>
+            <ng-container *ngIf="filteredGrowth.length > 1">
+              <div class="metric-card" *ngFor="let g of filteredGrowth | slice:0:5">
+                <div class="metric-card-content">
+                  <div class="metric-card-title">{{ g.name }}</div>
+                  <div class="metric-card-subtitle">{{ g.code }}</div>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+                  <span class="metric-reason-badge" [class.error]="g.margenPct < 0"
+                    [class.warning]="!g.cumple && g.margenPct >= 0">{{ g.margenPct | percent:'1.1-1' }}</span>
+                  <button class="btn-icon-edit" (click)="openGrowthItem(g)"><svg xmlns="http://www.w3.org/2000/svg"
+                      width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg></button>
+                </div>
+              </div>
+            </ng-container>
+          </ng-container>
+
+
+          <ng-container *ngIf="selectedSection === 'CONFLICTS'">
+            <div *ngIf="filteredConflicts.length === 1" class="metric-card single-mode">
+
+            </div>
+            <ng-container *ngIf="filteredConflicts.length > 1">
+
+            </ng-container>
+          </ng-container>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="full-table-modal-overlay" *ngIf="showFullTableModal" (click)="toggleFullTable()">
+  <div class="full-table-modal-content" (click)="$event.stopPropagation()">
+    <div class="full-table-header">
+      <h3>{{ getSectionTitle(selectedSection) }} - Listado Completo</h3>
+      <button class="btn-close-modal" (click)="toggleFullTable()">X</button>
+    </div>
+    <div class="full-table-body">
+
+      <table *ngIf="selectedSection === 'PRODUCTS'" class="simple-table">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Código</th>
+            <th>Problema</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of filteredProducts">
+            <td>{{ p.productName }}</td>
+            <td>{{ p.internalCode }}</td>
+            <td>{{ getIssueTitle(selectedIssue) }}</td>
+            <td><button class="btn-link" (click)="editProduct(p)">Editar</button></td>
+          </tr>
+        </tbody>
+      </table>
+
+
+      <table *ngIf="selectedSection === 'INVENTARIO'" class="simple-table">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Variante</th>
+            <th>Problema</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let v of filteredInventory">
+            <td>{{ v.product.productName }}</td>
+            <td>{{ v.variantName || v.variantSku }}</td>
+            <td>{{ getIssueTitle(selectedIssue) }}</td>
+            <td><button class="btn-link" (click)="editVariant(v)">Editar</button></td>
+          </tr>
+        </tbody>
+      </table>
+
+
+      <table *ngIf="selectedSection === 'MINIMUM'" class="simple-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Actual</th>
+            <th>Min</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let m of filteredMinimum">
+            <td>{{ m.name }} <span *ngIf="m.variant !== '-'">({{ m.variant }})</span></td>
+            <td>{{ m.current }}</td>
+            <td>{{ m.min }}</td>
+            <td><button class="btn-link"
+                (click)="m.type === 'Prod' ? editProduct(m.ref) : editVariant(m.ref)">Corregir</button></td>
+          </tr>
+        </tbody>
+      </table>
+
+
+      <table *ngIf="selectedSection === 'GROWTH'" class="simple-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Stock</th>
+            <th>Margen</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let g of filteredGrowth">
+            <td>{{ g.name }}</td>
+            <td>{{ g.stock }}</td>
+            <td [class.error]="g.margenPct < 0">{{ g.margenPct | percent:'1.1-1' }}</td>
+            <td><button class="btn-link" (click)="openGrowthItem(g)">Ver</button></td>
+          </tr>
+        </tbody>
+      </table>
+
+
+      <div *ngIf="selectedSection === 'CONFLICTS'">
+        <p>Detalle de conflictos en desarrollo.</p>
+      </div>
+
+    </div>
+  </div>
+</div>

@@ -1,0 +1,78 @@
+<div class="modal-backdrop" (click)="onClose()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Detalle del Pedido #{{ order?.externalId || order?.id }}</h2>
+      <button class="close-btn" (click)="onClose()">&times;</button>
+    </div>
+
+    <div class="modal-body" *ngIf="order">
+      <div class="info-section">
+        <h3>Información del Cliente</h3>
+        <p><strong>Nombre:</strong> {{ order.customer.name || 'N/A' }}</p>
+        <p><strong>Email:</strong> {{ order.customer.email || 'N/A' }}</p>
+        <p *ngIf="order.customer.phone"><strong>Teléfono:</strong> {{ order.customer.phone }}</p>
+        <p *ngIf="order.customer.address"><strong>Dirección:</strong> {{ order.customer.address }}</p>
+        <p *ngIf="order.customer.docNumber"><strong>DNI/CUIT:</strong> {{ order.customer.docNumber }}</p>
+      </div>
+
+      <div class="info-section">
+        <h3>Estado y Envío</h3>
+        <p><strong>Estado:</strong> {{ order.status }}</p>
+        <p><strong>Fecha:</strong> {{ order.date | date:'dd/MM/yyyy HH:mm' }}</p>
+        <p><strong>Método de Pago:</strong> {{ order.paymentMethod || 'N/A' }}</p>
+        <p><strong>Método de Envío:</strong> {{ order.shippingMethod || 'N/A' }}</p>
+        <p *ngIf="order.platformShipmentId"><strong>ID Envío:</strong> {{ order.platformShipmentId }}</p>
+        <p *ngIf="order.source === 'tiendanube'">
+          <strong>Estado de Pago:</strong>
+          <span [class]="order.paymentStatus === 'paid' ? 'badge-success' : 'badge-warning'"
+            style="padding: 2px 8px; border-radius: 4px; font-size: 0.9em; margin-left: 5px;">
+            {{ order.paymentStatus === 'paid' ? 'Pagado' : 'Pendiente' }}
+          </span>
+        </p>
+      </div>
+
+      <div class="items-section">
+        <h3>Items</h3>
+        <table class="items-table">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Cant.</th>
+              <th>Precio Unit.</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of order.items">
+              <td>{{ item.productName }}</td>
+              <td>{{ item.quantity }}</td>
+              <td>{{ item.unitPrice | currency:'ARS':'symbol':'1.0-2' }}</td>
+              <td>{{ item.subtotal | currency:'ARS':'symbol':'1.0-2' }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3" style="text-align: right;"><strong>Total:</strong></td>
+              <td><strong>{{ order.total | currency:'ARS':'symbol':'1.0-2' }}</strong></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-primary" *ngIf="order && order.source === 'tiendanube' && order.paymentStatus !== 'paid'"
+        (click)="markAsPaid()" [disabled]="loading" style="margin-right: 10px;">
+        <i class='bx' [class.bx-dollar-circle]="!loading" [class.bx-loader-alt]="loading" [class.bx-spin]="loading"></i>
+        {{ loading ? 'Procesando...' : 'Marcar como Pagado' }}
+      </button>
+
+      <button class="btn-danger" *ngIf="canRevert()" (click)="revertStatus()" [disabled]="loading"
+        style="margin-right: auto;">
+        <i class='bx' [class.bx-undo]="!loading" [class.bx-loader-alt]="loading" [class.bx-spin]="loading"></i>
+        {{ loading ? 'Revirtiendo...' : 'Revertir Estado' }}
+      </button>
+      <button class="btn-secondary" (click)="onClose()">Cerrar</button>
+    </div>
+  </div>
+</div>

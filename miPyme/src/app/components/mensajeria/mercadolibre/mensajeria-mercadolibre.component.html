@@ -1,0 +1,55 @@
+<div class="ml-messaging-layout">
+
+    <div class="ml-sidebar" [class.mobile-show]="mobilePanelMode === 'list'">
+        <app-spinner *ngIf="isLoadingConversations"></app-spinner>
+        <div *ngFor="let conv of conversations" class="ml-conversation-item"
+            [class.selected]="selectedConversation?.id === conv.id" (click)="selectConversation(conv)">
+            <div class="conv-avatar">
+                <i class='bx bx-user'></i>
+            </div>
+            <div class="conv-info">
+                <div class="conv-header">
+                    <span class="buyer-id">User #{{ conv.buyerId }}</span>
+                    <span class="date">{{ conv.lastMessageDate | date:'short' }}</span>
+                </div>
+                <div class="conv-preview">Pack #{{ conv.id }}</div>
+            </div>
+        </div>
+        <div *ngIf="conversations.length === 0 && !isLoadingConversations" class="no-data">
+            No hay conversaciones activas.
+        </div>
+    </div>
+
+
+    <div class="ml-chat-area" [class.mobile-show]="mobilePanelMode === 'chat'">
+        <div *ngIf="selectedConversation; else noSelection" class="chat-wrapper">
+
+            <div class="mobile-chat-header" *ngIf="layoutService.isMobile()">
+              <button class="mobile-back-btn" (click)="backToList()" aria-label="Volver">
+                <i class="bx bx-arrow-back"></i>
+              </button>
+              <span class="mobile-chat-title">Pack #{{ selectedConversation.id }}</span>
+            </div>
+            <app-spinner *ngIf="isLoadingMessages"></app-spinner>
+            <div class="chat-messages" #messagesContainer>
+                <div *ngFor="let msg of messages" class="message-bubble"
+                    [class.sent]="msg.fromUserId === selectedConversation.sellerId"
+                    [class.received]="msg.fromUserId !== selectedConversation.sellerId">
+                    <div class="message-text">{{ msg.text }}</div>
+                    <div class="message-time">{{ msg.dateCreated | date:'shortTime' }}</div>
+                </div>
+            </div>
+            <div class="chat-input">
+                <input type="text" [(ngModel)]="newMessage" placeholder="Escribe un mensaje..."
+                    (keyup.enter)="sendMessage()" [readonly]="isSending">
+                <button (click)="sendMessage()" [disabled]="isSending"><i class='bx bx-send'></i></button>
+            </div>
+        </div>
+        <ng-template #noSelection>
+            <div class="empty-state">
+                <i class='bx bx-message-square-detail'></i>
+                <p>Selecciona una conversación para ver los mensajes</p>
+            </div>
+        </ng-template>
+    </div>
+</div>

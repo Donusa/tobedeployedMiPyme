@@ -1,0 +1,51 @@
+<div class="plan-required-wrapper">
+
+    <div class="blurred-bg">
+        <div class="fake-row"></div>
+        <div class="fake-row short"></div>
+        <div class="fake-row"></div>
+        <div class="fake-row medium"></div>
+        <div class="fake-row short"></div>
+        <div class="fake-row"></div>
+        <div class="fake-row medium"></div>
+        <div class="fake-row"></div>
+        <div class="fake-grid">
+            <div class="fake-card"></div>
+            <div class="fake-card"></div>
+            <div class="fake-card"></div>
+        </div>
+        <div class="fake-row"></div>
+        <div class="fake-row short"></div>
+        <div class="fake-row medium"></div>
+    </div>
+
+
+    <div class="lock-overlay">
+        <div class="lock-card glass-panel">
+            <div class="lock-icon-wrapper">
+                <i class='bx bx-lock-alt'></i>
+            </div>
+            <h2>Contenido bloqueado</h2>
+            <p>Se requiere el plan <strong>{{ requiredPlanLabel }}</strong> para acceder a esta sección.</p>
+
+            <div class="plan-features-preview" *ngIf="planDefinition">
+                <p class="features-label">El plan <strong>{{ requiredPlanLabel }}</strong> incluye:</p>
+                <ul class="features-list">
+                    <li *ngFor="let feature of planDefinition.features | slice:0:4">
+                        <i class='bx bx-check-circle'></i>
+                        {{ feature }}
+                    </li>
+                    <li class="features-more">
+                        <i class='bx bx-dots-horizontal-rounded'></i>
+                        ¡Y mucho más!
+                    </li>
+                </ul>
+            </div>
+
+            <button class="btn-upgrade" (click)="goToPlans()">
+                <i class='bx bx-rocket'></i>
+                Mejorar plan
+            </button>
+        </div>
+    </div>
+</div>

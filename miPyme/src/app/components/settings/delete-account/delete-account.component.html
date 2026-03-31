@@ -1,0 +1,172 @@
+<div class="delete-container">
+
+  <div class="page-header danger-header">
+    <div class="header-icon">
+      <i class='bx bx-trash'></i>
+    </div>
+    <div class="header-text">
+      <h1>Borrar cuenta</h1>
+      <p>Esta acción eliminará permanentemente tu cuenta y todos los datos asociados.</p>
+    </div>
+  </div>
+
+
+  <div class="danger-banner">
+    <i class='bx bx-error'></i>
+    <div>
+      <strong>Acción irreversible.</strong>
+      Una vez confirmada, no podremos recuperar ningún dato de tu cuenta ni de tu empresa.
+    </div>
+  </div>
+
+
+  <div class="section-title">
+    <h2>¿Qué se elimina?</h2>
+    <p>El borrado de cuenta implica la eliminación completa de la siguiente información:</p>
+  </div>
+
+  <div class="deletion-grid">
+    <div class="deletion-item">
+      <div class="deletion-icon"><i class='bx bx-user'></i></div>
+      <div>
+        <strong>Perfil y credenciales</strong>
+        <p>Nombre, email, contraseña y configuración de autenticación (2FA).</p>
+      </div>
+    </div>
+    <div class="deletion-item">
+      <div class="deletion-icon"><i class='bx bx-building'></i></div>
+      <div>
+        <strong>Datos de la empresa</strong>
+        <p>Razón social, CUIT, datos fiscales y toda la configuración del tenant.</p>
+      </div>
+    </div>
+    <div class="deletion-item">
+      <div class="deletion-icon"><i class='bx bx-package'></i></div>
+      <div>
+        <strong>Inventario y stock</strong>
+        <p>Productos, categorías, marcas, depósitos y movimientos de stock.</p>
+      </div>
+    </div>
+    <div class="deletion-item">
+      <div class="deletion-icon"><i class='bx bx-receipt'></i></div>
+      <div>
+        <strong>Ventas y facturación</strong>
+        <p>Historial de ventas, facturas emitidas y datos de facturación electrónica.</p>
+      </div>
+    </div>
+    <div class="deletion-item">
+      <div class="deletion-icon"><i class='bx bx-link'></i></div>
+      <div>
+        <strong>Integraciones</strong>
+        <p>Tokens de Mercado Libre, Tienda Nube, WhatsApp y ARCA/AFIP.</p>
+      </div>
+    </div>
+    <div class="deletion-item">
+      <div class="deletion-icon"><i class='bx bx-group'></i></div>
+      <div>
+        <strong>Empleados y usuarios</strong>
+        <p>Todos los usuarios del tenant y sus permisos asociados.</p>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="export-recommendation backup-auto">
+    <i class='bx bx-shield-check'></i>
+    <div>
+      <strong>Respaldo automático incluido.</strong>
+      Al confirmar la eliminación, se generará automáticamente un respaldo completo de tus datos
+      (perfil, empresa, inventario, historial y configuración). El archivo se descargará en tu
+      dispositivo y una copia se conservará en nuestros servidores durante
+      <strong>60 días</strong>, transcurrido ese plazo será eliminada de forma definitiva.
+    </div>
+  </div>
+
+
+  <div class="confirmation-card" *ngIf="!deleteSuccess">
+    <h3><i class='bx bx-lock-alt'></i> Confirmar eliminación</h3>
+    <p>Para continuar, escribí <strong class="confirm-word">ELIMINAR</strong> en el campo a continuación y luego ingresá tu contraseña actual.</p>
+
+
+    <div class="progress-steps" *ngIf="isBusy">
+      <div class="progress-step" [class.active]="isBackingUp" [class.done]="isDeleting">
+        <div class="step-icon">
+          <i class='bx' [ngClass]="isDeleting ? 'bx-check' : (isBackingUp ? 'bx-loader-alt bx-spin' : 'bx-data')"></i>
+        </div>
+        <span>Generando respaldo</span>
+      </div>
+      <div class="step-connector"></div>
+      <div class="progress-step" [class.active]="isDeleting">
+        <div class="step-icon">
+          <i class='bx' [ngClass]="isDeleting ? 'bx-loader-alt bx-spin' : 'bx-trash'"></i>
+        </div>
+        <span>Eliminando cuenta</span>
+      </div>
+    </div>
+
+    <div class="confirm-form" *ngIf="!isBusy">
+      <div class="form-group">
+        <label>Escribí ELIMINAR para confirmar</label>
+        <input
+          type="text"
+          [(ngModel)]="confirmText"
+          placeholder="ELIMINAR"
+          class="form-control"
+          [class.input-error]="confirmText && confirmText !== 'ELIMINAR'"
+          autocomplete="off"
+        />
+        <span class="field-hint error-hint" *ngIf="confirmText && confirmText !== 'ELIMINAR'">
+          Debe decir exactamente ELIMINAR
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label>Contraseña actual</label>
+        <div class="password-wrapper">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            [(ngModel)]="currentPassword"
+            placeholder="Tu contraseña"
+            class="form-control"
+            autocomplete="current-password"
+          />
+          <button type="button" class="toggle-pw" (click)="showPassword = !showPassword">
+            <i class='bx' [ngClass]="showPassword ? 'bx-hide' : 'bx-show'"></i>
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="backupError" class="alert-warn">
+        <i class='bx bx-error'></i> {{ backupError }}
+      </div>
+
+      <div *ngIf="deleteError" class="alert-error">
+        <i class='bx bx-error-circle'></i> {{ deleteError }}
+      </div>
+
+      <div class="form-actions">
+        <button
+          class="btn-delete"
+          (click)="requestDelete()"
+          [disabled]="confirmText !== 'ELIMINAR' || !currentPassword"
+        >
+          <i class='bx bx-shield-check'></i> Generar respaldo y eliminar mi cuenta
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="success-card" *ngIf="deleteSuccess">
+    <i class='bx bx-check-circle'></i>
+    <h3>Cuenta eliminada</h3>
+    <p>
+      Se generó y descargó automáticamente el respaldo de tus datos.<br>
+      Una copia queda disponible en nuestros servidores hasta el
+      <strong>{{ backupExpiresAt | date:'dd/MM/yyyy' }}</strong>,
+      fecha en que será eliminada definitivamente.<br><br>
+      Serás redirigido al inicio de sesión en unos instantes.
+    </p>
+  </div>
+
+</div>

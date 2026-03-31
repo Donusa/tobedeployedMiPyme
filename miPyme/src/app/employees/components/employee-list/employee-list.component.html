@@ -1,0 +1,76 @@
+<div class="abm-container">
+  <div class="header-actions">
+    <div class="search-create-group">
+
+      <input type="text" placeholder="Buscar empleados..." class="search-input">
+      <button class="create-btn desktop-btn" (click)="openCreateModal()">
+        <i class="bx bx-plus"></i> Nuevo Empleado
+      </button>
+    </div>
+  </div>
+
+
+  <button class="fab-btn" (click)="openCreateModal()">
+    <i class="bx bx-plus"></i>
+  </button>
+
+  <div class="list-container">
+
+
+    @if (!layoutService.isMobile()) {
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Email</th>
+          <th>Permisos</th>
+          <th>Sucursales</th>
+          <th class="col-actions">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let employee of employees">
+          <td>{{ employee.name }}</td>
+          <td>{{ employee.email }}</td>
+          <td>
+            <span *ngFor="let perm of employee.permissions" class="badge bg-secondary me-1">{{ perm }}</span>
+          </td>
+          <td>
+            <span class="warehouse-list">{{ getWarehouseNames(employee.warehouseIds) }}</span>
+          </td>
+          <td class="col-actions">
+            <button class="icon-btn edit-btn" (click)="openEditModal(employee)" title="Editar">
+              <i class="bx bx-edit"></i>
+            </button>
+            <button class="icon-btn delete-btn" (click)="deleteEmployee(employee.id)" title="Eliminar">
+              <i class="bx bx-trash"></i>
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="employees.length === 0 && !isLoading">
+          <td colspan="5" style="text-align: center; padding: 40px; color: #888;">No hay empleados registrados.</td>
+        </tr>
+      </tbody>
+    </table>
+    }
+
+
+    @if (layoutService.isMobile()) {
+    <app-mobile-card-list
+      [items]="employees"
+      [columns]="mobileColumns"
+      [actions]="mobileActions"
+      emptyMessage="No hay empleados registrados.">
+    </app-mobile-card-list>
+    }
+
+  </div>
+
+  <app-spinner *ngIf="isLoading"></app-spinner>
+</div>
+
+<app-employee-modal
+  *ngIf="showModal"
+  [employee]="selectedEmployee"
+  (close)="onModalClose($event)"
+></app-employee-modal>

@@ -1,0 +1,175 @@
+<div class="sale-page-container">
+    <div class="page-header">
+        <h2>Nueva Venta</h2>
+        <button class="btn-secondary" (click)="cancel()">
+            <i class='bx bx-arrow-back'></i> Volver
+        </button>
+    </div>
+
+    <div class="sale-layout">
+
+        <div class="selection-panel">
+            <div class="panel-card">
+                <div class="card-header">
+                    <h3>Agregar Producto</h3>
+                    <button class="btn-toggle-scanner" (click)="toggleScanner()">
+                        <i class='bx bx-barcode-reader'></i> {{ showScanner ? 'Ocultar Escáner' : 'Activar Escáner' }}
+                    </button>
+                </div>
+
+                <div class="scanner-container" *ngIf="showScanner">
+                    <div class="scanner-controls" *ngIf="availableDevices.length > 1">
+                        <select #deviceSelect (change)="onDeviceSelectChange(deviceSelect.value)" class="device-select">
+                            <option *ngFor="let device of availableDevices" [value]="device.deviceId"
+                                [selected]="currentDevice && device.deviceId === currentDevice.deviceId">
+                                {{ device.label || 'Cámara ' + (availableDevices.indexOf(device) + 1) }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="scanner-wrapper">
+                        <zxing-scanner *ngIf="scannerEnabled" [formats]="allowedFormats" [device]="currentDevice"
+                            (camerasFound)="onCamerasFound($event)" (permissionResponse)="onPermissionResponse($event)"
+                            (scanSuccess)="handleScanSuccess($event)">
+                        </zxing-scanner>
+                        <div class="scanner-status" *ngIf="!hasPermission">
+                            <p class="error-text">Permiso de cámara denegado.</p>
+                            <button (click)="checkCameraPermission()" class="retry-permission-btn">Habilitar
+                                Cámara</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="search-box" *ngIf="!selectedProduct">
+                    <input type="text" [(ngModel)]="searchTerm" (input)="filterProducts()" (focus)="onSearchFocus()"
+                        (blur)="onSearchBlur()" placeholder="Buscar producto por nombre o código..."
+                        class="search-input">
+
+                    <div class="product-list" *ngIf="showDropdown">
+                        <div *ngFor="let product of filteredProducts" class="product-item"
+                            (click)="selectProduct(product)">
+                            <div class="prod-info">
+                                <span class="prod-name">{{ product.productName }}</span>
+                                <span class="prod-code">{{ product.internalCode }}</span>
+                            </div>
+                            <span class="stock-badge">Stock: {{ product.stockQuantity }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="selected-product-subpanel" *ngIf="selectedProduct">
+                    <div class="subpanel-header">
+                        <strong>{{ selectedProduct.productName }}</strong>
+                        <button class="btn-link" (click)="clearSelection()">Cambiar</button>
+                    </div>
+
+                    <div class="variants-section" *ngIf="loadingVariants">
+                        <span class="loading-text">Cargando variantes...</span>
+                    </div>
+
+                    <div class="variants-section" *ngIf="!loadingVariants && variants.length > 0">
+                        <label>Variante:</label>
+                        <select [(ngModel)]="selectedVariant" class="form-select">
+                            <option [ngValue]="null">Seleccionar variante...</option>
+                            <option *ngFor="let v of variants" [ngValue]="v">
+                                {{ v.variantSku }} - {{ v.attributes?.[0]?.attributeValue }} (Stock: {{ v.stockQuantity
+                                }} - {{ v.price | currency }})
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="quantity-section">
+                        <label>Cantidad:</label>
+                        <input type="number" [(ngModel)]="quantity" min="1" class="form-input">
+                    </div>
+
+                    <button class="btn-add" (click)="addToCart()" [disabled]="variants.length > 0 && !selectedVariant">
+                        <i class='bx bx-cart-add'></i> Agregar al Carrito
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="cart-panel">
+            <div class="panel-card">
+                <h3>Carrito de Venta</h3>
+                <div class="cart-items-container">
+                    <table class="cart-table">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th style="text-align: center;">Cant.</th>
+                                <th style="text-align: right;">Precio</th>
+                                <th style="text-align: right;">Subtotal</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of cartItems; let i = index">
+                                <td>
+                                    <div class="cart-item-info">
+                                        <span class="item-name">{{ item.product.productName }}</span>
+                                        <small *ngIf="item.variant" class="item-variant">({{ item.variant.variantSku
+                                            }})</small>
+                                    </div>
+                                </td>
+                                <td style="text-align: center;">{{ item.quantity }}</td>
+                                <td style="text-align: right;">{{ item.price | currency }}</td>
+                                <td style="text-align: right;">{{ item.subtotal | currency }}</td>
+                                <td style="text-align: right;">
+                                    <button class="btn-remove" (click)="removeFromCart(i)">
+                                        <i class='bx bx-x'></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr *ngIf="cartItems.length === 0">
+                                <td colspan="5" class="empty-cart">El carrito está vacío</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="cart-footer">
+                    <div class="total-row">
+                        <span>Total:</span>
+                        <span class="total-amount">{{ total | currency }}</span>
+                    </div>
+
+                    <div class="action-buttons">
+
+                        <div class="action-select-group">
+                            <label class="action-select-label">Medio de Pago</label>
+                            <select class="action-select" [(ngModel)]="selectedMedioPago">
+                                <option *ngFor="let mp of mediosPago" [value]="mp.value">{{ mp.label }}</option>
+                            </select>
+                        </div>
+
+
+                        <div class="action-select-group">
+                            <label class="action-select-label">Comprobante</label>
+                            <select class="action-select" [ngModel]="selectedDocType" (ngModelChange)="setDocType($event)">
+                                <option value="NONE">Sin comprobante</option>
+                                <option value="FISCAL">Factura (ARCA)</option>
+                                <option value="NON_FISCAL">Recibo X</option>
+                            </select>
+                        </div>
+
+                        <button class="btn-confirm-sale" (click)="submitSale()"
+                            [disabled]="cartItems.length === 0 || isSubmitting">
+                            <svg *ngIf="!isSubmitting" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            {{ isSubmitting ? 'Procesando...' : 'Confirmar Venta' }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<app-invoice-preview-modal *ngIf="showInvoicePreview" [saleData]="{ items: cartItems, total: total }"
+    [docType]="selectedDocType == 'FISCAL' ? 'FISCAL' : 'NON_FISCAL'" (confirm)="onInvoiceConfirm($event)"
+    (cancel)="showInvoicePreview = false">
+</app-invoice-preview-modal>

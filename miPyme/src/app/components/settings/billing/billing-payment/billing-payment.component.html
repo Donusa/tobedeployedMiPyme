@@ -1,0 +1,71 @@
+<div class="billing-container slide-in-bottom">
+    <div class="header-section">
+        <h2>Método de Pago</h2>
+        <p class="subtitle">Tu suscripción se gestiona a través de MercadoPago. Desde ahí podés administrar tus medios
+            de pago.</p>
+    </div>
+
+    <div class="loading-state" *ngIf="isLoading">
+        <i class='bx bx-loader-alt bx-spin'></i>
+        <p>Cargando información...</p>
+    </div>
+
+    <div class="payment-info-grid" *ngIf="!isLoading">
+
+        <div class="info-card glass-panel">
+            <div class="info-icon">
+                <i class='bx bxs-credit-card'></i>
+            </div>
+            <div class="info-content">
+                <h3>Estado de suscripción</h3>
+                <span class="status-badge"
+                    [ngClass]="getStatusClass(subscriptionStatus?.subscriptionStatus ?? null)">
+                    {{ getStatusLabel(subscriptionStatus?.subscriptionStatus ?? null) }}
+                </span>
+            </div>
+        </div>
+
+
+        <div class="info-card glass-panel">
+            <div class="info-icon">
+                <i class='bx bxs-shield-alt-2'></i>
+            </div>
+            <div class="info-content">
+                <h3>Estado del plan</h3>
+                <span class="plan-status">{{ subscriptionStatus?.planStatus || 'trial' | uppercase }}</span>
+                <span class="plan-tier" *ngIf="subscriptionStatus?.planTier">
+                    — Plan {{ subscriptionStatus?.planTier | titlecase }}
+                </span>
+            </div>
+        </div>
+
+
+        <div class="info-card glass-panel" *ngIf="subscriptionStatus?.amount">
+            <div class="info-icon">
+                <i class='bx bx-dollar-circle'></i>
+            </div>
+            <div class="info-content">
+                <h3>Monto mensual</h3>
+                <span class="amount">${{ subscriptionStatus?.amount }} ARS</span>
+            </div>
+        </div>
+
+
+        <div class="info-card glass-panel" *ngIf="subscriptionStatus?.validUntil">
+            <div class="info-icon">
+                <i class='bx bx-calendar'></i>
+            </div>
+            <div class="info-content">
+                <h3>Válido hasta</h3>
+                <span>{{ subscriptionStatus?.validUntil | date:'dd/MM/yyyy' }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="mp-notice glass-panel" *ngIf="!isLoading">
+        <i class='bx bx-info-circle'></i>
+        <p>Los medios de pago (tarjeta de crédito/débito) se administran directamente desde tu cuenta de MercadoPago al
+            momento de suscribirte o desde <a href="https://www.mercadopago.com.ar/subscriptions" target="_blank"
+                rel="noopener noreferrer">tu panel de MercadoPago</a>.</p>
+    </div>
+</div>

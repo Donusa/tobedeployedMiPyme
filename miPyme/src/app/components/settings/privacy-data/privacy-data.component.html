@@ -1,0 +1,172 @@
+<div class="privacy-container">
+
+  <div class="page-header">
+    <div class="page-header-icon">
+      <i class='bx bx-shield-quarter'></i>
+    </div>
+    <div class="page-header-text">
+      <h1>Datos y Privacidad</h1>
+      <p>Transparencia total sobre la información que MiPyme almacena sobre vos y tu empresa.</p>
+    </div>
+  </div>
+
+
+  <div class="export-cta-card">
+    <div class="export-cta-left">
+      <div class="export-cta-icon">
+        <i class='bx bx-download'></i>
+      </div>
+      <div class="export-cta-text">
+        <h2>Exportar todos mis datos</h2>
+        <p>Descargá un archivo JSON con toda la información almacenada en tu cuenta: perfil, empresa, sesiones, historial de accesos, notificaciones y preferencias.</p>
+      </div>
+    </div>
+    <button class="btn-export" (click)="exportData()" [disabled]="isExporting">
+      <span *ngIf="!isExporting">
+        <i class='bx bx-download'></i> Descargar mis datos
+      </span>
+      <span *ngIf="isExporting">
+        <i class='bx bx-loader-alt bx-spin'></i> Generando…
+      </span>
+    </button>
+  </div>
+
+  <div *ngIf="exportSuccess" class="alert-success">
+    <i class='bx bx-check-circle'></i> Archivo descargado correctamente.
+  </div>
+  <div *ngIf="exportError" class="alert-error">
+    <i class='bx bx-error-circle'></i> {{ exportError }}
+  </div>
+
+
+  <div class="section-title">
+    <h2>¿Qué información guardamos?</h2>
+    <p>A continuación encontrás cada categoría de datos que el sistema almacena, con una descripción detallada de cada campo.</p>
+  </div>
+
+  <div class="data-categories-grid">
+
+    <div class="data-card">
+      <div class="data-card-header">
+        <div class="data-card-icon icon-blue">
+          <i class='bx bx-user'></i>
+        </div>
+        <div>
+          <h3>Perfil de usuario</h3>
+          <span class="badge badge-blue">Cuenta</span>
+        </div>
+      </div>
+      <ul class="data-fields">
+        <li><i class='bx bx-chevron-right'></i><span class="field-name">Nombre completo</span></li>
+        <li><i class='bx bx-chevron-right'></i><span class="field-name">Dirección de email</span></li>
+        <li><i class='bx bx-chevron-right'></i><span class="field-name">Rol en el sistema</span></li>
+        <li><i class='bx bx-chevron-right'></i><span class="field-name">Permisos asignados</span></li>
+      </ul>
+    </div>
+
+    <div class="data-card">
+      <div class="data-card-header">
+        <div class="data-card-icon icon-purple">
+          <i class='bx bx-building'></i>
+        </div>
+        <div>
+          <h3>Empresa / Tenant</h3>
+          <span class="badge badge-purple">Organización</span>
+        </div>
+      </div>
+      <ul class="data-fields">
+        <li><i class='bx bx-chevron-right'></i><span class="field-name">Razón social y nombre comercial</span></li>
+        <li><i class='bx bx-chevron-right'></i><span class="field-name">CUIT / identificación fiscal</span></li>
+        <li><i class='bx bx-chevron-right'></i><span class="field-name">País, provincia y ciudad</span></li>
+        <li><i class='bx bx-chevron-right'></i><span class="field-name">Rubro / industria</span></li>
+        <li><i class='bx bx-chevron-right'></i><span class="field-name">Email y teléfono de contacto</span></li>
+        <li><i class='bx bx-chevron-right'></i><span class="field-name">Domicilio fiscal</span></li>
+        <li><i class='bx bx-chevron-right'></i><span class="field-name">Código SSO de tenant</span></li>
+      </ul>
+    </div>
+
+    <div class="data-card">
+      <div class="data-card-header">
+        <div class="data-card-icon icon-orange">
+          <i class='bx bx-devices'></i>
+        </div>
+        <div>
+          <h3>Sesiones activas</h3>
+          <span class="badge badge-orange">Seguridad</span>
+        </div>
+      </div>
+      <ul class="data-fields">
+        <li><i class='bx bx-chevron-right'></i><span class="field-name">Identificador de sesión</span></li>
+        <li><i class='bx bx-chevron-right'></i><span class="field-name">Información de dispositivo</span></li>
+        <li><i class='bx bx-chevron-right'></i><span class="field-name">Dirección IP de origen</span></li>
+        <li><i class='bx bx-chevron-right'></i><span class="field-name">Fecha de inicio de sesión</span></li>
+        <li><i class='bx bx-chevron-right'></i><span class="field-name">Última actividad registrada</span></li>
+      </ul>
+    </div>
+
+    <div class="data-card">
+      <div class="data-card-header">
+        <div class="data-card-icon icon-red">
+          <i class='bx bx-history'></i>
+        </div>
+        <div>
+          <h3>Historial de accesos</h3>
+          <span class="badge badge-red">Seguridad</span>
+        </div>
+      </div>
+      <ul class="data-fields">
+        <li><i class='bx bx-chevron-right'></i><span class="field-name">Fecha y hora de cada acceso</span></li>
+        <li><i class='bx bx-chevron-right'></i><span class="field-name">Dirección IP</span></li>
+        <li><i class='bx bx-chevron-right'></i><span class="field-name">Dispositivo / navegador</span></li>
+        <li><i class='bx bx-chevron-right'></i><span class="field-name">Resultado del intento (exitoso / fallido)</span></li>
+      </ul>
+    </div>
+
+    <div class="data-card">
+      <div class="data-card-header">
+        <div class="data-card-icon icon-green">
+          <i class='bx bx-bell'></i>
+        </div>
+        <div>
+          <h3>Notificaciones</h3>
+          <span class="badge badge-green">Actividad</span>
+        </div>
+      </div>
+      <ul class="data-fields">
+        <li><i class='bx bx-chevron-right'></i><span class="field-name">Tipo de notificación</span></li>
+        <li><i class='bx bx-chevron-right'></i><span class="field-name">Contenido / mensaje</span></li>
+        <li><i class='bx bx-chevron-right'></i><span class="field-name">Estado de lectura</span></li>
+        <li><i class='bx bx-chevron-right'></i><span class="field-name">Fecha de creación</span></li>
+      </ul>
+    </div>
+
+    <div class="data-card">
+      <div class="data-card-header">
+        <div class="data-card-icon icon-teal">
+          <i class='bx bx-slider-alt'></i>
+        </div>
+        <div>
+          <h3>Preferencias locales</h3>
+          <span class="badge badge-teal">Configuración</span>
+        </div>
+      </div>
+      <ul class="data-fields">
+        <li><i class='bx bx-chevron-right'></i><span class="field-name">Tema visual (claro / oscuro)</span></li>
+        <li><i class='bx bx-chevron-right'></i><span class="field-name">Idioma seleccionado</span></li>
+        <li><i class='bx bx-chevron-right'></i><span class="field-name">Recordar sesión</span></li>
+      </ul>
+      <p class="data-note">Guardadas en tu navegador (localStorage), no en nuestros servidores.</p>
+    </div>
+
+  </div>
+
+
+  <div class="legal-note">
+    <i class='bx bx-info-circle'></i>
+    <div>
+      <strong>Tu privacidad es nuestra prioridad.</strong>
+      MiPyme almacena únicamente los datos necesarios para el funcionamiento del servicio. No vendemos ni compartimos tu información personal con terceros. El archivo exportado es de uso personal y puede contener datos sensibles; guardalo en un lugar seguro.
+    </div>
+  </div>
+
+</div>

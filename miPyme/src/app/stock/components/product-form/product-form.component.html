@@ -1,0 +1,345 @@
+<app-spinner *ngIf="isLoading"></app-spinner>
+
+<div class="product-form-page" *ngIf="!isLoading">
+
+
+    <div class="page-context">
+        <span class="page-context__back" (click)="cancel()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            Productos
+        </span>
+        <span class="page-context__sep">/</span>
+        <span class="page-context__current">{{ isEditing ? (currentProduct.productName || 'Editar Producto') : 'Nuevo Producto' }}</span>
+    </div>
+
+    <div class="form-container">
+
+
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-icon section-icon--blue">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7H4a2 2 0 0 0-2 2v6c0 1.1.9 2 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"></path><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                </div>
+                <div>
+                    <h3>Información General</h3>
+                    <p class="section-sub">Datos principales del producto</p>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Nombre del Producto *</label>
+                    <input [(ngModel)]="currentProduct.productName" placeholder="Ej: Remera Algodón">
+                </div>
+                <div class="form-group">
+                    <label>Código Interno</label>
+                    <div class="input-with-scan">
+                        <input [(ngModel)]="currentProduct.internalCode" placeholder="Código de barras o interno">
+                        <button type="button" class="scan-btn" (click)="startScanning('productCode')" title="Escanear">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
+                                <path d="M17 3h2a2 2 0 0 1 2 2v2"></path>
+                                <path d="M21 17v2a2 2 0 0 1-2 2h-2"></path>
+                                <path d="M7 21H5a2 2 0 0 1-2-2v-2"></path>
+                                <rect x="7" y="7" width="10" height="10"></rect>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Precio Base</label>
+                    <input type="number" [(ngModel)]="currentProduct.price" placeholder="0.00">
+                </div>
+                <div class="form-group">
+                    <label>Costo Base</label>
+                    <input type="number" [(ngModel)]="currentProduct.cost" placeholder="0.00">
+                </div>
+                <div class="form-group">
+                    <label>Stock Disponible</label>
+                    <input type="number" [(ngModel)]="currentProduct.stockQuantity" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>Stock Mínimo</label>
+                    <input type="number" [(ngModel)]="currentProduct.minStock" placeholder="0">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <span class="toggle-switch">
+                        <input type="checkbox" [(ngModel)]="currentProduct.isActive">
+                        <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                    </span>
+                    <span class="toggle-text">Producto Activo</span>
+                </label>
+            </div>
+        </div>
+
+
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-icon section-icon--purple">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                </div>
+                <div>
+                    <h3>Clasificación y Ubicación</h3>
+                    <p class="section-sub">Categoría, marca, depósito y unidad</p>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Depósito</label>
+                    <select [ngModel]="currentProduct.warehouse" (ngModelChange)="onFormWarehouseChange($event)"
+                        [compareWith]="compareWarehouses">
+                        <option [ngValue]="undefined">Seleccionar Depósito</option>
+                        <option *ngFor="let w of warehouses" [ngValue]="w">{{ w.warehouseName }}</option>
+                        <option [ngValue]="'NEW'" class="create-option">+ Crear Nuevo...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Ubicación</label>
+                    <select [ngModel]="currentProduct.storage" (ngModelChange)="onFormLocationChange($event)"
+                        [disabled]="!currentProduct.warehouse" [compareWith]="compareLocations">
+                        <option [ngValue]="undefined">Seleccionar Ubicación</option>
+                        <option *ngFor="let l of formFilteredLocations" [ngValue]="l">{{ l.locationCode }} - {{
+                            l.locationDescription }}</option>
+                        <option [ngValue]="'NEW'" class="create-option">+ Crear Nueva...</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Marca</label>
+                    <select [ngModel]="currentProduct.productBrand" (ngModelChange)="onBrandChange($event)"
+                        [compareWith]="compareBrands">
+                        <option [ngValue]="undefined">Seleccionar Marca</option>
+                        <option *ngFor="let b of brands" [ngValue]="b">{{ b.brandName }}</option>
+                        <option [ngValue]="'NEW'" class="create-option">+ Crear Nueva...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Categoría</label>
+                    <select [ngModel]="currentProduct.productCategory" (ngModelChange)="onCategoryChange($event)"
+                        [compareWith]="compareCategories">
+                        <option [ngValue]="undefined">Seleccionar Categoría</option>
+                        <option *ngFor="let c of categories" [ngValue]="c">{{ c.categoryName }}</option>
+                        <option [ngValue]="'NEW'" class="create-option">+ Crear Nueva...</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Unidad de Medida</label>
+                    <select [ngModel]="currentProduct.measurementUnit" (ngModelChange)="onUnitChange($event)"
+                        [compareWith]="compareUnits">
+                        <option [ngValue]="undefined">Seleccionar Unidad</option>
+                        <option *ngFor="let u of units" [ngValue]="u">{{ u.unitName }} ({{ u.unitCode }})</option>
+                        <option [ngValue]="'NEW'" class="create-option">+ Crear Nueva...</option>
+                    </select>
+                </div>
+                <div class="form-group" *ngIf="currentProduct.measurementUnit">
+                    <label>Valor de Medida</label>
+                    <input type="text" [(ngModel)]="currentProduct.measurementValue" placeholder="Ej: 500 o 50x20">
+                </div>
+            </div>
+        </div>
+
+
+        <div class="section-card variants-section" *ngIf="isEditing">
+            <div class="section-header">
+                <div class="section-icon section-icon--teal">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                </div>
+                <div>
+                    <h3>Variantes de Producto</h3>
+                    <p class="section-sub">Gestiona variantes como talle, color, etc.</p>
+                </div>
+            </div>
+
+
+            <div class="variant-form-container">
+                <h4>{{ editingVariantId ? 'Editar Variante' : 'Agregar Nueva Variante' }}</h4>
+                <div class="variant-fixed-fields">
+                    <div class="form-row">
+                        <div class="form-group input-with-scan">
+                            <label>SKU</label>
+                            <div style="display:flex; gap: 5px;">
+                                <input [(ngModel)]="newVariant.variantSku" placeholder="SKU Único">
+                                <button type="button" class="scan-btn"
+                                    (click)="startScanning('variantSku')">SCAN</button>
+                            </div>
+                        </div>
+                        <div class="form-group input-with-scan">
+                            <label>GTIN/EAN</label>
+                            <div style="display:flex; gap: 5px;">
+                                <input [(ngModel)]="newVariant.variantGtin" placeholder="Código de Barras">
+                                <button type="button" class="scan-btn"
+                                    (click)="startScanning('variantGtin')">SCAN</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Peso (g)</label><input type="number"
+                                [(ngModel)]="newVariant.netWeightGrams"></div>
+                        <div class="form-group"><label>Precio</label><input type="number" [(ngModel)]="newVariant.price"
+                                placeholder="Opcional"></div>
+                        <div class="form-group"><label>Costo</label><input type="number" [(ngModel)]="newVariant.cost"
+                                placeholder="Opcional"></div>
+                        <div class="form-group"><label>Stock</label><input type="number"
+                                [(ngModel)]="newVariant.stockQuantity"></div>
+                        <div class="form-group"><label>Min Stock</label><input type="number"
+                                [(ngModel)]="newVariant.minStock"></div>
+                    </div>
+                </div>
+
+                <div class="attributes-group">
+                    <label>Atributos (Color, Talle...)</label>
+                    <div *ngFor="let attr of newVariant.attributes; let i = index; trackBy: trackByAttribute"
+                        class="attribute-row">
+                        <input [(ngModel)]="attr.attributeKey" placeholder="Clave (Ej: Color)">
+                        <input [(ngModel)]="attr.attributeValue" placeholder="Valor (Ej: Rojo)">
+                        <button (click)="removeVariantAttribute(i)" class="icon-btn delete-btn" title="Eliminar">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                    <button (click)="addVariantAttribute()" class="add-attr-btn">+ Agregar Atributo</button>
+                </div>
+
+                <div class="variant-actions">
+                    <button *ngIf="editingVariantId" (click)="cancelVariantEdit()" class="cancel-var-btn">Cancelar
+                        Edición</button>
+                    <button (click)="saveVariant()" class="save-var-btn">{{ editingVariantId ? 'Actualizar Variante' :
+                        'Agregar Variante' }}</button>
+                </div>
+            </div>
+
+
+            <div class="table-responsive">
+                <table class="data-table variants-table">
+                    <thead>
+                        <tr>
+                            <th>SKU</th>
+                            <th>GTIN</th>
+                            <th>Atributos</th>
+                            <th>Stock</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let v of currentVariants; trackBy: trackByVariant">
+                            <td>{{ v.variantSku }}</td>
+                            <td>{{ v.variantGtin }}</td>
+                            <td>
+                                <span *ngFor="let attr of v.attributes; let last = last">
+                                    {{ attr.attributeKey }}: {{ attr.attributeValue }}{{ !last ? ', ' : '' }}
+                                </span>
+                            </td>
+                            <td>{{ v.stockQuantity }}</td>
+                            <td class="col-var-actions">
+                                <button (click)="editVariant(v)" class="icon-btn edit-btn"><i
+                                        class='bx bx-edit'></i></button>
+                                <button (click)="deleteVariant(v)" class="icon-btn delete-btn"><i
+                                        class='bx bx-trash'></i></button>
+                            </td>
+                        </tr>
+                        <tr *ngIf="currentVariants.length === 0">
+                            <td colspan="5" style="text-align: center; padding: 20px; color: #888;">No hay variantes
+                                registradas.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="floating-bar">
+        <button class="btn-cancel" (click)="cancel()">Cancelar</button>
+        <button class="btn-save"
+            [class.btn-save--saving]="saveState === 'saving'"
+            [class.btn-save--success]="saveState === 'success'"
+            [class.btn-save--error]="saveState === 'error'"
+            [disabled]="saveState !== 'idle'"
+            (click)="saveProduct()">
+            <span class="btn-save__label" *ngIf="saveState === 'idle'">
+                {{ isEditing ? 'Guardar Cambios' : 'Crear Producto' }}
+            </span>
+            <span class="btn-save__spinner" *ngIf="saveState === 'saving'"></span>
+            <svg *ngIf="saveState === 'success'" class="btn-save__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <svg *ngIf="saveState === 'error'" class="btn-save__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+    </div>
+
+</div>
+
+
+<div class="modal-overlay" *ngIf="showCreateModal" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <h3>Crear {{ getModalTitle() }}</h3>
+
+        <div class="form-group"
+            *ngIf="createModalType === 'unit' || createModalType === 'warehouse' || createModalType === 'location'">
+            <label>Código</label>
+            <input [(ngModel)]="newItemCode" placeholder="Código">
+        </div>
+
+        <div class="form-group" *ngIf="createModalType === 'warehouse'">
+            <label>Dirección</label>
+            <input [(ngModel)]="newItemAddress" placeholder="Dirección">
+        </div>
+
+        <div class="form-group" *ngIf="createModalType === 'location'">
+            <label>Descripción</label>
+            <input [(ngModel)]="newItemDescription" placeholder="Descripción">
+        </div>
+        <div class="form-group" *ngIf="createModalType === 'location'">
+            <label>Tipo</label>
+            <input [(ngModel)]="newItemType" placeholder="Tipo">
+        </div>
+
+        <div class="form-group" *ngIf="createModalType !== 'location'">
+            <label>Nombre</label>
+            <input [(ngModel)]="newItemName" placeholder="Nombre">
+        </div>
+
+        <div class="modal-actions">
+            <button (click)="closeModal()">Cancelar</button>
+            <button (click)="saveNewItem()">Guardar</button>
+        </div>
+    </div>
+</div>
+
+
+<div class="scanner-overlay" *ngIf="showScanner" (click)="closeScanner()">
+    <div class="scanner-content" (click)="$event.stopPropagation()">
+        <h3>Escaneando...</h3>
+        <div class="scanner-controls" *ngIf="availableDevices.length > 1">
+            <select #deviceSelect (change)="onDeviceSelectChange(deviceSelect.value)">
+                <option *ngFor="let device of availableDevices" [value]="device.deviceId"
+                    [selected]="currentDevice && device.deviceId === currentDevice.deviceId">
+                    {{ device.label || 'Camera' }}
+                </option>
+            </select>
+        </div>
+        <div class="scanner-wrapper">
+            <zxing-scanner *ngIf="scannerEnabled" [formats]="allowedFormats" [device]="currentDevice"
+                (camerasFound)="onCamerasFound($event)" (permissionResponse)="onPermissionResponse($event)"
+                (scanSuccess)="handleScanSuccess($event)"></zxing-scanner>
+        </div>
+        <button class="close-scanner-btn" (click)="closeScanner()">Cancelar</button>
+    </div>
+</div>

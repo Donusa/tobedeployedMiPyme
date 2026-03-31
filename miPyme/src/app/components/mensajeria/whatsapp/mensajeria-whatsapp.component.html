@@ -1,0 +1,107 @@
+<div class="whatsapp-messaging-layout" *ngIf="!isCheckingStatus">
+
+
+    <div class="connect-state" *ngIf="!isConnected">
+        <div class="connect-card">
+            <i class='bx bxl-whatsapp connect-icon'></i>
+            <h2>Conectar WhatsApp Business</h2>
+            <p>Conectá tu cuenta de WhatsApp Business para recibir y enviar mensajes desde aquí.</p>
+
+            <button class="connect-btn" (click)="startConnect()" [disabled]="isConnecting">
+                <i class='bx bxl-whatsapp'></i>
+                {{ isConnecting ? 'Conectando...' : 'Conectar WhatsApp' }}
+            </button>
+
+            <div class="error-msg" *ngIf="connectionError">
+                <i class='bx bx-error-circle'></i> {{ connectionError }}
+            </div>
+        </div>
+    </div>
+
+
+    <ng-container *ngIf="isConnected">
+
+        <div class="sidebar" [class.mobile-show]="mobilePanelMode === 'list'">
+            <div class="sidebar-header">
+                <i class='bx bxl-whatsapp'></i>
+                <span>Conversaciones</span>
+                <button class="sync-btn" (click)="syncHistory()" [disabled]="isSyncing"
+                    title="Actualizar historial de conversaciones">
+                    <i class='bx' [ngClass]="isSyncing ? 'bx-loader-alt bx-spin' : 'bx-refresh'"></i>
+                </button>
+            </div>
+            <div class="sync-error" *ngIf="syncError">{{ syncError }}</div>
+
+            <app-spinner *ngIf="isLoadingConversations"></app-spinner>
+
+            <div *ngFor="let conv of conversations" class="conversation-item"
+                [class.selected]="selectedConversation?.id === conv.id" (click)="selectConversation(conv)">
+                <div class="conv-avatar">
+                    <i class='bx bx-user'></i>
+                </div>
+                <div class="conv-info">
+                    <div class="conv-header">
+                        <span class="contact-name">{{ conv.contactName || conv.contactWaId }}</span>
+                        <span class="date">{{ conv.lastMessageAt | date:'short' }}</span>
+                    </div>
+                    <div class="conv-wa-id" *ngIf="conv.contactName">{{ conv.contactWaId }}</div>
+                </div>
+                <span class="unread-badge" *ngIf="conv.unreadCount > 0">{{ conv.unreadCount }}</span>
+            </div>
+
+            <div *ngIf="conversations.length === 0 && !isLoadingConversations" class="no-data">
+                <i class='bx bx-message-rounded-dots'></i>
+                <p>No hay conversaciones aún.</p>
+            </div>
+        </div>
+
+
+        <div class="chat-area" [class.mobile-show]="mobilePanelMode === 'chat'">
+            <div *ngIf="selectedConversation; else noSelection" class="chat-wrapper">
+
+                <div class="chat-header">
+
+                    <button class="mobile-back-btn" *ngIf="layoutService.isMobile()" (click)="backToList()" aria-label="Volver a conversaciones">
+                      <i class="bx bx-arrow-back"></i>
+                      <span>Volver</span>
+                    </button>
+                    <div class="chat-header-info">
+                        <span class="chat-contact-name">{{ selectedConversation.contactName ||
+                            selectedConversation.contactWaId }}</span>
+                        <span class="chat-contact-wa" *ngIf="selectedConversation.contactName">{{
+                            selectedConversation.contactWaId }}</span>
+                    </div>
+                </div>
+
+                <app-spinner *ngIf="isLoadingMessages"></app-spinner>
+
+                <div class="chat-messages" #messagesContainer>
+                    <div *ngFor="let msg of messages" class="message-bubble" [class.sent]="msg.direction === 'OUT'"
+                        [class.received]="msg.direction === 'IN'">
+                        <div class="message-text">{{ msg.textBody }}</div>
+                        <div class="message-time">{{ msg.timestamp | date:'shortTime' }}</div>
+                    </div>
+                </div>
+
+                <div class="chat-input">
+                    <input type="text" [(ngModel)]="newMessage" placeholder="Escribe un mensaje..."
+                        (keyup.enter)="sendMessage()" [readonly]="isSending">
+                    <button (click)="sendMessage()" [disabled]="isSending || !newMessage.trim()">
+                        <i class='bx bx-send'></i>
+                    </button>
+                </div>
+            </div>
+
+            <ng-template #noSelection>
+                <div class="empty-state">
+                    <i class='bx bxl-whatsapp'></i>
+                    <p>Seleccioná una conversación para ver los mensajes</p>
+                </div>
+            </ng-template>
+        </div>
+    </ng-container>
+</div>
+
+<div class="checking-status-wrapper" *ngIf="isCheckingStatus">
+  <app-spinner></app-spinner>
+</div>

@@ -1,0 +1,55 @@
+<div class="abm-container">
+  <h2>Ubicaciones</h2>
+
+  <div class="form-container">
+    <div class="form-group">
+        <label>Depósito</label>
+        <select [(ngModel)]="currentLocation.warehouse">
+            <option [ngValue]="undefined" disabled>Seleccione un depósito</option>
+            <option *ngFor="let wh of warehouses" [ngValue]="wh">
+                {{ wh.warehouseName }}
+            </option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Código Ubicación</label>
+        <input [(ngModel)]="currentLocation.locationCode" placeholder="Ej: A-01-01">
+    </div>
+    <div class="form-group">
+        <label>Descripción</label>
+        <input [(ngModel)]="currentLocation.locationDescription" placeholder="Ej: Estante A, Nivel 1">
+    </div>
+    <div class="form-group">
+        <label>Tipo</label>
+        <input [(ngModel)]="currentLocation.locationType" placeholder="Ej: Estantería, Pallet, Piso">
+    </div>
+    <div class="actions">
+        <button (click)="save()">{{ isEditing ? 'Actualizar' : 'Crear' }}</button>
+        <button (click)="resetForm()">Cancelar</button>
+    </div>
+  </div>
+
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Depósito</th>
+        <th>Código</th>
+        <th>Descripción</th>
+        <th>Tipo</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let loc of locations">
+        <td>{{ loc.warehouse.warehouseName }}</td>
+        <td>{{ loc.locationCode }}</td>
+        <td>{{ loc.locationDescription }}</td>
+        <td>{{ loc.locationType }}</td>
+        <td>
+          <button (click)="edit(loc)">Editar</button>
+          <button (click)="delete(loc.storageLocationId!)">Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

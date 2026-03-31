@@ -1,0 +1,221 @@
+<div class="layout-container">
+
+<div class="sidebar-backdrop" [class.open]="isSidebarOpen" (click)="toggleSidebar()" (touchstart)="onBackdropTouchStart($event)" (touchend)="onBackdropTouchEnd($event)"></div>
+
+
+  <aside class="sidebar" [class.sidebar-open]="isSidebarOpen" [class.collapsed]="isSidebarCollapsed"
+    @sidebarContentAnim>
+    <div class="sidebar-header">
+      <div class="logo">{{ companyName.charAt(0) }}</div>
+      <span class="brand-name" *ngIf="!isSidebarCollapsed">{{ companyName }}</span>
+      <button class="collapse-btn" (click)="toggleSidebarCollapse()">
+        <i class='bx' [class.bx-chevron-left]="!isSidebarCollapsed" [class.bx-chevron-right]="isSidebarCollapsed"></i>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav">
+
+      <div class="nav-view main-view" *ngIf="!isSettingsView">
+        <ul>
+          <li *ngFor="let item of menuItems">
+
+            <a *ngIf="!item.children" [routerLink]="item.route" routerLinkActive="active" class="nav-item"
+              (click)="onMenuClick(item)" [title]="isSidebarCollapsed ? item.label : ''">
+              <i [class]="item.icon + ' nav-icon'"></i>
+              <span class="nav-label" *ngIf="!isSidebarCollapsed">{{ item.label }}</span>
+              <span class="plan-lock-badge" *ngIf="isPlanLocked(item) && !isSidebarCollapsed"
+                [title]="'Requiere plan ' + planService.getRequiredPlanLabel($any(item).requiredPlan)">
+                <i class='bx bx-lock-alt'></i>
+              </span>
+            </a>
+
+
+            <ng-container *ngIf="item.children">
+              <div class="nav-item parent-link" (click)="toggleSubmenu(item)" [class.expanded]="item.expanded"
+                [title]="isSidebarCollapsed ? item.label : ''">
+                <div class="nav-item-content">
+                  <i [class]="item.icon + ' nav-icon'"></i>
+                  <span class="nav-label" *ngIf="!isSidebarCollapsed">{{ item.label }}</span>
+                </div>
+                <i class='bx bx-chevron-down chevron-icon' [class.rotated]="item.expanded"
+                  *ngIf="!isSidebarCollapsed"></i>
+              </div>
+
+              <ul class="submenu" *ngIf="item.expanded && !isSidebarCollapsed">
+                <li *ngFor="let child of item.children">
+                  <a [routerLink]="child.route" routerLinkActive="active" class="nav-item child-link">
+                    <i [class]="child.icon + ' nav-icon child-icon'"></i>
+                    <span class="nav-label">{{ child.label }}</span>
+                  </a>
+                </li>
+              </ul>
+            </ng-container>
+          </li>
+
+
+          <li *ngIf="menuItems.length === 0" class="p-3 text-muted" style="font-size: 0.8rem;">
+            <div><strong>Debug Info:</strong></div>
+            <div>Role: {{ debugInfo.role || 'None' }}</div>
+            <div>Perms: {{ debugInfo.permissions.join(', ') || 'None' }}</div>
+            <div>Token: {{ debugInfo.rawToken }}</div>
+          </li>
+        </ul>
+      </div>
+
+
+      <div class="nav-view settings-view" *ngIf="isSettingsView" [@slideInOut]>
+        <div class="settings-top-actions">
+          <div class="settings-page-header">
+            <i class="bx bx-cog"></i>
+            <span *ngIf="!isSidebarCollapsed">Configuración</span>
+          </div>
+          <button class="btn-back" *ngIf="!settingsFromMobile" (click)="backToMainMenu()">
+            <i class="bx bx-arrow-back"></i>
+            <span *ngIf="!isSidebarCollapsed">Menú Principal</span>
+          </button>
+        </div>
+
+        <div class="settings-scroll-content">
+          <div *ngFor="let group of settingsMenu" class="settings-group">
+            <div class="settings-category-label" *ngIf="!isSidebarCollapsed">{{ group.category }}</div>
+            <ng-container *ngFor="let item of group.items">
+              <a *ngIf="item.route" [routerLink]="item.route" routerLinkActive="active"
+                [routerLinkActiveOptions]="{exact: true}" class="nav-item setting-item"
+                [title]="isSidebarCollapsed ? item.label : ''">
+                <i [class]="item.icon + ' nav-icon'"></i>
+                <span class="nav-label" *ngIf="!isSidebarCollapsed">{{ item.label }}</span>
+              </a>
+              <div *ngIf="!item.route" class="nav-item setting-item" (click)="onSettingClick(item.action)"
+                [title]="isSidebarCollapsed ? item.label : ''">
+                <i [class]="item.icon + ' nav-icon'"></i>
+                <span class="nav-label" *ngIf="!isSidebarCollapsed">{{ item.label }}</span>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer" *ngIf="!isSettingsView">
+      <div class="nav-item" (click)="goToSettings()" style="cursor: pointer;"
+        [title]="isSidebarCollapsed ? 'Configuración' : ''">
+        <i class="bx bx-cog nav-icon"></i>
+        <span class="nav-label" *ngIf="!isSidebarCollapsed">Configuración</span>
+      </div>
+    </div>
+  </aside>
+
+
+  <main class="main-content" @mainContentAnim>
+    <header class="top-bar">
+      <div class="top-bar-left">
+        <button class="menu-toggle" (click)="toggleSidebar()" aria-label="Abrir menú">
+          <span class="menu-toggle-label">{{ companyName.charAt(0) }}</span>
+        </button>
+        <h2 class="page-title">{{ currentTitle }}</h2>
+      </div>
+
+      <div class="top-bar-right">
+
+        <button class="theme-toggle-btn" (click)="toggleTheme()" [title]="isDarkTheme ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'" aria-label="Cambiar tema">
+          <i class="bx" [class.bx-sun]="isDarkTheme" [class.bx-moon]="!isDarkTheme"></i>
+        </button>
+
+        <div class="notifications-container" (click)="toggleNotificationMenu()">
+          <i class="bx bx-bell notifications-icon"></i>
+          <span class="notif-badge" *ngIf="unreadCount > 0">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
+          <div class="notifications-dropdown" *ngIf="isNotificationOpen" (click)="$event.stopPropagation()">
+            <div class="notif-header" *ngIf="notifications.length > 0">
+              <span class="notif-header-title">Notificaciones</span>
+              <button class="notif-mark-all-btn" *ngIf="unreadCount > 0" (click)="markAllRead()">
+                Marcar todas como leídas
+              </button>
+            </div>
+            <div class="notif-item" *ngFor="let n of notifications" [class.notif-read]="n.read"
+              (click)="onNotificationClick(n)">
+              <i [class]="getNotificationIcon(n.type) + ' notif-type-icon'"
+                [style.color]="getNotificationIconColor(n.type)"></i>
+              <div class="notif-content">
+                <div class="notif-text">{{ n.message }}</div>
+                <div class="notif-time">{{ getTimeAgo(n.createdAt) }}</div>
+              </div>
+              <div class="notif-unread-dot" *ngIf="!n.read"></div>
+            </div>
+            <div class="notif-empty" *ngIf="notifications.length === 0">
+              <i class="bx bx-bell-off" style="font-size: 1.5rem; margin-bottom: 4px;"></i>
+              <span>Sin notificaciones</span>
+            </div>
+          </div>
+        </div>
+        <div class="user-dropdown-container" (click)="toggleUserMenu()">
+          <span class="user-name-top">{{ userName }}</span>
+          <i class="bx bx-chevron-down dropdown-icon" [class.rotated]="isUserMenuOpen"></i>
+
+          <div class="user-dropdown-menu" *ngIf="isUserMenuOpen">
+            <div class="dropdown-item" (click)="goToProfile(); $event.stopPropagation()">
+              <i class="bx bx-user"></i>
+              <span>Perfil</span>
+            </div>
+            <div class="dropdown-item" (click)="goToSubscription(); $event.stopPropagation()">
+              <i class="bx bx-credit-card-front"></i>
+              <span>Mi suscripción</span>
+            </div>
+            <div class="dropdown-divider"></div>
+            <div class="dropdown-item danger" (click)="logout(); $event.stopPropagation()">
+              <i class="bx bx-log-out"></i>
+              <span>Cerrar sesión</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+    <div class="content-wrapper">
+
+      <div *ngIf="showSubscriptionBanner" class="subscription-banner" [ngClass]="subscriptionBannerClass">
+        <i class="bx" [class.bx-info-circle]="subscriptionBannerClass === 'banner-info'" [class.bx-error]="subscriptionBannerClass === 'banner-warning'" [class.bx-block]="subscriptionBannerClass === 'banner-danger'"></i>
+        <span class="banner-message">{{ subscriptionBannerMessage }}</span>
+        <a *ngIf="subscriptionBannerAction" [routerLink]="subscriptionBannerAction.route" class="banner-action-link">
+          {{ subscriptionBannerAction.label }}
+        </a>
+        <button class="banner-dismiss" (click)="dismissSubscriptionBanner()" title="Cerrar">
+          <i class="bx bx-x"></i>
+        </button>
+      </div>
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+
+
+  <app-bottom-nav (menuToggle)="openMainMenuMobile()" (settingsToggle)="openSettingsMobile()"></app-bottom-nav>
+
+  <div *ngIf="chatOpen" class="ml-chat-bubble" [class.minimized]="isChatMinimized">
+    <div class="ml-chat-header" (click)="toggleChatHeader()">
+      <div class="ml-chat-title">
+        <i class='bx bx-message-rounded-dots'></i>
+        <span>Chat #{{ chatConversationId }}</span>
+      </div>
+      <div style="display:flex; gap:4px;">
+        <button class="btn-icon" (click)="closeChat(); $event.stopPropagation()"><i class='bx bx-x'></i></button>
+      </div>
+    </div>
+    <div class="ml-chat-body" *ngIf="!isChatMinimized" #mlChatBody (scroll)="onChatScroll()">
+      <div class="ml-loader-top" *ngIf="loadingOlder">
+        <div class="spinner small"></div>
+      </div>
+      <div *ngIf="chatLoading" class="loading-state">
+        <div class="spinner"></div>
+      </div>
+      <div *ngFor="let m of chatMessages" class="ml-msg-line"
+        [ngClass]="(m.fromUserId === chatSellerId) ? 'me' : 'other'">
+        <div class="ml-msg-bubble" [ngClass]="(m.fromUserId === chatSellerId) ? 'me' : 'other'">
+          <div class="ml-msg-text">{{ m.text }}</div>
+          <div class="ml-msg-meta">{{ m.dateCreated | date:'short' }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="ml-chat-input" *ngIf="!isChatMinimized">
+      <input type="text" [(ngModel)]="chatNewMessage" class="ml-chat-textbox" placeholder="Escribe un mensaje...">
+      <button class="btn-primary" (click)="sendChatMessage()"><i class='bx bx-send'></i></button>
+    </div>
+  </div>
+</div>

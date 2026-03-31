@@ -1,0 +1,214 @@
+
+.operations-panel {
+    background: transparent;
+    padding: 24px;
+}
+
+.controls-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 0 4px;
+}
+
+.btn-group {
+    display: inline-flex;
+    background: #f1f5f9;
+    padding: 4px;
+    border-radius: 12px;
+    gap: 4px;
+}
+
+.btn-toggle {
+    border: none;
+    background: transparent;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-toggle:hover {
+    color: #1e293b;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.btn-toggle.active {
+    background: #ffffff;
+    color: #2563eb;
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.1);
+}
+
+.custom-range-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    margin-top: 16px;
+    background: #f8fafc;
+    padding: 12px 20px;
+    border-radius: 12px;
+}
+
+.custom-range-row input {
+    padding: 8px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: #1e293b;
+}
+
+.summary-cards-row {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.summary-kpi-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 24px;
+    border-radius: 20px;
+    flex: 1;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+}
+
+.summary-kpi-card .kpi-label {
+    font-size: 0.8rem;
+    color: #64748b;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+}
+
+.summary-kpi-card .kpi-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.chart-container {
+    background: white;
+    padding: 24px;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
+
+.btn-cta-correct {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-cta-correct:hover {
+    background: #1d4ed8;
+    transform: scale(1.02);
+}
+
+
+:host-context(body.dark-theme) .btn-group {
+    background: #374151;
+}
+
+:host-context(body.dark-theme) .btn-toggle {
+    color: #9ca3af;
+}
+
+:host-context(body.dark-theme) .btn-toggle:hover {
+    color: #f9fafb;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+:host-context(body.dark-theme) .btn-toggle.active {
+    background: #1f2937;
+    color: #60a5fa;
+    box-shadow: 0 2px 6px rgba(96, 165, 250, 0.15);
+}
+
+:host-context(body.dark-theme) .custom-range-row {
+    background: #1f2937;
+}
+
+:host-context(body.dark-theme) .custom-range-row input {
+    border-color: #4b5563;
+    color: #f9fafb;
+    background: #374151;
+}
+
+:host-context(body.dark-theme) .summary-kpi-card {
+    background: rgba(31, 41, 55, 0.8);
+    border-color: rgba(55, 65, 81, 0.5);
+}
+
+:host-context(body.dark-theme) .summary-kpi-card .kpi-label {
+    color: #9ca3af;
+}
+
+:host-context(body.dark-theme) .summary-kpi-card .kpi-value {
+    color: #f9fafb;
+}
+
+:host-context(body.dark-theme) .chart-container {
+    background: #1f2937;
+    border-color: #374151;
+}
+
+@media (max-width: 1023px) {
+
+    .operations-panel {
+        padding: 12px;
+    }
+
+
+    .controls-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+
+    .btn-group {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+
+    .custom-range-row {
+        flex-wrap: wrap;
+        padding: 10px 14px;
+    }
+
+    .custom-range-row input {
+        flex: 1 1 100%;
+    }
+
+
+    .summary-cards-row {
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+
+    .chart-container {
+        padding: 14px;
+    }
+}

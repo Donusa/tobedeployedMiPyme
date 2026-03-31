@@ -1,0 +1,44 @@
+.instagram-placeholder {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.empty-state {
+    text-align: center;
+    color: #999;
+}
+
+.empty-state i {
+    font-size: 56px;
+    margin-bottom: 16px;
+    background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    opacity: 0.5;
+}
+
+.empty-state p {
+    margin: 4px 0;
+    font-size: 14px;
+}
+
+.empty-state .hint {
+    font-size: 12px;
+    color: #bbb;
+}
+
+
+:host-context(body.dark-theme) .instagram-placeholder {
+    background: #111827;
+}
+
+:host-context(body.dark-theme) .empty-state {
+    color: #9ca3af;
+}
+
+:host-context(body.dark-theme) .empty-state .hint {
+    color: #6b7280;
+}

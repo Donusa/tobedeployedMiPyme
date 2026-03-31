@@ -1,0 +1,34 @@
+<div class="abm-container">
+  <h2>Marcas</h2>
+
+  <div class="form-container">
+    <div class="form-group">
+        <label>Nombre</label>
+        <input [(ngModel)]="currentBrand.brandName" placeholder="Ej: Nike">
+    </div>
+    <div class="actions">
+        <button (click)="save()">{{ isEditing ? 'Actualizar' : 'Crear' }}</button>
+        <button (click)="resetForm()">Cancelar</button>
+    </div>
+  </div>
+
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let brand of brands">
+        <td>{{ brand.brandId }}</td>
+        <td>{{ brand.brandName }}</td>
+        <td>
+          <button (click)="edit(brand)">Editar</button>
+          <button (click)="delete(brand.brandId!)">Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

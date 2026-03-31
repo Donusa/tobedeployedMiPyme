@@ -1,0 +1,79 @@
+<div class="modal-backdrop" (click)="close.emit()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ offer ? 'Editar Oferta' : 'Nueva Oferta' }}</h2>
+      <button class="btn-close" (click)="close.emit()"><i class='bx bx-x'></i></button>
+    </div>
+    <div class="modal-body">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label>Nombre</label>
+          <input type="text" formControlName="name" class="form-control">
+        </div>
+
+        <div class="form-group checkbox-group">
+          <input type="checkbox" formControlName="indefinite" id="indefinite">
+          <label for="indefinite">Oferta indefinida</label>
+        </div>
+
+        <div class="form-row" *ngIf="!form.get('indefinite')?.value">
+          <div class="form-group">
+            <label>Fecha Inicio</label>
+            <input type="date" formControlName="startDate" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Fecha Fin</label>
+            <input type="date" formControlName="endDate" class="form-control">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+             <label>Tipo de Descuento</label>
+             <select formControlName="discountType" class="form-control">
+               <option value="PERCENTAGE">Porcentaje (%)</option>
+               <option value="FIXED_AMOUNT">Monto Fijo ($)</option>
+               <option value="X_FOR_Y">X por Y (ej. 2x1)</option>
+             </select>
+          </div>
+          <div class="form-group" *ngIf="form.get('discountType')?.value !== 'X_FOR_Y'">
+             <label>Valor</label>
+             <input type="number" formControlName="discountValue" class="form-control">
+          </div>
+          <div class="form-group" *ngIf="form.get('discountType')?.value === 'X_FOR_Y'">
+             <label>Compra (X)</label>
+             <input type="number" formControlName="buyQuantity" class="form-control" placeholder="Ej. 2">
+          </div>
+          <div class="form-group" *ngIf="form.get('discountType')?.value === 'X_FOR_Y'">
+             <label>Paga (Y)</label>
+             <input type="number" formControlName="payQuantity" class="form-control" placeholder="Ej. 1">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Aplicar a</label>
+          <select formControlName="targetType" class="form-control">
+            <option value="CATEGORY">Categoría</option>
+            <option value="BRAND">Marca</option>
+            <option value="WAREHOUSE">Depósito</option>
+            <option value="LOCATION">Ubicación</option>
+            <option value="SPECIFIC">Productos Específicos</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Seleccionar Items</label>
+          <select formControlName="targetIds" multiple class="form-control multi-select">
+            <option *ngFor="let opt of targetOptions" [value]="opt.id">{{ opt.name }}</option>
+          </select>
+          <small class="text-muted">Mantén presionado Ctrl para seleccionar múltiples</small>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="close.emit()">Cancelar</button>
+          <button type="submit" class="btn-primary" [disabled]="form.invalid">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

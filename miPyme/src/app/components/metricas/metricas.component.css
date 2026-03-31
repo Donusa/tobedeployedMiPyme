@@ -1,0 +1,15 @@
+.metricas-container {
+  padding: 24px;
+  background-color: var(--color-bg-light, #f8fafc);
+  min-height: calc(100vh - 64px);
+}
+
+@media (max-width: 768px) {
+  .metricas-container {
+    padding: 12px;
+  }
+}
+
+:host-context(body.dark-theme) .metricas-container {
+  background: var(--color-bg-light, #111827);
+}

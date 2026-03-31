@@ -1,0 +1,143 @@
+<div class="audit-container">
+
+  <div class="page-header">
+    <div class="header-icon">
+      <i class='bx bx-list-check'></i>
+    </div>
+    <div class="header-text">
+      <h1>Auditoría</h1>
+      <p>Registro completo de accesos e inicios de sesión en tu cuenta.</p>
+    </div>
+  </div>
+
+
+  <div class="stats-row" *ngIf="!isLoading && logs.length > 0">
+    <div class="stat-card">
+      <div class="stat-icon icon-blue"><i class='bx bx-log-in'></i></div>
+      <div class="stat-body">
+        <span class="stat-value">{{ totalLogs }}</span>
+        <span class="stat-label">Registros totales</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon icon-green"><i class='bx bx-calendar-check'></i></div>
+      <div class="stat-body">
+        <span class="stat-value">{{ successCount }}</span>
+        <span class="stat-label">Últimos 30 días</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon icon-orange"><i class='bx bx-devices'></i></div>
+      <div class="stat-body">
+        <span class="stat-value">{{ uniqueDevices }}</span>
+        <span class="stat-label">Dispositivos únicos</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon icon-purple"><i class='bx bx-globe'></i></div>
+      <div class="stat-body">
+        <span class="stat-value">{{ uniqueIps }}</span>
+        <span class="stat-label">IPs distintas</span>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="filters-bar" *ngIf="!isLoading && logs.length > 0">
+    <div class="search-wrapper">
+      <i class='bx bx-search'></i>
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="applyFilters()"
+        placeholder="Buscar por dispositivo, IP, ubicación…"
+        class="search-input"
+      />
+    </div>
+    <select [(ngModel)]="mediumFilter" (ngModelChange)="applyFilters()" class="filter-select">
+      <option value="">Todos los medios</option>
+      <option *ngFor="let m of availableMediums" [value]="m">{{ m }}</option>
+    </select>
+    <button class="btn-refresh" (click)="loadLogs()">
+      <i class='bx bx-refresh' [class.bx-spin]="isLoading"></i> Actualizar
+    </button>
+  </div>
+
+
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Cargando registros…</p>
+  </div>
+
+
+  <div class="empty-state" *ngIf="!isLoading && logs.length === 0">
+    <i class='bx bx-folder-open'></i>
+    <p>No hay registros de auditoría disponibles.</p>
+  </div>
+
+
+  @if (!layoutService.isMobile()) {
+  <div class="table-card" *ngIf="!isLoading && filtered.length > 0">
+    <table class="audit-table">
+      <thead>
+        <tr>
+          <th (click)="sortBy('timestamp')" class="sortable">
+            Fecha y hora
+            <i class='bx' [ngClass]="getSortIcon('timestamp')"></i>
+          </th>
+          <th>Dispositivo</th>
+          <th>Ubicación</th>
+          <th>Medio</th>
+          <th>IP</th>
+          <th>Usuario</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let log of paginated" class="audit-row">
+          <td class="cell-date">
+            <span class="date-main">{{ log.timestamp | date:'dd/MM/yyyy' }}</span>
+            <span class="date-time">{{ log.timestamp | date:'HH:mm:ss' }}</span>
+          </td>
+          <td class="cell-device">
+            <i class='bx' [ngClass]="getDeviceIcon(log.device)"></i>
+            <span>{{ log.device || '-' }}</span>
+          </td>
+          <td>{{ log.location || '-' }}</td>
+          <td>
+            <span class="medium-badge" [ngClass]="getMediumClass(log.medium)">{{ log.medium || '-' }}</span>
+          </td>
+          <td class="cell-ip">{{ log.ipAddress }}</td>
+          <td class="cell-user">{{ log.username }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="no-results" *ngIf="filtered.length === 0 && searchTerm">
+      <i class='bx bx-search-alt'></i>
+      <p>Sin resultados para "<em>{{ searchTerm }}</em>"</p>
+    </div>
+  </div>
+  }
+
+
+  @if (layoutService.isMobile()) {
+  <app-mobile-card-list
+    *ngIf="!isLoading && paginated.length > 0"
+    [items]="paginated"
+    [columns]="mobileColumns"
+    [actions]="[]"
+    emptyMessage="No hay registros de auditoría.">
+  </app-mobile-card-list>
+  }
+
+
+  <div class="pagination" *ngIf="!isLoading && totalPages > 1">
+    <button class="page-btn" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">
+      <i class='bx bx-chevron-left'></i>
+    </button>
+    <span class="page-info">Página {{ currentPage }} de {{ totalPages }}</span>
+    <button class="page-btn" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">
+      <i class='bx bx-chevron-right'></i>
+    </button>
+  </div>
+
+</div>

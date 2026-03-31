@@ -1,0 +1,128 @@
+<div class="modal-overlay" (click)="onCancel()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>Previsualización de Comprobante</h3>
+            <button class="close-btn" (click)="onCancel()">×</button>
+        </div>
+
+        <div class="modal-body">
+            <div class="format-selection">
+                <label>Seleccione Formato:</label>
+                <div class="format-options">
+                    <div class="format-option" [class.selected]="selectedFormat === 'TICKET'"
+                        (click)="selectFormat('TICKET')">
+                        <i class='bx bx-receipt'></i>
+                        <span>Ticket (80mm)</span>
+                    </div>
+                    <div class="format-option" [class.selected]="selectedFormat === 'INVOICE'"
+                        (click)="selectFormat('INVOICE')">
+                        <i class='bx bx-file-blank'></i>
+                        <span>Factura (A4)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="preview-container">
+                <div class="preview-scroll">
+
+                    <div class="preview-paper ticket-paper" *ngIf="selectedFormat === 'TICKET'">
+                        <div class="ticket-header">
+                            <h4>{{ docType === 'FISCAL' ? 'MiPyme' : 'DOCUMENTO NO VALIDO COMO FACTURA' }}</h4>
+                            <h2 *ngIf="docType === 'NON_FISCAL'"
+                                style="text-align: center; border: 1px solid black; display: inline-block; padding: 2px 8px; margin: 5px auto;">
+                                X</h2>
+                            <p *ngIf="docType === 'FISCAL'">CUIT: 30-12345678-9</p>
+                            <p>Dirección del Local</p>
+                            <p *ngIf="docType === 'FISCAL'">Punto de Venta: 0001</p>
+                            <p>Comp. Nro: 00001234</p>
+                            <p>Fecha: {{ today | date:'dd/MM/yyyy HH:mm' }}</p>
+                        </div>
+                        <div class="ticket-items">
+                            <div class="ticket-row header-row">
+                                <span>Cant x Precio</span>
+                                <span>Total</span>
+                            </div>
+                            <div class="ticket-row" *ngFor="let item of saleData.items">
+                                <div class="item-desc">
+                                    {{ item.product.productName }}
+                                    <span *ngIf="item.variant">({{ item.variant.variantSku }})</span>
+                                </div>
+                                <div class="item-price-row">
+                                    <span>{{ item.quantity }} x {{ item.price | currency }}</span>
+                                    <span>{{ item.subtotal | currency }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ticket-total">
+                            <span>TOTAL</span>
+                            <span>{{ saleData.total | currency }}</span>
+                        </div>
+                        <div class="ticket-footer">
+                            <p>Gracias por su compra</p>
+                            <p *ngIf="docType === 'FISCAL'">Firma CAEA: ....................</p>
+                        </div>
+                    </div>
+
+
+                    <div class="preview-paper invoice-paper" *ngIf="selectedFormat === 'INVOICE'">
+                        <div class="invoice-header">
+                            <div class="company-logo">
+                                <h1>MiPyme</h1>
+                                <p *ngIf="docType === 'NON_FISCAL'" style="font-weight: bold; margin-top: 5px;">
+                                    DOCUMENTO NO VALIDO COMO FACTURA</p>
+                            </div>
+                            <div class="invoice-info">
+                                <h3 *ngIf="docType === 'FISCAL'">FACTURA B</h3>
+                                <h3 *ngIf="docType === 'NON_FISCAL'">RECIBO X</h3>
+                                <p *ngIf="docType === 'FISCAL'">Nro: 0001-00001234</p>
+                                <p>Fecha: {{ today | date:'dd/MM/yyyy' }}</p>
+                                <p *ngIf="docType === 'FISCAL'">CUIT: 30-12345678-9</p>
+                            </div>
+                        </div>
+                        <div class="client-info">
+                            <p><strong>Cliente:</strong> Consumidor Final</p>
+                            <p *ngIf="docType === 'FISCAL'"><strong>Condición IVA:</strong> Consumidor Final</p>
+                        </div>
+                        <table class="invoice-table">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Cantidad</th>
+                                    <th>Precio Unit.</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let item of saleData.items">
+                                    <td>
+                                        {{ item.product.productName }}
+                                        <span *ngIf="item.variant">({{ item.variant.variantSku }})</span>
+                                    </td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>{{ item.price | currency }}</td>
+                                    <td>{{ item.subtotal | currency }}</td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3" class="total-label">TOTAL</td>
+                                    <td class="total-value">{{ saleData.total | currency }}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        <div class="invoice-footer" *ngIf="docType === 'FISCAL'">
+                            <p>CAE: .................... Vto CAE: ....................</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-secondary" (click)="onCancel()">Cancelar</button>
+            <button class="btn-primary confirm-btn" (click)="onConfirm()">
+                <i class='bx bx-printer'></i> Confirmar y Emitir
+            </button>
+        </div>
+    </div>
+</div>

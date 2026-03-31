@@ -1,0 +1,45 @@
+<div class="abm-container">
+  <h2>Categorías</h2>
+
+  <div class="form-container">
+    <div class="form-group">
+        <label>Nombre</label>
+        <input [(ngModel)]="currentCategory.categoryName" placeholder="Ej: Zapatillas">
+    </div>
+    <div class="form-group">
+        <label>Categoría Padre</label>
+        <select [(ngModel)]="currentCategory.parentCategory">
+            <option [ngValue]="null">Ninguna</option>
+            <option *ngFor="let cat of categories" [ngValue]="cat">
+                {{ cat.categoryName }}
+            </option>
+        </select>
+    </div>
+    <div class="actions">
+        <button (click)="save()">{{ isEditing ? 'Actualizar' : 'Crear' }}</button>
+        <button (click)="resetForm()">Cancelar</button>
+    </div>
+  </div>
+
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Padre</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let cat of categories">
+        <td>{{ cat.categoryId }}</td>
+        <td>{{ cat.categoryName }}</td>
+        <td>{{ cat.parentCategory?.categoryName || '-' }}</td>
+        <td>
+          <button (click)="edit(cat)">Editar</button>
+          <button (click)="delete(cat.categoryId!)">Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

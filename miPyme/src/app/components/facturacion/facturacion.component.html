@@ -1,0 +1,139 @@
+<div class="facturacion-container">
+  <div class="header-section">
+    <h2>Facturación Electrónica</h2>
+    <button class="btn-primary" (click)="facturarLibre()">
+      <i class='bx bx-plus'></i> Generar Factura Libre
+    </button>
+  </div>
+
+
+  <div class="tabs-section">
+    <button class="tab-btn" [class.active]="activeTab === 'ventas'" (click)="switchTab('ventas')">
+      <i class='bx bx-cart'></i> Ventas por Facturar
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'comprobantes'" (click)="switchTab('comprobantes')">
+      <i class='bx bx-file'></i> Comprobantes Emitidos
+    </button>
+  </div>
+
+
+  @if (activeTab === 'ventas') {
+  <div class="filters-section">
+    <div class="search-box">
+      <i class='bx bx-search'></i>
+      <input type="text" [(ngModel)]="searchTerm" placeholder="Buscar por ID o Vendedor...">
+    </div>
+  </div>
+
+  <div class="table-container">
+    <app-spinner *ngIf="isLoading"></app-spinner>
+
+    @if (!layoutService.isMobile() && !isLoading) {
+    <table class="sales-table">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>ID Venta</th>
+          <th>Vendedor</th>
+          <th>Total</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let sale of filteredSales">
+          <td>{{ sale.saleDate | date:'medium' }}</td>
+          <td>#{{ sale.saleId }}</td>
+          <td>{{ sale.createdBy || 'N/A' }}</td>
+          <td class="amount">{{ sale.totalAmount | currency }}</td>
+          <td>
+            <span class="status-badge" [class.billed]="sale.facturado" [class.pending]="!sale.facturado">
+              {{ sale.facturado ? 'Facturado' : 'Pendiente' }}
+            </span>
+          </td>
+          <td>
+            <button class="btn-icon" [class.btn-disabled]="sale.facturado" (click)="facturarVenta(sale)" title="Facturar">
+              <i class='bx bx-receipt'></i>
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="filteredSales.length === 0">
+          <td colspan="6" class="no-data">No se encontraron ventas.</td>
+        </tr>
+      </tbody>
+    </table>
+    }
+
+    @if (layoutService.isMobile() && !isLoading) {
+    <app-mobile-card-list
+      [items]="filteredSales"
+      [columns]="mobileColumns"
+      [actions]="mobileActions"
+      emptyMessage="No se encontraron ventas.">
+    </app-mobile-card-list>
+    }
+
+  </div>
+  }
+
+
+  @if (activeTab === 'comprobantes') {
+  <div class="filters-section">
+    <div class="invoice-filters">
+      <div class="date-range">
+        <label>Desde</label>
+        <input type="date" [(ngModel)]="invoiceDateFrom">
+      </div>
+      <div class="date-range">
+        <label>Hasta</label>
+        <input type="date" [(ngModel)]="invoiceDateTo">
+      </div>
+      <button class="btn-secondary" (click)="loadInvoices()">
+        <i class='bx bx-search'></i> Buscar
+      </button>
+    </div>
+    <div class="search-box">
+      <i class='bx bx-search'></i>
+      <input type="text" [(ngModel)]="invoiceSearchTerm" placeholder="Filtrar por N° Cbte, CAE o monto...">
+    </div>
+  </div>
+
+  <div class="table-container">
+    <app-spinner *ngIf="isLoadingInvoices"></app-spinner>
+
+    @if (!isLoadingInvoices) {
+    <table class="sales-table">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Tipo</th>
+          <th>Pto Vta</th>
+          <th>N° Cbte</th>
+          <th>Total</th>
+          <th>CAE</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let inv of filteredInvoices" class="clickable-row" (click)="viewInvoiceDetail(inv)">
+          <td>{{ inv.cbteFch }}</td>
+          <td>{{ getCbteTipoLabel(inv.cbteTipo) }}</td>
+          <td>{{ inv.ptoVta }}</td>
+          <td>{{ inv.cbteNro }}</td>
+          <td class="amount">{{ inv.impTotal | currency }}</td>
+          <td class="cae-cell">{{ inv.cae || '—' }}</td>
+          <td>
+            <span class="status-badge" [class.billed]="inv.resultado === 'A'" [class.pending]="inv.resultado !== 'A'">
+              {{ inv.resultado === 'A' ? 'Aprobado' : 'Rechazado' }}
+            </span>
+          </td>
+        </tr>
+        <tr *ngIf="filteredInvoices.length === 0">
+          <td colspan="7" class="no-data">No se encontraron comprobantes en el período seleccionado.</td>
+        </tr>
+      </tbody>
+    </table>
+    }
+  </div>
+  }
+</div>

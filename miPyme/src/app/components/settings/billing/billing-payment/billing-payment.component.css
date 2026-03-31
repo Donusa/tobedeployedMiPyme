@@ -1,0 +1,314 @@
+.billing-container {
+    padding: 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.header-section {
+    margin-bottom: 2rem;
+}
+
+.header-section h2 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--color-text-main);
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    color: var(--color-text-muted);
+    font-size: 1rem;
+}
+
+.payment-methods-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 1.5rem;
+}
+
+.payment-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 200px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.payment-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+}
+
+.payment-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: radial-gradient(circle at top right, rgba(37, 99, 235, 0.05), transparent 60%);
+    pointer-events: none;
+}
+
+.card-chip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.card-chip .bx-chip {
+    font-size: 2.2rem;
+    color: #fbbf24;
+}
+
+.card-brand {
+    font-size: 2.5rem;
+    color: var(--color-text-main);
+}
+
+.card-number {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.4rem;
+    letter-spacing: 2px;
+    color: var(--color-text-main);
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+}
+
+.card-details {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.card-details .label {
+    display: block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin-bottom: 4px;
+}
+
+.card-details .value {
+    font-size: 1rem;
+    color: var(--color-text-main);
+    font-weight: 500;
+    letter-spacing: 1px;
+}
+
+.card-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-border);
+}
+
+.badge-default {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.btn-icon {
+    background: transparent;
+    border: none;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.btn-icon.danger:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+}
+
+.payment-card.add-new {
+    background: transparent;
+    border: 2px dashed var(--color-border);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: none;
+}
+
+.payment-card.add-new:hover {
+    background: var(--color-bg-card);
+    border-color: var(--color-primary);
+}
+
+.payment-card.add-new:hover .icon-circle {
+    background: var(--color-primary);
+    color: #fff;
+    transform: scale(1.1);
+}
+
+.add-content {
+    text-align: center;
+}
+
+.icon-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--color-border);
+    color: var(--color-text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin: 0 auto 1rem;
+    transition: all 0.3s;
+}
+
+.add-content h3 {
+    color: var(--color-text-main);
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.add-content p {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+}
+
+.slide-in-bottom {
+    animation: slideInBottom 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+@keyframes slideInBottom {
+    0% {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+
+.payment-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.info-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-radius: 14px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+}
+
+.info-icon {
+    font-size: 2rem;
+    color: var(--color-primary, #6366f1);
+    flex-shrink: 0;
+}
+
+.info-content h3 {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+}
+
+.info-content span {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--color-text-main);
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.status-badge.active {
+    background: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+}
+
+.status-badge.paused {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+}
+
+.status-badge.cancelled {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.status-badge.pending {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+
+.status-badge.none {
+    background: rgba(107, 114, 128, 0.1);
+    color: #6b7280;
+}
+
+.mp-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1.25rem;
+    border-radius: 12px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.mp-notice i {
+    font-size: 1.3rem;
+    color: var(--color-primary, #6366f1);
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.mp-notice a {
+    color: var(--color-primary, #6366f1);
+    text-decoration: underline;
+}
+
+.loading-state {
+    text-align: center;
+    padding: 3rem;
+    color: var(--color-text-muted);
+    font-size: 1.1rem;
+}
+
+.loading-state i {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 0.75rem;
+}

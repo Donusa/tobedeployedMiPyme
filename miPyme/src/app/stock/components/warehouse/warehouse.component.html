@@ -1,0 +1,71 @@
+<div class="abm-container">
+  <app-spinner *ngIf="isLoading"></app-spinner>
+  <div class="header-actions">
+    <h2 class="page-title"><i class="bx bx-store-alt"></i> Depósitos / Sucursales</h2>
+    <button class="create-btn" (click)="showForm = true" *ngIf="!showForm">
+      <i class="bx bx-plus"></i> Nuevo Depósito
+    </button>
+  </div>
+
+
+  <div class="form-card" *ngIf="showForm || isEditing">
+    <h3 class="form-title">{{ isEditing ? 'Editar Depósito' : 'Nuevo Depósito' }}</h3>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Código</label>
+        <input [(ngModel)]="currentWarehouse.warehouseCode" placeholder="Ej: DEP01">
+      </div>
+      <div class="form-group">
+        <label>Nombre</label>
+        <input [(ngModel)]="currentWarehouse.warehouseName" placeholder="Ej: Depósito Central">
+      </div>
+      <div class="form-group">
+        <label>Dirección</label>
+        <input [(ngModel)]="currentWarehouse.address" placeholder="Ej: Av. Principal 123">
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-secondary" (click)="resetForm()" [disabled]="isSaving">Cancelar</button>
+      <button class="btn-primary" (click)="save()" [disabled]="isSaving">
+        <span *ngIf="isSaving" class="spinner"></span>
+        <i *ngIf="!isSaving" class="bx" [ngClass]="isEditing ? 'bx-check' : 'bx-plus'"></i>
+        {{ isEditing ? 'Actualizar' : 'Crear' }}
+      </button>
+    </div>
+  </div>
+
+
+  <div class="list-container">
+    <table class="data-table" *ngIf="warehouses.length > 0">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Nombre</th>
+          <th>Dirección</th>
+          <th class="col-actions">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let wh of warehouses">
+          <td><span class="code-badge">{{ wh.warehouseCode }}</span></td>
+          <td class="td-name">{{ wh.warehouseName }}</td>
+          <td class="td-address">{{ wh.address || '—' }}</td>
+          <td class="col-actions">
+            <button class="icon-btn edit-btn" (click)="edit(wh); showForm = true" title="Editar">
+              <i class="bx bx-edit"></i>
+            </button>
+            <button class="icon-btn delete-btn" (click)="delete(wh.warehouseId!)" title="Eliminar">
+              <i class="bx bx-trash"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="warehouses.length === 0" class="empty-state">
+      <i class="bx bx-store-alt"></i>
+      <p>No hay depósitos registrados</p>
+      <small>Creá tu primer depósito para empezar a usarlo en la caja y el stock</small>
+    </div>
+  </div>
+</div>

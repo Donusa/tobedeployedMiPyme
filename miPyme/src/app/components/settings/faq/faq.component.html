@@ -1,0 +1,46 @@
+<div class="faq-container">
+  <div class="header-section">
+    <h1>Centro de Ayuda</h1>
+    <p>Encuentra respuestas rápidas a las preguntas más frecuentes sobre MiPyme.</p>
+
+    <div class="search-box">
+      <i class='bx bx-search'></i>
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()"
+        placeholder="Buscar una pregunta (ej. stock, ventas, contraseña)..."
+        class="search-input"
+      >
+    </div>
+  </div>
+
+  <div class="faq-content">
+    <div *ngIf="filteredFaqs.length === 0" class="no-results">
+      <i class='bx bx-search-alt'></i>
+      <p>No encontramos resultados para "{{ searchTerm }}"</p>
+    </div>
+
+    <div class="faq-list">
+      <div *ngFor="let faq of filteredFaqs" class="faq-item" [class.open]="faq.isOpen" [ngClass]="getCategoryClass(faq.category)">
+        <div class="faq-question" (click)="toggleFaq(faq)">
+          <div class="category-indicator"></div>
+          <span class="category-badge">{{ faq.category }}</span>
+          <span class="question-text">{{ faq.question }}</span>
+          <i class='bx bx-chevron-down chevron' [class.rotated]="faq.isOpen"></i>
+        </div>
+        <div class="faq-answer" *ngIf="faq.isOpen">
+          <p>{{ faq.answer }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="support-action-simple">
+    <p>¿No encontraste lo que buscabas?
+      <span class="support-link" (click)="goToSupport()">
+        Contactar a Soporte <i class='bx bx-right-arrow-alt'></i>
+      </span>
+    </p>
+  </div>
+</div>

@@ -1,0 +1,76 @@
+<div class="billing-container slide-in-bottom">
+    <div class="header-section">
+        <h2>Datos de Facturación</h2>
+        <p class="subtitle">Información fiscal para la emisión de tus facturas.</p>
+    </div>
+
+    <div class="form-card glass-panel" *ngIf="!isLoading">
+        <form (submit)="$event.preventDefault(); save()">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Razón Social / Nombre Completo</label>
+                    <input type="text" class="form-control" name="businessName" placeholder="Ej. Mi Empresa S.R.L."
+                        [(ngModel)]="companyData.businessName">
+                </div>
+
+                <div class="form-group">
+                    <label>CUIT / CUIL</label>
+                    <input type="text" class="form-control" name="cuit" placeholder="Sin guiones"
+                        [(ngModel)]="companyData.cuit">
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Condición frente al IVA</label>
+                    <select class="form-control" name="ivaCondition" ngModel="ri">
+                        <option value="ri">Responsable Inscripto</option>
+                        <option value="mono">Monotributo</option>
+                        <option value="exento">Exento</option>
+                        <option value="cf">Consumidor Final</option>
+                    </select>
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Dirección Fiscal</label>
+                    <input type="text" class="form-control" name="fiscalAddress"
+                        placeholder="Calle, Número, Piso, Depto" [(ngModel)]="companyData.fiscalAddress">
+                </div>
+
+                <div class="form-group">
+                    <label>Localidad</label>
+                    <input type="text" class="form-control" name="city" placeholder="Ciudad"
+                        [(ngModel)]="companyData.city">
+                </div>
+
+                <div class="form-group">
+                    <label>Provincia</label>
+                    <input type="text" class="form-control" name="province" placeholder="Provincia"
+                        [(ngModel)]="companyData.province">
+                </div>
+
+                <div class="form-group">
+                    <label>Código Postal</label>
+                    <input type="text" class="form-control" name="postalCode" placeholder="CP" ngModel="1000">
+                </div>
+            </div>
+
+            <div class="save-feedback" *ngIf="saveSuccess">
+                <i class='bx bx-check-circle'></i> Datos guardados correctamente.
+            </div>
+            <div class="save-feedback error" *ngIf="saveError">
+                <i class='bx bx-error-circle'></i> {{ saveError }}
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary" [disabled]="isSaving">
+                    <i class='bx bx-loader-alt bx-spin' *ngIf="isSaving"></i>
+                    {{ isSaving ? 'Guardando...' : 'Guardar Cambios' }}
+                </button>
+            </div>
+        </form>
+    </div>
+
+
+    <div *ngIf="isLoading" style="text-align: center; padding: 2rem;">
+        <p style="color: var(--color-text-muted);">Cargando datos de facturación...</p>
+    </div>
+</div>

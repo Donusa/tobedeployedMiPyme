@@ -1,0 +1,120 @@
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-left">
+    </div>
+    <div class="header-right">
+      <button class="btn-primary" (click)="createNewOrder()">
+        <i class='bx bx-plus'></i> Nuevo Pedido
+      </button>
+    </div>
+  </div>
+
+  <div class="filters-bar">
+    <div class="search-box">
+      <i class='bx bx-search'></i>
+      <input type="text" placeholder="Buscar por cliente, ID o ref..." [(ngModel)]="searchTerm"
+        (input)="applyFilters()">
+    </div>
+
+    <div class="filter-group">
+      <select [(ngModel)]="sourceFilter" (change)="applyFilters()">
+        <option value="all">Todos los Canales</option>
+        <option value="local">Local</option>
+        <option value="mercadolibre">MercadoLibre</option>
+        <option value="tiendanube">TiendaNube</option>
+      </select>
+
+      <select [(ngModel)]="statusFilter" (change)="applyFilters()">
+        <option value="all">Todos los Estados</option>
+        <option value="RECEIVED">Recibido</option>
+        <option value="PACKED">Empaquetado</option>
+        <option value="SHIPPED">Enviado</option>
+        <option value="DELIVERED">Entregado</option>
+        <option value="CANCELLED">Cancelado</option>
+        <option value="COMPLETED">Completado</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="orders-grid">
+    <div class="loading-state" *ngIf="isLoading">
+      <i class='bx bx-loader-alt bx-spin'></i> Cargando pedidos...
+    </div>
+
+    <div class="empty-state" *ngIf="!isLoading && filteredOrders.length === 0">
+      <i class='bx bx-package'></i>
+      <p>No se encontraron pedidos</p>
+    </div>
+
+    <div class="order-card" *ngFor="let order of filteredOrders" [class.ml-card]="order.source === 'mercadolibre'"
+      [class.tn-card]="order.source === 'tiendanube'" (click)="viewDetail(order)">
+      <div class="card-header">
+        <div class="source-badge" [class]="order.source">
+          <i [class]="getSourceIcon(order.source)"></i>
+          <span>{{ getSourceLabel(order.source) }}</span>
+        </div>
+        <span class="order-id">#{{ order.id }}</span>
+        <span class="order-date">{{ order.date | date:'dd/MM HH:mm' }}</span>
+      </div>
+
+      <div class="card-body">
+        <div class="customer-info">
+          <h4>{{ order.customer.name }}</h4>
+          <p *ngIf="order.customer.email">{{ order.customer.email }}</p>
+          <p *ngIf="order.customer.address" class="address"><i class='bx bx-map'></i> {{ order.customer.address }}</p>
+        </div>
+
+        <div class="items-summary">
+          <ng-container *ngIf="order.items && order.items.length > 0; else noItems">
+            <p>{{ order.items.length }} ítem(s) - {{ order.items[0].productName }} <span
+                *ngIf="order.items.length > 1">+ {{ order.items.length - 1 }} más</span></p>
+          </ng-container>
+          <ng-template #noItems>
+            <p>Sin ítems registrados</p>
+          </ng-template>
+        </div>
+
+        <div class="financial-summary">
+          <div class="payment-status" *ngIf="order.source === 'tiendanube'">
+            <span class="status-dot" [class.paid]="order.paymentStatus === 'paid'"
+              [class.pending]="order.paymentStatus !== 'paid'"></span>
+            <span class="status-text" [class.pending-text]="order.paymentStatus !== 'paid'">{{ order.paymentStatus ===
+              'paid' ? 'Pagado' : 'Pendiente' }}</span>
+          </div>
+          <div class="order-total">
+            {{ order.total | currency }}
+          </div>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <div class="status-badge" [class]="getStatusClass(order.status)">
+          {{ getStatusLabel(order.status) }}
+        </div>
+
+        <div class="actions">
+          <button class="btn-action pay" *ngIf="order.source === 'tiendanube' && order.paymentStatus !== 'paid'"
+            (click)="$event.stopPropagation(); markAsPaid(order)" title="Marcar como Pagado">
+            <i class='bx bx-dollar'></i>
+          </button>
+
+          <button class="btn-advance"
+            *ngIf="order.status !== 'DELIVERED' && order.status !== 'CANCELLED' && order.status !== 'COMPLETED' && order.source !== 'mercadolibre'"
+            (click)="$event.stopPropagation(); advanceStatus(order)" [disabled]="loadingOrders.has(order.id)">
+            <span *ngIf="!loadingOrders.has(order.id)">Avanzar</span>
+            <i class='bx' [class.bx-right-arrow-alt]="!loadingOrders.has(order.id)"
+              [class.bx-loader-alt]="loadingOrders.has(order.id)" [class.bx-spin]="loadingOrders.has(order.id)"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <app-order-detail-modal *ngIf="selectedOrder" [order]="selectedOrder" (close)="closeDetail()">
+  </app-order-detail-modal>
+
+
+  <button class="fab-new-order" (click)="createNewOrder()" title="Nuevo Pedido">
+    <i class='bx bx-plus'></i>
+  </button>
+</div>

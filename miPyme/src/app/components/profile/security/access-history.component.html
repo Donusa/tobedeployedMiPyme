@@ -1,0 +1,34 @@
+<div class="security-container">
+  <h3>Historial de Accesos</h3>
+  <p class="subtitle">Registros de acceso a tu cuenta (hasta 365 días de historial).</p>
+
+  <div *ngIf="isLoading" class="loading-state">
+    <app-spinner></app-spinner>
+  </div>
+
+  <div *ngIf="!isLoading && logs.length === 0" class="empty-state">
+    No hay registros de acceso recientes.
+  </div>
+
+  <div *ngIf="!isLoading && logs.length > 0" class="logs-list">
+    <div class="log-item header">
+      <div>Dispositivo</div>
+      <div>Ubicación</div>
+      <div>Medio</div>
+      <div>IP</div>
+      <div>Fecha</div>
+    </div>
+    <div *ngFor="let log of logs" class="log-item">
+      <div class="device-info">
+        <i class="bx" [ngClass]="getDeviceIcon(log.device)"></i>
+        <span>{{ log.device }}</span>
+      </div>
+      <div>{{ log.location || '-' }}</div>
+      <div>
+        <span class="badge">{{ log.medium }}</span>
+      </div>
+      <div class="ip-address">{{ log.ipAddress }}</div>
+      <div class="timestamp">{{ log.timestamp | date:'short' }}</div>
+    </div>
+  </div>
+</div>

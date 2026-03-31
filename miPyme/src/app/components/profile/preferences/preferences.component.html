@@ -1,0 +1,78 @@
+<div class="preferences-container">
+  <div class="card">
+    <div class="card-header">
+      <h2>Preferencias</h2>
+      <p class="text-muted">Personaliza tu experiencia en MiPyme</p>
+    </div>
+
+    <div class="card-body">
+      <div *ngIf="successMessage" class="alert alert-success">
+        {{ successMessage }}
+      </div>
+
+      <form (ngSubmit)="savePreferences()">
+
+        <h3 class="section-title">General</h3>
+
+        <div class="form-group">
+          <label for="theme">Tema de la interfaz</label>
+          <select id="theme" class="form-control" [(ngModel)]="preferences.theme" name="theme">
+            <option value="light">Claro</option>
+            <option value="dark">Oscuro (Beta)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="language">Idioma</label>
+          <select id="language" class="form-control" [(ngModel)]="preferences.language" name="language">
+            <option value="es">Español</option>
+            <option value="en">English</option>
+            <option value="pt">Português</option>
+          </select>
+        </div>
+
+        <div class="divider"></div>
+
+
+        <h3 class="section-title">Métricas y Tableros</h3>
+
+        <div class="form-group">
+          <label for="targetMargin">Margen Objetivo por Defecto (%)</label>
+          <div class="input-group">
+            <input type="number" id="targetMargin" class="form-control" [(ngModel)]="preferences.stockMetrics.targetMargin" name="targetMargin" min="0" max="100">
+            <span class="input-group-text">%</span>
+          </div>
+          <small class="form-text text-muted">Este valor se usará como referencia en los indicadores de rentabilidad.</small>
+        </div>
+
+        <div class="divider"></div>
+
+
+        <h3 class="section-title">Notificaciones</h3>
+
+        <div class="form-check">
+          <label class="checkbox-container">
+            <input type="checkbox" [(ngModel)]="preferences.notifications.email" name="emailNotif">
+            <span class="checkmark"></span>
+            <span class="label-text">Recibir resúmenes por email</span>
+          </label>
+        </div>
+
+        <div class="form-check">
+          <label class="checkbox-container">
+            <input type="checkbox" [(ngModel)]="preferences.notifications.push" name="pushNotif">
+            <span class="checkmark"></span>
+            <span class="label-text">Notificaciones push en el navegador</span>
+          </label>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+            <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <span *ngIf="!isLoading">Guardar Cambios</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

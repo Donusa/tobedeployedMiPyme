@@ -1,0 +1,63 @@
+<div class="modal-overlay" (click)="cerrar.emit()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3><i class="bx bx-stop-circle"></i> Cerrar Caja</h3>
+      <button class="close-btn" (click)="cerrar.emit()"><i class="bx bx-x"></i></button>
+    </div>
+    <div class="modal-body">
+
+      <div class="cierre-summary">
+        <div *ngIf="resumen?.cajaFisica" class="summary-row">
+          <span>Apertura de caja</span>
+          <span>{{ resumen?.cajaFisica?.aperturaEfectivo | currency:'ARS':'symbol':'1.2-2' }}</span>
+        </div>
+        <div *ngIf="resumen?.cajaFisica" class="summary-row positive">
+          <span>+ Ingresos en efectivo</span>
+          <span>{{ resumen?.cajaFisica?.ingresosEfectivo | currency:'ARS':'symbol':'1.2-2' }}</span>
+        </div>
+        <div *ngIf="resumen?.cajaFisica" class="summary-row negative">
+          <span>− Egresos en efectivo</span>
+          <span>{{ resumen?.cajaFisica?.egresosEfectivo | currency:'ARS':'symbol':'1.2-2' }}</span>
+        </div>
+        <div class="summary-row total">
+          <span><strong>= Efectivo esperado</strong></span>
+          <strong>{{ efectivoEsperado | currency:'ARS':'symbol':'1.2-2' }}</strong>
+        </div>
+        <div *ngIf="resumen" class="summary-row" style="margin-top: 8px; opacity: 0.7;">
+          <span>Total vendido ({{ resumen.cantidadVentas }} ventas)</span>
+          <span>{{ resumen.totalVendido | currency:'ARS':'symbol':'1.2-2' }}</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Monto contado de efectivo *</label>
+        <div class="input-with-prefix">
+          <span class="prefix">$</span>
+          <input type="number" [(ngModel)]="montoContado" (ngModelChange)="calcularDiferencia()"
+                 min="0" step="0.01" placeholder="Ingresá el total contado" autofocus>
+        </div>
+      </div>
+
+
+      <div *ngIf="diferencia !== null" class="diferencia-display"
+           [class.ok]="diferencia === 0"
+           [class.warning]="diferencia !== 0">
+        <i class="bx" [ngClass]="diferencia === 0 ? 'bx-check-circle' : 'bx-error'"></i>
+        <span *ngIf="diferencia === 0">Sin diferencia ✓</span>
+        <span *ngIf="diferencia !== 0">Diferencia: {{ diferencia | currency:'ARS':'symbol':'1.2-2' }}</span>
+      </div>
+
+      <div class="form-group">
+        <label>Observación {{ diferencia !== 0 ? '*' : '(opcional)' }}</label>
+        <textarea [(ngModel)]="observacion" rows="3" placeholder="Notas del cierre..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="cerrar.emit()">Cancelar</button>
+      <button class="btn btn-danger" (click)="submit()" [disabled]="isSubmitting">
+        <i class="bx" [ngClass]="isSubmitting ? 'bx-loader-alt bx-spin' : 'bx-stop-circle'"></i>
+        {{ isSubmitting ? 'Cerrando...' : 'Cerrar Caja' }}
+      </button>
+    </div>
+  </div>
+</div>

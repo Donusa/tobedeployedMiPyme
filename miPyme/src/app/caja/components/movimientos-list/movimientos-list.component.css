@@ -1,0 +1,152 @@
+.movimientos-container {
+
+}
+
+.movimientos-table-container {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th {
+  text-align: left;
+  padding: 12px 14px;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-light);
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-main);
+  font-size: 0.86rem;
+  vertical-align: middle;
+}
+
+.data-table tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table tr.anulado {
+  opacity: 0.5;
+  text-decoration: line-through;
+}
+
+
+.monto-cell {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.positive { color: #059669; }
+.negative { color: #dc2626; }
+
+
+.tipo-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tipo-badge.tipo-\+ {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.tipo-badge.tipo-\- {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.tipo-badge.tipo- {
+  background: var(--color-bg-light);
+  color: var(--color-text-muted);
+}
+
+
+.estado-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+.estado-badge.activo {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.estado-badge.anulado-badge {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+
+.desc-cell {
+  max-width: 240px;
+}
+
+.desc-cell span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.categoria-tag {
+  display: inline-block;
+  margin-top: 2px;
+  padding: 1px 6px;
+  background: #eff6ff;
+  color: #3b82f6;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  color: #ef4444;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+
+.btn-icon:hover {
+  background: #fee2e2;
+}
+
+.no-data {
+  text-align: center;
+  color: var(--color-text-muted);
+  padding: 40px;
+  font-style: italic;
+}
+
+@media (max-width: 1023px) {
+  .data-table th:nth-child(5),
+  .data-table td:nth-child(5),
+  .data-table th:nth-child(6),
+  .data-table td:nth-child(6) {
+    display: none;
+  }
+}

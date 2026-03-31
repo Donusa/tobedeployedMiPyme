@@ -1,0 +1,426 @@
+<div class="wizard-container">
+  <div class="wizard-card" [class.wide]="step === 2">
+
+
+    <div class="wizard-header" *ngIf="step === 1">
+      <div class="tn-wizard-icon-container" [class.success]="isConnected">
+        <i class='bx' [ngClass]="iconClass"></i>
+      </div>
+      <h2 *ngIf="step === 1">{{ isConnected ? '¡Conexión Exitosa!' : 'Sincronización con TiendaNube' }}</h2>
+    </div>
+
+
+    <div class="stats-grid" *ngIf="step === 2 && !isLoading">
+      <div class="stat-card success no-hover">
+        <div class="stat-icon"><i class='bx bx-check-circle'></i></div>
+        <div class="stat-info">
+          <span class="stat-value">Conectado</span>
+          <span class="stat-label">Estado</span>
+        </div>
+      </div>
+
+      <div class="stat-card warning" (click)="toggleTab('products')" [class.active]="activeTab === 'products'">
+        <div class="stat-icon"><i class='bx bx-error-circle'></i></div>
+        <div class="stat-info">
+          <span class="stat-value">{{ products.length }}</span>
+          <span class="stat-label">Desincronizados</span>
+        </div>
+      </div>
+
+      <div class="stat-card info" (click)="toggleTab('linked')" [class.active]="activeTab === 'linked'">
+        <div class="stat-icon"><i class='bx bx-link'></i></div>
+        <div class="stat-info">
+          <span class="stat-value">{{ linkedLocalProducts.length }}</span>
+          <span class="stat-label">Vinculados</span>
+        </div>
+      </div>
+
+      <div class="stat-card purple" (click)="toggleTab('sales')" [class.active]="activeTab === 'sales'">
+        <div class="stat-icon"><i class='bx bx-shopping-bag'></i></div>
+        <div class="stat-info">
+          <span class="stat-value">{{ orders.length }}</span>
+          <span class="stat-label">Ventas</span>
+        </div>
+      </div>
+
+      <div class="stat-card danger" (click)="toggleTab('problems')" [class.active]="activeTab === 'problems'">
+        <div class="stat-icon"><i class='bx bx-error'></i></div>
+        <div class="stat-info">
+          <span class="stat-value">{{ getProblematicTnProducts().length }}</span>
+          <span class="stat-label">Con Problemas</span>
+        </div>
+      </div>
+    </div>
+
+
+
+
+    <div class="wizard-content">
+
+
+      <div *ngIf="isLoading" class="loading-state">
+        <div class="spinner"></div>
+        <p>{{ loadingMessage }}</p>
+      </div>
+
+
+      <ng-container *ngIf="step === 1 && !isLoading && !isConnected">
+        <p class="tn-intro-text">
+          A continuación comenzará el proceso de sincronización con su tienda de TiendaNube.
+        </p>
+
+        <div class="tn-info-box" *ngIf="!errorMessage">
+          <i class='bx bx-info-circle'></i>
+          <p>Por favor, siga los pasos uno a uno para poder completar dicha sincronización de manera exitosa.</p>
+        </div>
+
+
+        <div class="tn-error-box" *ngIf="errorMessage">
+          <i class='bx bx-error-circle'></i>
+          <p>{{ errorMessage }}</p>
+        </div>
+      </ng-container>
+
+
+      <ng-container *ngIf="step === 2 && !isLoading && activeTab === 'products'">
+
+        <div class="tn-product-list">
+          <div class="tn-product-item" *ngFor="let p of products" (click)="toggleProductSelection(p.id)"
+            [class.selected]="isProductSelected(p.id)">
+            <div class="tn-checkbox-container">
+              <input type="checkbox" class="tn-checkbox" [checked]="isProductSelected(p.id)"
+                (click)="$event.stopPropagation(); toggleProductSelection(p.id)">
+            </div>
+            <div class="tn-product-img">
+              <i class='bx bx-package' style="font-size: 24px; color: #999;"></i>
+            </div>
+            <div class="tn-product-info">
+              <h4>{{ p.name?.es || p.name?.pt || 'Producto sin nombre' }}</h4>
+              <div style="display: flex; gap: 6px; align-items: center; margin-top: 4px; flex-wrap: wrap;">
+                <span>{{ p.variants?.length || 0 }} variantes</span>
+                <span *ngIf="p.published" class="status-chip status-paid">Publicada</span>
+                <span *ngIf="p.published === false" class="status-chip status-cancelled">Pausada / Oculta</span>
+              </div>
+            </div>
+          </div>
+          <div class="tn-empty-state" *ngIf="products.length === 0">
+            <p>No se encontraron productos.</p>
+          </div>
+        </div>
+      </ng-container>
+
+
+      <ng-container *ngIf="step === 2 && !isLoading && activeTab === 'linked'">
+
+        <div class="tn-product-list">
+          <div class="tn-product-item" *ngFor="let p of linkedLocalProducts"
+            (click)="toggleLinkedProductSelection(p.productId)" [class.selected]="isLinkedProductSelected(p.productId)">
+            <div class="tn-checkbox-container">
+              <input type="checkbox" class="tn-checkbox" [checked]="isLinkedProductSelected(p.productId)"
+                (click)="$event.stopPropagation(); toggleLinkedProductSelection(p.productId)">
+            </div>
+            <div class="tn-product-img">
+              <i class='bx bx-link' style="font-size: 24px; color: #4caf50;"></i>
+            </div>
+            <div class="tn-product-info">
+              <h4>{{ p.productName }}</h4>
+                <div style="display: flex; gap: 6px; align-items: center; margin-top: 4px; flex-wrap: wrap;">
+                <span>{{ p.productVariants?.length || 0 }} variantes | TN ID: {{ p.tiendaNubeId }}</span>
+                <ng-container *ngIf="getTnProduct(p.tiendaNubeId) as tnp">
+                  <span *ngIf="tnp.published" class="status-chip status-paid">Publicada</span>
+                  <span *ngIf="tnp.published === false" class="status-chip status-cancelled">Pausada / Oculta</span>
+                </ng-container>
+              </div>
+            </div>
+          </div>
+          <div class="tn-empty-state" *ngIf="linkedLocalProducts.length === 0">
+            <p>No hay productos vinculados actualmente.</p>
+          </div>
+        </div>
+      </ng-container>
+
+
+      <ng-container *ngIf="step === 2 && !isLoading && activeTab === 'sales'">
+        <div *ngIf="orders.length === 0" class="tn-empty-state">
+          <i class='bx bx-shopping-bag' style="font-size: 48px; margin-bottom: 1rem;"></i>
+          <p>No hay órdenes recientes.</p>
+        </div>
+        <div *ngIf="orders.length > 0">
+          <div class="tn-product-list full-width">
+            <div class="tn-product-item" *ngFor="let o of orders" [ngClass]="getOrderStatusBorderClass(o)">
+              <div class="tn-product-info order-info">
+                <div class="order-header">
+                  <div>
+                    <h4 style="margin: 0;">#{{ o.number }}</h4>
+                    <span class="order-meta">
+                      {{ o.customer?.name || o.customer?.email || 'Cliente' }} • {{ o.created_at | date:'short' }}
+                    </span>
+                  </div>
+                  <div class="order-amount">
+                    {{ o.total | currency: (o.currency || 'ARS') }}
+                  </div>
+                </div>
+
+                <div class="order-chips">
+                  <span [class]="statusChip('order', o.status)">
+                    {{ o.status | titlecase }}
+                  </span>
+                  <span *ngIf="o.payment_status" [class]="statusChip('payment', o.payment_status)">
+                    <i class='bx bx-credit-card' style="margin-right: 4px;"></i>
+                    {{ o.payment_status | titlecase }}
+                  </span>
+                  <span *ngIf="o.shipping_status" [class]="statusChip('shipping', o.shipping_status)">
+                    <i class='bx bx-package' style="margin-right: 4px;"></i>
+                    {{ o.shipping_status | titlecase }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+
+      <ng-container *ngIf="step === 2 && !isLoading && activeTab === 'problems'">
+        <p class="tn-intro-text">
+          Hay <strong>{{ problematicTnProducts.length }}</strong> publicaciones pausadas u ocultas.
+        </p>
+
+        <div class="tn-product-list full-width">
+          <div class="tn-product-item problem-item" *ngFor="let p of problematicTnProducts">
+            <div class="tn-product-img">
+              <i class='bx bx-error-circle' style="font-size: 24px; color: #dc3545;"></i>
+            </div>
+            <div class="tn-product-info problem-info">
+
+
+              <div class="problem-col-title">
+                <h4>{{ p.name?.es || p.name?.pt || 'Producto sin nombre' }}</h4>
+                <div style="margin-top: 4px;">
+                  <span>{{ p.variants?.length || 0 }} variantes | TN ID: {{ p.id }}</span>
+                </div>
+              </div>
+
+
+              <div class="problem-col-status">
+                <span *ngIf="p.published === false" class="status-chip status-cancelled">Pausada / Oculta</span>
+              </div>
+            </div>
+          </div>
+          <div class="tn-empty-state" *ngIf="problematicTnProducts.length === 0">
+            <p>No se encontraron publicaciones con problemas.</p>
+          </div>
+        </div>
+      </ng-container>
+
+    </div>
+
+
+    <div class="wizard-actions">
+      <button class="btn-primary" (click)="connect()" *ngIf="step === 1 && !isLoading && !isConnected">
+        Comenzar Sincronización
+        <i class='bx bx-right-arrow-alt'></i>
+      </button>
+
+      <ng-container *ngIf="step === 2 && !isLoading">
+        <div class="tn-action-group" *ngIf="activeTab === 'products' && selectedProducts.size > 0">
+          <button class="btn-primary" [disabled]="selectedProducts.size === 0" (click)="syncSelected()">
+            Sincronizar Seleccionados ({{ selectedProducts.size }})
+          </button>
+        </div>
+        <div class="tn-action-group" *ngIf="activeTab === 'linked' && selectedLinkedProducts.size > 0">
+          <button class="btn-danger" [disabled]="selectedLinkedProducts.size === 0" (click)="unlinkSelected()">
+            Desvincular Seleccionados ({{ selectedLinkedProducts.size }})
+          </button>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+<button class="fab-sync" *ngIf="step === 2 && !isLoading && activeTab === 'products' && selectedProducts.size > 0"
+  (click)="syncSelected()">
+  <i class='bx bx-sync'></i>
+  <span class="fab-badge">{{ selectedProducts.size }}</span>
+</button>
+
+<button class="fab-unlink" *ngIf="step === 2 && !isLoading && activeTab === 'linked' && selectedLinkedProducts.size > 0"
+  (click)="unlinkSelected()">
+  <i class='bx bx-unlink'></i>
+  <span class="fab-badge">{{ selectedLinkedProducts.size }}</span>
+</button>
+
+<div class="modal-overlay" *ngIf="showMappingModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Vincular Productos</h3>
+      <button class="close-btn" (click)="cancelMapping()">&times;</button>
+    </div>
+
+    <div class="conflicts-list">
+      <p class="tn-intro-text" style="text-align: left; margin-bottom: 1.5rem;">
+        Por favor, indique con qué producto de su inventario local corresponde cada producto de TiendaNube seleccionado.
+        Si selecciona "Crear Nuevo Producto", se importará como nuevo.
+      </p>
+
+      <div *ngFor="let candidate of mappingCandidates; let i = index" class="conflict-item">
+        <div class="conflict-summary">
+          <strong>{{ candidate.tnProduct.name.es || 'Producto Sin Nombre' }}</strong>
+          <div class="badges">
+            <span class="badge new" *ngIf="!candidate.selectedLocalId">Se creará nuevo</span>
+            <span class="badge warning" *ngIf="candidate.selectedLocalId">Se vinculará</span>
+          </div>
+        </div>
+
+        <div class="match-selector-row">
+          <label>Vincular con:</label>
+          <select [(ngModel)]="candidate.selectedLocalId" class="match-select">
+            <option [ngValue]="null">-- Crear Nuevo Producto --</option>
+            <option *ngFor="let p of localProducts" [ngValue]="p.productId">
+              {{ p.productName }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="cancelMapping()">Cancelar</button>
+      <button class="btn-primary" (click)="confirmMapping()">Analizar Diferencias</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showConflictModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Resolución de Conflictos</h3>
+      <button class="close-btn" (click)="cancelSync()">&times;</button>
+    </div>
+
+    <div class="conflicts-list">
+      <div *ngFor="let conflict of conflicts; let i = index" class="conflict-item">
+        <div class="conflict-summary">
+          <strong>{{ conflict.tiendaNubeProduct.name.es || 'Producto Sin Nombre' }}</strong>
+          <div class="badges">
+            <span class="badge new" *ngIf="conflict.isNew">Nuevo (Importar)</span>
+            <span class="badge warning" *ngIf="!conflict.isNew && conflict.differences.length > 0">Diferencias</span>
+            <span class="badge success" *ngIf="!conflict.isNew && conflict.differences.length === 0">Sincronizado</span>
+          </div>
+        </div>
+
+        <div class="match-selector-row">
+          <label>Vincular con:</label>
+          <select #matchSelect [value]="conflict.localProduct?.productId" (change)="onManualMatch(i, matchSelect.value)"
+            class="match-select">
+            <option [value]="null">-- Crear Nuevo Producto --</option>
+            <option *ngFor="let p of localProducts" [value]="p.productId">
+              {{ p.productName }}
+            </option>
+          </select>
+        </div>
+
+        <div class="differences-container" *ngIf="!conflict.isNew && conflict.differences.length > 0">
+          <table class="differences-table">
+            <thead>
+              <tr>
+                <th>Campo</th>
+                <th>Valor Local</th>
+                <th>Valor TiendaNube</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let diff of conflict.differences; let j = index">
+                <td>
+                  <div class="field-name">{{ diff.label || (diff.field | titlecase) }}</div>
+                  <div class="field-meta" *ngIf="diff.identifier">{{ diff.identifier }}</div>
+                </td>
+
+
+                <ng-container *ngIf="diff.field === 'variant_mapping'; else standardDiff">
+                  <td colspan="2">
+                    <div class="variant-mapping-control">
+                      <span>Mapear <strong>{{ diff.remoteValue }}</strong> con:</span>
+                      <select #variantSelect [value]="diff.localValue"
+                        (change)="onVariantMatch(i, j, variantSelect.value)" class="match-select small">
+                        <option [value]="null">-- Ignorar / Crear Nuevo --</option>
+                        <option *ngFor="let v of conflict.localProduct?.productVariants" [value]="v.productVariantId">
+                          {{ v.variantSku }} - {{ v.attributeValues || v.variantName || 'Variante' }}
+                        </option>
+                      </select>
+                    </div>
+                  </td>
+                  <td class="resolution-actions">
+                    <div class="status-indicator" [class.resolved]="diff.resolution === 'LOCAL'">
+                      <i class='bx' [class.bx-check]="diff.resolution === 'LOCAL'"
+                        [class.bx-error]="!diff.resolution"></i>
+                      {{ diff.resolution === 'LOCAL' ? 'Vinculado' : 'Pendiente' }}
+                    </div>
+                  </td>
+                </ng-container>
+
+
+                <ng-template #standardDiff>
+                  <td [class.selected-val]="diff.resolution === 'LOCAL'">{{ diff.localValue }}</td>
+                  <td [class.selected-val]="diff.resolution === 'REMOTE'">{{ diff.remoteValue }}</td>
+                  <td class="resolution-actions">
+                    <button class="res-btn local" [class.active]="diff.resolution === 'LOCAL'"
+                      (click)="resolveConflict(i, j, 'LOCAL')">
+                      Mantener Local
+                    </button>
+                    <button class="res-btn remote" [class.active]="diff.resolution === 'REMOTE'"
+                      (click)="resolveConflict(i, j, 'REMOTE')">
+                      Usar TiendaNube
+                    </button>
+                  </td>
+                </ng-template>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="cancelSync()">Cancelar</button>
+      <button class="btn-primary" (click)="confirmSync()">Confirmar Sincronización</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showUnlinkConfirmModal">
+  <div class="modal-content small-modal">
+    <div class="modal-header">
+      <h3>Confirmar Desvinculación</h3>
+      <button class="close-btn" (click)="closeUnlinkConfirmModal()">&times;</button>
+    </div>
+    <div class="modal-body" style="padding: 2rem; text-align: center;">
+      <i class='bx bx-error-circle' style="font-size: 48px; color: #f59e0b; display: block; margin: 0 auto 1rem;"></i>
+      <p style="font-size: 1.1rem; margin-bottom: 0.5rem;">¿Está seguro que desea desvincular
+        {{selectedLinkedProducts.size}} productos?</p>
+      <p class="modal-desc-text">Esta acción no eliminará los productos, solo la conexión con
+        TiendaNube.</p>
+    </div>
+    <div class="modal-footer center-footer">
+      <button class="btn-secondary" (click)="closeUnlinkConfirmModal()">Cancelar</button>
+      <button class="btn-primary" (click)="confirmUnlink()">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showUnlinkSuccessModal">
+  <div class="modal-content small-modal">
+    <div class="modal-header">
+      <h3>Operación Exitosa</h3>
+      <button class="close-btn" (click)="closeUnlinkSuccessModal()">&times;</button>
+    </div>
+    <div class="modal-body success-message">
+      <i class='bx bx-check-circle' style="font-size: 48px; color: #4caf50; display: block; margin: 0 auto 1rem;"></i>
+      <p style="text-align: center; font-size: 1.1rem; margin: 0;">Productos desvinculados exitosamente.</p>
+    </div>
+    <div class="modal-footer center-footer">
+      <button class="btn-primary" (click)="closeUnlinkSuccessModal()">Aceptar</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,50 @@
+<div class="sales-container">
+    <app-spinner *ngIf="isLoading"></app-spinner>
+
+    <div class="sales-table-container">
+
+
+        @if (!layoutService.isMobile()) {
+        <table class="sales-table">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>ID Venta</th>
+                    <th>Vendedor</th>
+                    <th>Facturado</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let sale of sales" (click)="openDetail(sale)" class="clickable-row">
+                    <td>{{ sale.saleDate | date:'short' }}</td>
+                    <td>#{{ sale.saleId }}</td>
+                    <td>{{ sale.createdBy || '-' }}</td>
+                    <td>
+                        <span [class.status-billed]="sale.facturado" [class.status-pending]="!sale.facturado">
+                            {{ sale.facturado ? 'Facturado' : 'Pendiente' }}
+                        </span>
+                    </td>
+                    <td class="amount">{{ sale.totalAmount | currency }}</td>
+                </tr>
+                <tr *ngIf="sales.length === 0">
+                    <td colspan="5" class="no-data">No hay ventas registradas.</td>
+                </tr>
+            </tbody>
+        </table>
+        }
+
+
+        @if (layoutService.isMobile()) {
+        <app-mobile-card-list
+            [items]="sales"
+            [columns]="mobileColumns"
+            [actions]="mobileActions"
+            emptyMessage="No hay ventas registradas.">
+        </app-mobile-card-list>
+        }
+
+    </div>
+</div>
+
+<app-sale-detail-modal *ngIf="selectedSale" [sale]="selectedSale" (close)="closeDetail()"></app-sale-detail-modal>

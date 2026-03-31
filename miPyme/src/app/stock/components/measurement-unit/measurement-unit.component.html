@@ -1,0 +1,38 @@
+<div class="abm-container">
+  <h2>Unidades de Medida</h2>
+
+  <div class="form-container">
+    <div class="form-group">
+        <label>Código</label>
+        <input [(ngModel)]="currentUnit.unitCode" placeholder="Ej: KG" [disabled]="isEditing">
+    </div>
+    <div class="form-group">
+        <label>Nombre</label>
+        <input [(ngModel)]="currentUnit.unitName" placeholder="Ej: Kilogramo">
+    </div>
+    <div class="actions">
+        <button (click)="save()">{{ isEditing ? 'Actualizar' : 'Crear' }}</button>
+        <button (click)="resetForm()">Cancelar</button>
+    </div>
+  </div>
+
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Código</th>
+        <th>Nombre</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let unit of units">
+        <td>{{ unit.unitCode }}</td>
+        <td>{{ unit.unitName }}</td>
+        <td>
+          <button (click)="edit(unit)">Editar</button>
+          <button (click)="delete(unit.unitCode)">Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

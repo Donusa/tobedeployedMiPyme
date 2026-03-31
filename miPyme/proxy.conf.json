@@ -1,0 +1,15 @@
+{
+  "/api": {
+    "target": "https://px47l7q6-8080.brs.devtunnels.ms",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+  "/ws": {
+    "target": "wss://px47l7q6-8080.brs.devtunnels.ms",
+    "ws": true,
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}

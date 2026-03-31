@@ -1,0 +1,58 @@
+<div class="checkout-result-container slide-in-bottom">
+
+    <div class="result-card glass-panel" *ngIf="status === 'loading'">
+        <div class="icon-wrapper loading">
+            <i class='bx bx-loader-alt bx-spin'></i>
+        </div>
+        <h2>Procesando...</h2>
+        <p>Estamos verificando tu suscripción.</p>
+    </div>
+
+
+    <div class="result-card glass-panel" *ngIf="status === 'success'">
+        <div class="icon-wrapper success">
+            <i class='bx bx-check-circle'></i>
+        </div>
+        <h2>¡Suscripción activada!</h2>
+        <p>Tu plan fue activado correctamente. Ya podés disfrutar de todas las funcionalidades.</p>
+        <div class="result-actions">
+            <button class="btn-primary" (click)="goHome()">
+                <i class='bx bx-home'></i> Ir al inicio
+            </button>
+            <button class="btn-secondary" (click)="goToPlans()">
+                <i class='bx bx-receipt'></i> Ver mi plan
+            </button>
+        </div>
+    </div>
+
+
+    <div class="result-card glass-panel" *ngIf="status === 'pending'">
+        <div class="icon-wrapper pending">
+            <i class='bx bx-time-five'></i>
+        </div>
+        <h2>Pago pendiente</h2>
+        <p>Tu suscripción está pendiente de confirmación. Te notificaremos cuando se active.</p>
+        <div class="result-actions">
+            <button class="btn-primary" (click)="goHome()">
+                <i class='bx bx-home'></i> Ir al inicio
+            </button>
+            <button class="btn-secondary" (click)="goToPlans()">
+                <i class='bx bx-receipt'></i> Ver planes
+            </button>
+        </div>
+    </div>
+
+
+    <div class="result-card glass-panel" *ngIf="status === 'failure'">
+        <div class="icon-wrapper failure">
+            <i class='bx bx-x-circle'></i>
+        </div>
+        <h2>No se pudo completar</h2>
+        <p>Hubo un problema con el proceso de pago. Podés intentar nuevamente.</p>
+        <div class="result-actions">
+            <button class="btn-primary" (click)="goToPlans()">
+                <i class='bx bx-refresh'></i> Intentar de nuevo
+            </button>
+        </div>
+    </div>
+</div>

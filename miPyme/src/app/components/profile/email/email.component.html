@@ -1,0 +1,58 @@
+<div class="corporate-container">
+  <div class="hero-section">
+    <div class="hero-content">
+      <h1 class="corp-title">Cambiar Email</h1>
+      <p class="corp-subtitle">Gestión de su dirección de correo electrónico institucional.</p>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <app-spinner *ngIf="isLoading"></app-spinner>
+
+    <div *ngIf="successMessage" class="alert alert-success mt-4">
+      <i class="fas fa-check-circle"></i> {{ successMessage }}
+    </div>
+    <div *ngIf="errorMessage" class="alert alert-danger mt-4">
+      <i class="fas fa-exclamation-triangle"></i> {{ errorMessage }}
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #emailForm="ngForm" *ngIf="!isLoading">
+      <section class="edit-form-panel">
+
+        <div class="detail-group">
+          <label for="currentEmail" class="detail-label">CORREO ELECTRÓNICO ACTUAL</label>
+          <div>
+            <input type="email" id="currentEmail" name="currentEmail" class="edit-form-control" [value]="currentEmail"
+              disabled>
+          </div>
+        </div>
+
+        <div class="detail-group">
+          <label for="newEmail" class="detail-label">NUEVO CORREO ELECTRÓNICO</label>
+          <div>
+            <input type="email" id="newEmail" name="newEmail" class="edit-form-control" [(ngModel)]="newEmail" required
+              email placeholder="Ingrese su nuevo email">
+          </div>
+        </div>
+
+        <div class="detail-group">
+          <label for="currentPassword" class="detail-label">CONTRASEÑA ACTUAL PARA CONFIRMAR</label>
+          <div class="input-icon-wrapper">
+            <input [type]="showPassword ? 'text' : 'password'" id="currentPassword" name="currentPassword"
+              class="edit-form-control" [(ngModel)]="currentPassword" required
+              placeholder="Ingrese su contraseña actual">
+            <i class="bx" [class.bx-show]="!showPassword" [class.bx-hide]="showPassword" (click)="togglePassword()"></i>
+          </div>
+          <div class="info-footer" style="padding-top: 0.5rem; margin-top: 0;">
+            <i class="fas fa-shield-alt"></i> Por seguridad, ingrese su contraseña actual para autorizar el cambio.
+          </div>
+        </div>
+
+        <div class="form-actions" style="text-align: right; border-top: 1px solid #e2e8f0; padding-top: 1.5rem;">
+          <button type="submit" class="edit-btn-primary" [disabled]="!emailForm.form.valid">Guardar Cambios</button>
+        </div>
+
+      </section>
+    </form>
+  </div>
+</div>

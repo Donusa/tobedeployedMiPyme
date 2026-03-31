@@ -1,0 +1,101 @@
+<div class="status-container">
+  <div class="header-section">
+    <div class="header-actions">
+        <span class="last-updated">Última actualización: {{ lastUpdated | date:'mediumTime' }}</span>
+        <button class="refresh-btn" (click)="checkAllServices()">
+        <i class='bx bx-refresh'></i> Actualizar
+        </button>
+    </div>
+  </div>
+
+  <div class="overall-status-card" [style.border-left-color]="getOverallStatusColor()">
+    <div class="status-icon-large" [style.color]="getOverallStatusColor()">
+      <i class='bx' [ngClass]="{
+        'bx-check-circle': overallStatus === 'operational',
+        'bx-error': overallStatus === 'degraded',
+        'bx-x-circle': overallStatus === 'outage'
+      }"></i>
+    </div>
+    <div class="status-info">
+      <h2>{{ getOverallStatusText() }}</h2>
+      <p>Monitoreo en tiempo real de servicios y conectividad.</p>
+    </div>
+  </div>
+
+
+  <div class="services-grid">
+    <div *ngFor="let service of activeServices" class="service-card">
+      <div class="service-header">
+        <div class="service-name">
+          <i [class]="service.icon"></i>
+          <span>{{ service.name }}</span>
+        </div>
+        <div class="status-badge" [ngClass]="getStatusColor(service.status)">
+          <i *ngIf="service.status === 'checking'" class="bx bx-loader-alt bx-spin"></i>
+          <span *ngIf="service.status !== 'checking'">{{ getStatusLabel(service.status) }}</span>
+        </div>
+      </div>
+
+      <p class="service-desc">{{ service.description }}</p>
+
+      <div class="service-metrics">
+        <div class="metric">
+          <span class="label">Uptime</span>
+          <span class="value">{{ service.uptime }}</span>
+        </div>
+        <div class="metric">
+          <span class="label">Latencia</span>
+          <span class="value" [class.high-latency]="service.latency > 100">{{ service.latency }}ms</span>
+        </div>
+      </div>
+
+      <div class="history-bar">
+        <div *ngFor="let i of [1,2,3,4,5,6,7,8,9,10,11,12]" class="bar"
+             [style.height.%]="service.status === 'checking' ? 0 : 40 + (i * 5) % 60"
+             [ngClass]="{
+               'bar-green': service.status === 'operational',
+               'bar-yellow': service.status === 'degraded',
+               'bar-red': service.status === 'outage'
+             }">
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="coming-soon-header">
+    <i class='bx bx-time-five'></i>
+    <span>Próximamente</span>
+  </div>
+
+  <div class="services-grid">
+    <div *ngFor="let service of comingSoonServices" class="service-card coming-soon-card">
+      <div class="service-header">
+        <div class="service-name">
+          <i [class]="service.icon"></i>
+          <span>{{ service.name }}</span>
+        </div>
+        <div class="status-badge" [ngClass]="getStatusColor(service.status)">
+          <span>{{ getStatusLabel(service.status) }}</span>
+        </div>
+      </div>
+
+      <p class="service-desc">{{ service.description }}</p>
+
+      <div class="service-metrics">
+        <div class="metric">
+          <span class="label">Uptime</span>
+          <span class="value">{{ service.uptime }}</span>
+        </div>
+        <div class="metric">
+          <span class="label">Latencia</span>
+          <span class="value">—</span>
+        </div>
+      </div>
+
+      <div class="history-bar coming-soon-bars">
+        <div *ngFor="let i of [1,2,3,4,5,6,7,8,9,10,11,12]" class="bar bar-gray"></div>
+      </div>
+    </div>
+  </div>
+</div>
