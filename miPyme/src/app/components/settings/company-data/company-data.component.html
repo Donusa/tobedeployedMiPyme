@@ -27,18 +27,35 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="cuit">CUIT/RUT</label>
-                        <input type="text" id="cuit" name="cuit" [(ngModel)]="formData.cuit" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label for="industry">Industria / Rubro</label>
-                        <input type="text" id="industry" name="industry" [(ngModel)]="formData.industry" class="form-control">
+                        <label for="companyEmail">Email de Contacto</label>
+                        <input type="email" id="companyEmail" name="companyEmail" [(ngModel)]="formData.companyEmail" class="form-control">
                     </div>
                 </div>
             </div>
 
             <div class="form-section">
-                <h3>Ubicación y Contacto</h3>
+                <h3>Datos Fiscales — Requeridos para ARCA</h3>
+                <p class="section-hint">Estos datos son necesarios para configurar la facturación electrónica con AFIP.</p>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="cuit">CUIT</label>
+                        <input type="text" id="cuit" name="cuit" [(ngModel)]="formData.cuit" class="form-control" placeholder="Ej: 20123456789">
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Teléfono</label>
+                        <input type="text" id="phone" name="phone" [(ngModel)]="formData.phone" class="form-control" placeholder="+54 11 1234-5678">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fiscalAddress">Dirección Fiscal</label>
+                        <input type="text" id="fiscalAddress" name="fiscalAddress" [(ngModel)]="formData.fiscalAddress" class="form-control">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Ubicación</h3>
                 <div class="form-row">
                     <div class="form-group">
                         <label for="country">País</label>
@@ -53,20 +70,6 @@
                     <div class="form-group">
                         <label for="city">Ciudad</label>
                         <input type="text" id="city" name="city" [(ngModel)]="formData.city" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label for="fiscalAddress">Dirección Fiscal</label>
-                        <input type="text" id="fiscalAddress" name="fiscalAddress" [(ngModel)]="formData.fiscalAddress" class="form-control">
-                    </div>
-                </div>
-                 <div class="form-row">
-                    <div class="form-group">
-                        <label for="companyEmail">Email de Contacto</label>
-                        <input type="email" id="companyEmail" name="companyEmail" [(ngModel)]="formData.companyEmail" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label for="phone">Teléfono</label>
-                        <input type="text" id="phone" name="phone" [(ngModel)]="formData.phone" class="form-control">
                     </div>
                 </div>
             </div>

@@ -53,9 +53,6 @@ public class Company {
 	private String city;
 
 	@Column
-	private String industry;
-
-	@Column
 	private String email;
 
 	@Column
@@ -177,7 +174,7 @@ public class Company {
 	}
 
 	public Company(String companyId, String name, String tenantSchema, Instant createdAt, String ssoCode,
-			String businessName, String cuit, String country, String province, String city, String industry,
+			String businessName, String cuit, String country, String province, String city,
 			String email, String phone, String fiscalAddress, boolean termsAccepted) {
 		this.companyId = companyId;
 		this.name = name;
@@ -189,7 +186,6 @@ public class Company {
 		this.country = sanitize(country);
 		this.province = sanitize(province);
 		this.city = sanitize(city);
-		this.industry = sanitize(industry);
 		this.email = sanitize(email);
 		this.phone = sanitize(phone);
 		this.fiscalAddress = sanitize(fiscalAddress);
@@ -247,10 +243,6 @@ public class Company {
 		return city;
 	}
 
-	public String getIndustry() {
-		return industry;
-	}
-
 	public String getEmail() {
 		return email;
 	}
@@ -289,10 +281,6 @@ public class Company {
 
 	public void setCity(String city) {
 		this.city = sanitize(city);
-	}
-
-	public void setIndustry(String industry) {
-		this.industry = sanitize(industry);
 	}
 
 	public void setEmail(String email) {

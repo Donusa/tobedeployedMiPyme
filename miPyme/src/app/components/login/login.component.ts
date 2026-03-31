@@ -129,13 +129,6 @@ export class LoginComponent implements OnInit {
   registerStep: number = 1;
 
 
-  locationQuery: string = '';
-  locationResults: any[] = [];
-  showLocationDropdown: boolean = false;
-  isSearchingLocation: boolean = false;
-  isLocationValid: boolean = false;
-  private searchTimeout: any;
-
   confirmPassword: string = '';
 
 
@@ -180,16 +173,7 @@ export class LoginComponent implements OnInit {
   registerData = {
     businessName: '',
     tradeName: '',
-    cuit: '',
     ssoCode: '',
-    location: '',
-    country: '',
-    province: '',
-    city: '',
-    industry: '',
-    companyEmail: '',
-    phone: '',
-    fiscalAddress: '',
     termsAccepted: false,
     adminName: '',
     adminEmail: '',
@@ -202,13 +186,7 @@ export class LoginComponent implements OnInit {
     password: false,
     registerBusinessName: false,
     registerTradeName: false,
-    registerCuit: false,
-    registerLocation: false,
-    registerIndustry: false,
     registerAdminName: false,
-    registerCompanyEmail: false,
-    registerPhone: false,
-    registerFiscalAddress: false,
     registerAdminEmail: false,
     registerAdminPassword: false,
     registerConfirmPassword: false
@@ -218,22 +196,16 @@ export class LoginComponent implements OnInit {
     if (this.isLoading) return true;
     if (this.isRegisterMode) {
       if (this.registerStep === 1) {
-        return !this.registerData.ssoCode || this.isGeneratingSso;
+        return !this.registerData.ssoCode || this.isGeneratingSso || !this.registerData.adminName;
       }
       if (this.registerStep === 2) {
-        return !this.isLocationValid || !this.registerData.adminName;
-      }
-      if (this.registerStep === 3) {
-        return !this.registerData.phone;
-      }
-      if (this.registerStep === 4) {
         return !this.registerData.adminEmail ||
                !this.registerData.adminPassword ||
                !this.confirmPassword ||
                (this.registerData.adminPassword !== this.confirmPassword) ||
                !this.registerData.termsAccepted;
       }
-      if (this.registerStep === 5) {
+      if (this.registerStep === 3) {
         return !this.selectedPlan;
       }
     }
@@ -359,83 +331,16 @@ export class LoginComponent implements OnInit {
     this.isForgotPasswordMode = false;
     this.errorMessage = '';
     this.isErrorVisible = false;
-    this.locationQuery = '';
-    this.locationResults = [];
-    this.showLocationDropdown = false;
-    this.isLocationValid = false;
     this.registerData = {
       businessName: '',
       tradeName: '',
-      cuit: '',
       ssoCode: '',
-      location: '',
-      country: '',
-      province: '',
-      city: '',
-      industry: '',
-      companyEmail: '',
-      phone: '',
-      fiscalAddress: '',
       termsAccepted: false,
       adminName: '',
       adminEmail: '',
       adminPassword: ''
     };
     this.selectedPlan = '';
-  }
-
-  onLocationInput() {
-    this.isLocationValid = false;
-    if (this.searchTimeout) clearTimeout(this.searchTimeout);
-
-    const query = this.registerData.location;
-
-    if (!query || query.length < 3) {
-      this.locationResults = [];
-      this.showLocationDropdown = false;
-      this.isSearchingLocation = false;
-      return;
-    }
-
-    this.searchTimeout = setTimeout(() => {
-      this.isSearchingLocation = true;
-      this.showLocationDropdown = true;
-      this.locationResults = [];
-
-      this.authService.searchLocations(query).subscribe({
-        next: (results) => {
-          this.locationResults = results;
-          this.isSearchingLocation = false;
-
-          this.showLocationDropdown = results.length > 0;
-        },
-        error: (err) => {
-          console.error('Error searching locations', err);
-          this.isSearchingLocation = false;
-          this.showLocationDropdown = false;
-        }
-      });
-    }, 500);
-  }
-
-  selectLocation(result: any) {
-    this.isLocationValid = true;
-    this.registerData.location = result.display_name;
-
-
-    if (result.address) {
-      this.registerData.country = result.address.country || '';
-      this.registerData.province = result.address.state || result.address.region || '';
-
-      this.registerData.city = result.address.city ||
-                               result.address.town ||
-                               result.address.village ||
-                               result.address.municipality ||
-                               result.address.county || '';
-    }
-
-    this.showLocationDropdown = false;
-    this.locationResults = [];
   }
 
   generateSso() {
@@ -496,18 +401,13 @@ export class LoginComponent implements OnInit {
   onNextStep() {
     if (this.registerStep === 1) {
 
-
-
-
-
        this.shakeState.registerTradeName = !this.registerData.tradeName;
-
+       this.shakeState.registerAdminName = !this.registerData.adminName;
 
        this.shakeState.registerBusinessName = false;
-       this.shakeState.registerCuit = false;
 
-       if (this.shakeState.registerTradeName) {
-         this.showError('El Nombre de Fantasía es obligatorio');
+       if (this.shakeState.registerTradeName || this.shakeState.registerAdminName) {
+         this.showError('Por favor complete los campos obligatorios');
          return;
        }
 
@@ -518,33 +418,6 @@ export class LoginComponent implements OnInit {
 
        this.registerStep++;
     } else if (this.registerStep === 2) {
-
-       this.shakeState.registerLocation = !this.registerData.location;
-       this.shakeState.registerAdminName = !this.registerData.adminName;
-
-       this.shakeState.registerIndustry = false;
-
-       if (this.shakeState.registerLocation || this.shakeState.registerAdminName) {
-         this.showError('Por favor complete los campos obligatorios');
-         return;
-       }
-
-       this.registerStep++;
-    } else if (this.registerStep === 3) {
-
-       this.shakeState.registerCompanyEmail = false;
-       this.shakeState.registerPhone = !this.registerData.phone;
-
-       this.shakeState.registerFiscalAddress = false;
-
-       if (this.shakeState.registerPhone) {
-         this.showError('Por favor complete los campos de contacto obligatorios');
-         return;
-       }
-
-
-       this.registerStep++;
-    } else if (this.registerStep === 4) {
 
        this.shakeState.registerAdminEmail = !this.registerData.adminEmail;
        this.shakeState.registerAdminPassword = !this.registerData.adminPassword;
@@ -572,7 +445,7 @@ export class LoginComponent implements OnInit {
        this.selectedPlan = 'pro';
        this.activeCarouselIndex = 1;
        this.registerStep++;
-    } else if (this.registerStep === 5) {
+    } else if (this.registerStep === 3) {
        if (!this.selectedPlan) {
           this.showError('Por favor seleccione un plan');
           return;
@@ -627,7 +500,7 @@ export class LoginComponent implements OnInit {
                   this.isLoading = false;
                   this.isRegistrationSuccess = false;
                   this.isRegisterMode = true;
-                  this.registerStep = 5;
+                  this.registerStep = 3;
                   this.showError('Tu cuenta fue creada pero no pudimos iniciar el pago. Por favor iniciá sesión y completá el pago para acceder.');
                 }
               });

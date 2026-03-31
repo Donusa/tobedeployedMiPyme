@@ -54,7 +54,6 @@ public class CompanyService {
         if (request.country() != null) company.setCountry(request.country());
         if (request.province() != null) company.setProvince(request.province());
         if (request.city() != null) company.setCity(request.city());
-        if (request.industry() != null) company.setIndustry(request.industry());
         if (request.companyEmail() != null) company.setEmail(request.companyEmail());
         if (request.phone() != null) company.setPhone(request.phone());
         if (request.fiscalAddress() != null) company.setFiscalAddress(request.fiscalAddress());
