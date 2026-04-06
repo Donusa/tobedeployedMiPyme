@@ -20,13 +20,13 @@ import org.springframework.web.filter.CorsFilter;
 public class SecurityConfig {
 
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
-	@Value("${ORIGINS_ALLOWED:http://192.168.100.4:4200,http://localhost:4200,https://px47l7q6-4200.brs.devtunnels.ms,http://px47l7q6-4200.brs.devtunnels.ms}")
+	@Value("${mipyme.cors.allowed-origins:}")
 	private final String allowedOrigins;
 	private final CorsConfigurationSource corsConfigurationSourceBean;
 
 	public SecurityConfig(
 			JwtAuthenticationFilter jwtAuthenticationFilter,
-			@Value("${mipyme.cors.allowed-origins:http://192.168.100.4:4200,http://localhost:4200,https://px47l7q6-4200.brs.devtunnels.ms,http://px47l7q6-4200.brs.devtunnels.ms}") String allowedOrigins,
+			@Value("${mipyme.cors.allowed-origins:}") String allowedOrigins,
 			CorsConfigurationSource corsConfigurationSourceBean) {
 		this.jwtAuthenticationFilter = jwtAuthenticationFilter;
 		this.allowedOrigins = allowedOrigins;

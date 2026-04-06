@@ -4,6 +4,7 @@ import { TiendaNubeService } from '../../../services/tienda-nube.service';
 import { StockService } from '../../../services/stock.service';
 import { catchError, timeout } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-tienda-nube-sync-wizard',
@@ -43,8 +44,8 @@ export class TiendaNubeSyncWizardComponent implements OnInit {
   mappingCandidates: { tnProduct: any, selectedLocalId: number | null }[] = [];
   variantMappings: { [tnProductId: number]: { [tnVariantId: number]: number } } = {};
 
-  private readonly APP_ID = '26042';
-  private readonly REDIRECT_URI = 'https://px47l7q6-4200.brs.devtunnels.ms/tiendanube';
+  private readonly APP_ID = environment.tiendaNubeAppId;
+  private readonly REDIRECT_URI = window.location.origin + environment.tiendaNubeRedirectPath;
 
   constructor(
     private route: ActivatedRoute,

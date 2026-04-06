@@ -21,7 +21,7 @@ public class JwtService {
 	private final long refreshExpirationSeconds;
 
 	public JwtService(
-			@Value("${jwt.secret:mySecretKeyForDevelopmentOnlyChange12345}") String secret,
+			@Value("${jwt.secret}") String secret,
 			@Value("${jwt.expiration-seconds:3600}") long expirationSeconds,
 			@Value("${jwt.refresh-expiration-seconds:86400}") long refreshExpirationSeconds
 	) {
