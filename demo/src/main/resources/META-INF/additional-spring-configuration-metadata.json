@@ -7,6 +7,7 @@
     {"name": "mipyme.tenant.default-schema", "type": "java.lang.String", "description": "Default schema/tenant name used when no tenant context is set."},
     {"name": "tiendanube.app-id", "type": "java.lang.String", "description": "TiendaNube application ID."},
     {"name": "tiendanube.client-secret", "type": "java.lang.String", "description": "TiendaNube client secret."},
+    {"name": "tiendanube.webhook-base-url", "type": "java.lang.String", "description": "Base URL for TiendaNube webhook callbacks."},
     {"name": "mercadolibre.app-id", "type": "java.lang.String", "description": "MercadoLibre application ID."},
     {"name": "mercadolibre.client-secret", "type": "java.lang.String", "description": "MercadoLibre client secret."},
     {"name": "mercadolibre.redirect-uri", "type": "java.lang.String", "description": "MercadoLibre OAuth redirect URI."},

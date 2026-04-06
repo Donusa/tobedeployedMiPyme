@@ -56,6 +56,9 @@ public class TiendaNubeService {
     @Value("${tiendanube.user-agent:MiPyme/1.0 (contacto@mipyme.com)}")
     private String userAgent;
 
+    @Value("${tiendanube.webhook-base-url:}")
+    private String webhookBaseUrl;
+
     private final RestTemplate restTemplate;
     private final TiendaNubeConfigRepository configRepository;
     private final CompanySchemaService companySchemaService;
@@ -198,7 +201,7 @@ public class TiendaNubeService {
     }
 
     private void registerWebhooks(Long storeId, String accessToken) {
-        String baseUrl = "https://px47l7q6-8080.brs.devtunnels.ms/api/tiendanube/webhooks";
+        String baseUrl = webhookBaseUrl + "/api/tiendanube/webhooks";
         String[] events = { "order/created", "order/updated", "order/paid", "order/packed", "order/fulfilled",
                 "order/cancelled" };
 

@@ -25,7 +25,7 @@ public class MercadoPagoWebhookController {
 
     private static final Logger logger = LoggerFactory.getLogger(MercadoPagoWebhookController.class);
 
-    @Value("${mercadopago.webhook.secret:bcf71b2a75c8de9fcacb45fa45597210b2160278b514ab5ceb165c72abf61c41}")
+    @Value("${mercadopago.webhook.secret:}")
     private String webhookSecret;
 
     private static final Pattern TS_PATTERN = Pattern.compile("ts=(\\w+)");
