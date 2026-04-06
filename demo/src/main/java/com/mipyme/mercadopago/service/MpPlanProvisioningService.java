@@ -28,7 +28,7 @@ public class MpPlanProvisioningService {
     @Value("${mercadopago.access-token:}")
     private String accessToken;
 
-    @Value("${mercadopago.back-url:http://localhost:4200/configuracion/facturacion/checkout-result}")
+    @Value("${mercadopago.back-url}")
     private String backUrl;
 
     @Value("${mercadopago.price-usd.base:10}")

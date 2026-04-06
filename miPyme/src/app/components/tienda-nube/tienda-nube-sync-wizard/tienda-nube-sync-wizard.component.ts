@@ -45,7 +45,7 @@ export class TiendaNubeSyncWizardComponent implements OnInit {
   variantMappings: { [tnProductId: number]: { [tnVariantId: number]: number } } = {};
 
   private readonly APP_ID = environment.tiendaNubeAppId;
-  private readonly REDIRECT_URI = environment.tiendaNubeRedirectUri;
+  private readonly REDIRECT_URI = window.location.origin + environment.tiendaNubeRedirectPath;
 
   constructor(
     private route: ActivatedRoute,
