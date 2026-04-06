@@ -26,15 +26,5 @@ export class AppComponent implements OnInit {
       });
       console.log('[FB SDK] Initialized successfully');
     };
-
-    if (typeof FB !== 'undefined') {
-      FB.init({
-        appId: environment.facebookAppId,
-        autoLogAppEvents: true,
-        xfbml: true,
-        version: environment.facebookSdkVersion
-      });
-      console.log('[FB SDK] Initialized successfully (sync)');
-    }
   }
 }
